@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Order View</title>
+</head>
+<body>
+    <main class="main-content">
+    <header class="header-section">
+        <div>
+            <h1>Travel Orders</h1>
+            <p>View and manage employee travel documentation.</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline">← Back to Dashboard</a>
+    </header>
+
+    <div class="split-layout">
+        <div class="left-panel">
+            <% if (preview) { 
+                const ext = preview.split('.').pop().toLowerCase();
+            %>
+                <div class="card" style="margin-bottom:0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h3>Document Preview</h3>
+                        <div style="display:flex; gap:8px;">
+                            <a href="<%= preview %>" target="_blank" class="btn btn-outline" style="padding:6px 12px; font-size:0.8rem;">Full View</a>
+                        </div>
+                    </div>
+                    <div class="preview-wrapper">
+                        <% if(ext === 'pdf') { %>
+                            <iframe src="<%= preview %>"></iframe>
+                        <% } else { %>
+                            <img src="<%= preview %>" class="preview-img" style="object-fit: contain;">
+                        <% } %>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="empty-preview">
+                    <span style="font-size:3rem; margin-bottom:1rem;">📄</span>
+                    <h3>No Document Selected</h3>
+                    <p>Select a travel order from the list to view its contents.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="right-panel">
+            <div class="card" style="padding:1rem;">
+                <form method="get" class="search-form">
+                    <input type="text" name="search" placeholder="Search TO #, name, department, or destination..." value="<%= search || '' %>">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <% if(search) { %>
+                        <a href="/travel-orders" class="btn btn-outline">Clear</a>
+                    <% } %>
+                </form>
+            </div>
+
+            <div class="card" style="padding:0; overflow:hidden;">
+                <div class="table-container">
+<% if (employee && ['hrmu', 'admin'].includes(employee.department.toLowerCase())) { %>
+                            <div style="margin-bottom:1rem;">
+                            <a href="/travel-orders/upload" class="btn btn-primary">
+                                + Upload Travel Order
+                            </a>
+                        </div>
+                    <% } %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>TO #</th>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Destination</th>
+                                <th>Departure</th>
+                                <th>Return Date</th>
+                                <th>Date Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(orders.length === 0) { %>
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:3rem 1rem; color: var(--text-muted);">
+                                        No travel records found.
+                                    </td>
+                                </tr>
+                            <% } %>
+
+                            <% orders.forEach(order => { 
+                                const isActive = (previewId === order.id) ? 'background:#eff6ff;' : '';
+                                const travelDate = order.travel_date ? new Date(order.travel_date).toLocaleDateString() : '-';
+                                const returnDate = order.return_date ? new Date(order.return_date).toLocaleDateString() : '-';
+                            %>
+                                <tr style="<%= isActive %>">
+                                    <td style="font-weight:500;"><%= order.to_no %></td>
+                                    <td style="max-width:180px; white-space:normal;">
+    <%= order.employees %>
+</td>
+
+<td style="max-width:150px; white-space:normal;">
+    <%= order.departments %>
+</td>
+                                    <td><%= order.destination %></td>
+                                    <td><%= travelDate %></td>
+                                    <td><%= returnDate %></td>
+                                    <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+
+                                   <td>
+    <div style="display:flex; gap:10px;">
+        
+        <!-- View -->
+        <a href="/travel-orders?search=<%= search %>&preview_id=<%= order.id %>" class="action-link">
+            <%= (previewId === order.id) ? 'Viewing' : 'View' %>
+        </a>
+
+        <!-- Print -->
+        <a href="/travel-orders/print/<%= order.id %>" 
+           target="_blank" 
+           class="action-link">
+            🖨 Print
+        </a>
+
+    </div>
+</td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

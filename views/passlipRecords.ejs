@@ -1,0 +1,36 @@
+<h2><%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %> Passlips</h2>
+
+<a href="/dashboard" class="btn">← Back to Dashboard</a>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-top:1rem;">
+    <thead>
+        <tr>
+            <th>Passlip No</th>
+            <th>Date</th>
+            <th>Employee Name</th>
+            <th>Employee ID</th>
+            <th>Department</th>
+            <th>Office / Agency</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if(records.length === 0){ %>
+            <tr>
+                <td colspan="7" style="text-align:center;">No records found</td>
+            </tr>
+        <% } else { %>
+            <% records.forEach(r => { %>
+                <tr>
+                    <td><%= r.passlip_no %></td>
+                    <td><%= new Date(r.pass_date).toLocaleDateString() %></td>
+                    <td><%= r.employee_name %></td>
+                    <td><%= r.employee_id %></td>
+                    <td><%= r.department %></td>
+                    <td><%= r.office_visit %></td>
+                    <td><%= r.purpose %></td>
+                </tr>
+            <% }) %>
+        <% } %>
+    </tbody>
+</table>

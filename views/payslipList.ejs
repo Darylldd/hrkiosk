@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payslip List</title>
+</head>
+<body>
+    <h2>All Payslips</h2>
+    <a href="/dashboard">⬅ Back to Dashboard</a>
+    <a href="/payslip/create"><button style="margin-left:20px;">+ Create New Payslip</button></a>
+
+    <table border="1" cellpadding="10" cellspacing="0" style="margin-top:20px; width:100%;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Month</th>
+                <th>Cutoff</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% payslips.forEach(p => { %>
+                <tr>
+                    <td><%= p.id %></td>
+                    <td><%= p.employee_name %></td>
+                    <td><%= p.month %></td>
+                    <td><%= p.cutoff === 'FIRST_HALF' ? '1st Half' : '2nd Half' %></td>
+            <td>
+
+<button class="view-btn" data-id="<%= p.id %>">View</button>
+<a href="/payslip/<%= p.id %>/print" target="_blank"><button>Print</button></a>
+<button class="email-btn" data-id="<%= p.id %>">Send Email</button>
+
+</td>
+                </tr>
+            <% }) %>
+
+        </tbody>
+    </table>
+    <div id="payslipModal" style="display:none; position:fixed; top:0; left:0; 
+width:100%; height:100%; background:rgba(0,0,0,0.6); 
+justify-content:center; align-items:center;">
+
+    <div style="background:#fff; padding:20px; width:80%; height:80%; overflow:auto; border-radius:10px;">
+        
+    <button id="closeBtn" style="float:right;">X Close</button>
+
+        <div id="payslipContent">
+            Loading...
+        </div>
+
+    </div>
+</div>
+<script nonce="<%= nonce %>">
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => openPayslip(btn.dataset.id));
+    });
+    document.querySelectorAll('.email-btn').forEach(btn => {
+        btn.addEventListener('click', () => sendEmail(btn.dataset.id));
+    });
+
+    function openPayslip(id) {
+        fetch('/payslip/' + id)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('payslipContent').innerHTML = html;
+                document.getElementById('payslipModal').style.display = 'flex';
+            });
+    }
+    function closePayslip() {
+        document.getElementById('payslipModal').style.display = 'none';
+    }
+    function sendEmail(id) {
+        if (!confirm('Send this payslip to employee email?')) return;
+        fetch('/payslip/send-email/' + id)
+            .then(res => res.text())
+            .then(msg => alert(msg));
+    }
+    document.getElementById('closeBtn').addEventListener('click', closePayslip);
+    window.addEventListener('click', e => {
+        const modal = document.getElementById('payslipModal');
+        if (e.target === modal) closePayslip();
+    });
+</script>
+</body>
+</html>

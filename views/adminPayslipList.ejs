@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payslip Records</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; background: #f4f6f8; padding: 24px; }
+  h2 { margin-bottom: 16px; color: #1a5276; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .btn-create { background: #1a5276; color: #fff; padding: 8px 18px; border-radius: 4px; text-decoration: none; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  th { background: #1a5276; color: #fff; padding: 10px 12px; text-align: left; }
+  td { padding: 9px 12px; border-bottom: 1px solid #eee; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f0f7ff; }
+  .actions a { margin-right: 8px; text-decoration: none; font-weight: bold; }
+  .view   { color: #1a5276; }
+  .print  { color: #e67e22; }
+  .email  { color: #27ae60; }
+  .delete { color: #e74c3c; }
+  .empty  { text-align: center; padding: 30px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h2>📄 Payslip Records</h2>
+  <a href="/admin/payslip/create" class="btn-create">+ Create New Payslip</a>
+   <a class="btn-cancel" href="/dashboard">Cancel</a>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Employee Name</th>
+      <th>Month</th>
+      <th>Year</th>
+      <th>Net Pay</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (!payslips || payslips.length === 0) { %>
+      <tr><td colspan="6" class="empty">No payslips found.</td></tr>
+    <% } else { %>
+      <% payslips.forEach((p, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= p.employee_name %></td>
+          <td><%= p.month %></td>
+          <td><%= p.year %></td>
+          <td>₱ <%= Number(p.net_pay || 0).toFixed(2) %></td>
+          <td class="actions">
+            <a href="/admin/payslip/<%= p.id %>/view"  class="view">View</a>
+            <a href="/admin/payslip/<%= p.id %>/print" class="print">Print</a>
+          <a href="/admin/payslip/<%= p.id %>/send-email" class="email email-link">Email</a>
+<form action="/admin/payslip/<%= p.id %>/delete" method="POST" style="display:inline;" class="delete-form">
+              <button type="submit" style="background:none;border:none;cursor:pointer;font-weight:bold;color:#e74c3c;font-size:13px;">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    <% } %>
+  </tbody>
+</table>
+<script nonce="<%= nonce %>">
+    document.querySelectorAll('.email-link').forEach(a => {
+        a.addEventListener('click', e => {
+            if (!confirm('Send email to employee?')) e.preventDefault();
+        });
+    });
+    document.querySelectorAll('.delete-form').forEach(f => {
+        f.addEventListener('submit', e => {
+            if (!confirm('Delete this payslip?')) e.preventDefault();
+        });
+    });
+</script>
+
+</body>
+</html>

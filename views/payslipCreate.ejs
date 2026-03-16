@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Input</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Input styling to fit within the table cells seamlessly */
+        .calc-input {
+            width: 90%;
+            padding: 4px 8px;
+            text-align: right;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: #1a4d80;
+            box-shadow: 0 0 3px rgba(26, 77, 128, 0.3);
+        }
+
+        /* Buttons matching the image */
+        .btn {
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-gray { background-color: #6c757d; }
+        .btn-gray:hover { background-color: #5a6268; }
+        
+        .btn-green { background-color: #28a745; }
+        .btn-green:hover { background-color: #218838; }
+        
+        .btn-blue { background-color: #007bff; }
+        .btn-blue:hover { background-color: #0069d9; }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="width: 800px; margin: 0 auto; font-family: Arial, sans-serif; padding: 40px; background-color: white; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        
+        <script nonce="<%= nonce %>">
+    const employeesData = JSON.parse('<%- JSON.stringify(employees || []) %>');
+</script>
+
+            <img src="/images/uhi.png" alt="Header Graphic" style="position: absolute; top: 0; left: 0; width: 350px; height: auto; opacity: 0.9;">
+
+        <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 25px; position: relative; z-index: 1;">
+                <img src="/images/bp.png" alt="Bagong Pilipinas" style="height: 64.6px; margin-right: 15px;">
+                <img src="/images/dabfar.png" alt="BFAR" style="height: 65px; margin-right: 25px;">
+            
+            <div style="font-size: 12px; line-height: 1.3;">
+                <strong>Republic of the Philippines</strong><br>
+                Department of Agriculture<br>
+                <strong>BUREAU OF FISHERIES AND AQUATIC RESOURCES</strong><br>
+                <span style="color: #1a4d80; font-weight: bold; font-size: 14px;">REGIONAL FISHERIES OFFICE - MIMAROPA</span><br>
+                Sapul, Calapan City 5200, Oriental Mindoro<br>
+                Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189<br>
+                <span style="font-size: 11px; color: #0000EE; text-decoration: underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; letter-spacing: 3px; font-weight: bold; color: #333;">PAYSLIP INPUT</h2>
+        </div>
+
+        <form action="/payslip/create" method="POST" id="payrollForm">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; font-size: 13px;">
+                <div style="line-height: 1.8;">
+                    <strong>Name:</strong> 
+                <select name="employee_id" id="employee_id" style="padding: 4px; font-weight: bold;" required>
+    <option value="">-- Select Employee --</option>
+
+    <% employees.forEach(emp => { 
+        const fullName = (emp.first_name || '') + ' ' + (emp.middle_name || '') + ' ' + (emp.last_name || '');
+    %>
+
+        <option 
+            value="<%= emp.id %>"
+            data-account="<%= emp.account_no || '' %>"
+        >
+            <%= fullName.toUpperCase() %>
+        </option>
+
+    <% }) %>
+
+</select>
+                    <br>
+                    <strong>Account No.:</strong> <span id="account_no_display">------</span>
+                </div>
+                
+                <div style="text-align: left;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">For the Month Of:</label>
+                    <input type="month" name="month" required style="padding: 4px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+                    
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Payroll Type:</label>
+                    <select name="cutoff" required style="padding: 4px; width: 100%; box-sizing: border-box;">
+                        <option value="">Which Half</option>
+                        <option value="FIRST_HALF">1st Half</option>
+                        <option value="SECOND_HALF">2nd Half</option>
+                    </select>
+                </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px;">
+                <thead>
+                    <tr style="text-align: center; font-weight: bold; background-color: #c0ecf8;">
+                        <td style="border: 1px solid #000; width: 25%; padding: 10px;">EARNINGS</td>
+                        <td style="border: 1px solid #000; width: 20%; padding: 10px;">Amount</td>
+                        <td style="border: 1px solid #000; width: 35%; padding: 10px;">DEDUCTIONS</td>
+                        <td style="border: 1px solid #000; width: 20%; padding: 10px;">Amount</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border-right: 1px solid #000; padding: 10px; vertical-align: top;">
+                            Basic Pay
+                        </td>
+                        <td style="border-right: 1px solid #000; padding: 10px; text-align: center; vertical-align: top;">
+                            <input type="number" step="0.01" name="basic_pay" class="calc-input earn-input" placeholder="0.00" required>
+                        </td>
+                        
+                        <td style="border-right: 1px solid #000; padding: 0;">
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">LATE/ABSENCES</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MP1)</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MP2)</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MPL)</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (Calamity Loan)</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">SSS</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PHILHEALTH</div>
+                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">TAX</div>
+                            <div style="padding: 8px 10px;">DISALLOWANCES</div>
+                        </td>
+                        
+                        <td style="border-right: 1px solid #000; padding: 10px; text-align: center; vertical-align: top;">
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="late_absences" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mp1" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mp2" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mpl" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_calamity" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="sss" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="philhealth" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="tax" class="calc-input ded-input" placeholder="0.00"></div>
+                            <div style="padding: 4px 0;"><input type="number" step="0.01" name="disallowances" class="calc-input ded-input" placeholder="0.00"></div>
+                        </td>
+                    </tr>
+
+                    <tr style="font-weight: bold; border-top: 1px solid #000;">
+                        <td style="border: 1px solid #000; padding: 10px;">Total Earnings</td>
+                        <td style="border: 1px solid #000; padding: 10px; text-align: center;" id="display_total_earnings">0.00</td>
+                        <td style="border: 1px solid #000; padding: 10px; text-align: right;">Total Deductions</td>
+                        <td style="border: 1px solid #000; padding: 10px; text-align: center;" id="display_total_deductions">0.00</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" style="border: none;"></td>
+                        <td style="border: 1px solid #000; padding: 12px 10px; text-align: right; font-weight: bold; background-color: #c0ecf8;">Net Pay</td>
+                        <td style="border: 1px solid #000; padding: 12px 10px; text-align: center; font-weight: bold; background-color: #c0ecf8; color: #0056b3;" id="display_net_pay">
+                            0.00
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="btn-container">
+                <a href="/dashboard" class="btn btn-gray">Return</a>
+                <button type="submit" class="btn btn-green">Save Payroll</button>
+            </div>
+        </form>
+
+    </div>
+<script nonce="<%= nonce %>">
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Handle Account Number Auto-Fill
+            const empSelect = document.getElementById('employee_id');
+            const accDisplay = document.getElementById('account_no_display');
+
+            empSelect.addEventListener('change', (e) => {
+                const selectedId = e.target.value;
+                const employee = employeesData.find(emp => String(emp.id) === String(selectedId));
+                
+                if (employee && employee.account_no) {
+                    accDisplay.textContent = employee.account_no;
+                } else {
+                    accDisplay.textContent = '------';
+                }
+            });
+
+            // 2. Handle Real-Time Math Calculations
+            const earnInputs = document.querySelectorAll('.earn-input');
+            const dedInputs = document.querySelectorAll('.ded-input');
+            
+            const displayEarn = document.getElementById('display_total_earnings');
+            const displayDed = document.getElementById('display_total_deductions');
+            const displayNet = document.getElementById('display_net_pay');
+
+            function calculateTotals() {
+                let totalEarn = 0;
+                let totalDed = 0;
+
+                // Sum Earnings
+                earnInputs.forEach(input => {
+                    const val = parseFloat(input.value) || 0;
+                    totalEarn += val;
+                });
+
+                // Sum Deductions
+                dedInputs.forEach(input => {
+                    const val = parseFloat(input.value) || 0;
+                    totalDed += val;
+                });
+
+                // Net Pay
+                const netPay = totalEarn - totalDed;
+
+                // Update UI formatting to 2 decimal places
+                displayEarn.textContent = totalEarn.toFixed(2);
+                displayDed.textContent = totalDed.toFixed(2);
+                displayNet.textContent = netPay.toFixed(2);
+            }
+
+            // Bind events to all calculation inputs
+            const allInputs = document.querySelectorAll('.calc-input');
+            allInputs.forEach(input => {
+                input.addEventListener('input', calculateTotals);
+            });
+        });
+    </script>
+</body>
+</html>

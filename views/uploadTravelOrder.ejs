@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Travel Order</title>
+    <style>
+        .employee-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .employee-row select, .employee-row input { flex: 1; }
+    </style>
+</head>
+<body>
+
+<h2>Upload Travel Order</h2>
+
+<% if (msg) { %>
+<p><%= msg %></p>
+<% } %>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input type="text" name="to_no" placeholder="TO Number" required>
+<label for="">Departure</label>
+<input type="date" name="travel_date" required>
+<label for="">Return Date:</label>
+<input type="date" name="return_date" placeholder="Return Date" required>
+<input type="text" name="destination" placeholder="Destination" required>
+
+<div id="employees-container">
+
+<div class="employee-row">
+
+<select name="employee_ids[]" required class="employee-select">
+<option value="">Select Employee</option>
+
+<% employees.forEach(e => { %>
+<option 
+value="<%= e.id %>" 
+data-position="<%= e.position || '' %>"
+>
+<%= e.first_name %> <%= e.last_name %> (<%= e.department || 'No Dept' %>)
+</option>
+<% }) %>
+
+</select>
+
+<input type="text" name="positions[]" placeholder="Position">
+
+<button type="button" class="add-employee-btn">+</button>
+
+</div>
+
+</div>
+
+<input type="text" name="salary_per_diem" placeholder="Salary / Per Diem">
+
+<textarea name="specific_purpose" placeholder="Specific Purpose of Travel"></textarea>
+
+<textarea name="objectives" placeholder="Objectives"></textarea>
+
+<textarea name="per_diems_allowed" placeholder="Per Diems Allowed"></textarea>
+
+<textarea name="appropriation" placeholder="Appropriation to be Charged"></textarea>
+
+<textarea name="remarks" placeholder="Remarks / Special Instructions"></textarea>
+
+<input type="text" name="office_station" placeholder="Office Station" value="<%= order.office_station || '' %>">
+
+<label>Contact Number:</label>
+<input type="text" name="contact_number" value="<%= order.contact_number || '' %>">
+
+<input type="text" name="recommending_approval" placeholder="Recommending Approval" value="<%= order.recommending_approval || '' %>">
+
+<input type="text" name="recommending_position" placeholder="Recommending Approval Position">
+
+<input type="text" name="approved_by" placeholder="Approved By">
+
+<input type="file" name="file" required>
+
+<button type="submit">Upload</button>
+
+</form>
+
+<a href="/travel-orders" class="dashboard-btn">📄 Travel Orders</a>
+
+<script nonce="<%= nonce %>">
+
+document.addEventListener("change", function(e){
+
+if(e.target.classList.contains("employee-select")){
+
+const selectedOption = e.target.options[e.target.selectedIndex];
+const position = selectedOption.getAttribute("data-position");
+
+const row = e.target.closest(".employee-row");
+const positionInput = row.querySelector('input[name="positions[]"]');
+
+positionInput.value = position || "";
+
+}
+
+});
+
+
+document.addEventListener("click", function(e){
+
+if(e.target.classList.contains("add-employee-btn")){
+
+const container = document.getElementById("employees-container");
+const row = e.target.closest(".employee-row");
+
+const newRow = row.cloneNode(true);
+
+newRow.querySelector("select").value = "";
+newRow.querySelector('input[name="positions[]"]').value = "";
+
+container.appendChild(newRow);
+
+}
+
+});
+
+</script>
+
+</body>
+</html>

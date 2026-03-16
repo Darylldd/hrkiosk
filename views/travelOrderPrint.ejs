@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#235c8e">
+    <title>Travel Order</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+        
+        :root {
+            --bfar-blue: #235c8e;
+            --bfar-light-blue: #3d8cc7;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 0;
+            background-color: #525659; 
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper-container {
+            width: 210mm;
+            height: 297mm; 
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin: 20px 0;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
+
+        .bg-top { position: absolute; top: 0; left: 0; width: 45%; max-height: 120px; object-fit: contain; object-position: top left; z-index: 1; }
+        .bg-bottom { position: absolute; bottom: 0; right: 0; width: 45%; max-height: 120px; object-fit: contain; object-position: bottom right; z-index: 1; }
+
+        .paper-content {
+            position: relative;
+            z-index: 2;
+            padding: 35px 45px 25px 45px; 
+            height: 100%; 
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column; 
+        }
+
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .header-logos-left { display: flex; gap: 15px; width: 25%; }
+        .header-logos-left img { height: 65px; object-fit: contain; }
+        .header-logos-right { width: 25%; display: flex; justify-content: flex-end; }
+        .header-logos-right img { height: 70px; object-fit: contain; }
+
+        .header-text { width: 50%; text-align: center; font-size: 10pt; line-height: 1.1; color: #222; }
+        .header-text .agency-name { color: var(--bfar-blue); font-weight: bold; font-size: 11pt; margin: 2px 0; }
+        .header-text .region-name { color: var(--bfar-light-blue); font-weight: bold; }
+        .header-text .contact-info { color: #555; }
+        .header-text .emails { color: var(--bfar-light-blue); text-decoration: underline; }
+
+        /* ── NEW: subtle hover on footer/email links for screen viewing ── */
+        .header-text .emails:hover { color: var(--bfar-blue); }
+
+        .section-title { text-align: center; font-size: 13pt; font-weight: bold; letter-spacing: 0.5px; margin: 5px 0 0 0; }
+
+        .meta-info { margin-left: auto; font-size: 10.5pt; margin-bottom: 15px; width: 250px; }
+        .meta-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .meta-row.underline span:last-child { border-bottom: 1px solid black; flex-grow: 1; margin-left: 5px; }
+
+        .form-grid { display: grid; grid-template-columns: 210px 1fr; row-gap: 6px; font-size: 10.5pt; flex-shrink: 0; }
+        .label { font-style: italic; font-weight: bold; color: #111; display: flex; align-items: flex-end; line-height: 1.1; }
+        .value { border-bottom: 1px solid #000; padding: 0 5px 1px 5px; min-height: 18px; display: flex; align-items: flex-end; white-space: pre-wrap; line-height: 1.1; }
+
+        /* ── NEW: prevent very long single words / names from blowing out the grid ── */
+        .value { overflow-wrap: break-word; word-break: break-word; }
+
+        /* ── NEW: placeholder dash for truly empty values so underline still reads as a field ── */
+        .value:empty::after { content: '\00a0'; color: transparent; }
+
+        .split-row { display: flex; align-items: flex-end; width: 100%; }
+        .split-row .value { flex: 1; }
+        .split-row .label-mid { font-style: italic; font-weight: bold; margin: 0 10px 0 20px; }
+
+        .signature-area { margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; font-size: 10.5pt; flex-shrink: 0; }
+        .sign-box-left { grid-column: 1; padding-right: 30px;  }
+        .sign-box-right { grid-column: 2; padding-left: 30px; }
+        .sign-label { margin-bottom: 30px; } 
+        .sign-name { font-weight: bold; text-transform: uppercase; }
+
+        /* ── NEW: visible signature line above the printed name ── */
+        .sign-name {
+            border-top: 1px solid #000;
+            padding-top: 4px;
+            display: inline-block;
+            min-width: 180px;
+        }
+
+        .footer-text {
+            margin-top: auto; 
+            padding-bottom: 10px; 
+            display: flex; justify-content: flex-start; gap: 100px; font-size: 10pt; z-index: 3; color: #333; position: relative; 
+        }
+        .footer-text span { display: flex; align-items: center; gap: 5px; }
+
+        /* ── NEW: print button — visible on screen, hidden on print ── */
+        .print-btn-wrap {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+        }
+        .print-btn {
+            background-color: var(--bfar-blue);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+            transition: background 0.2s;
+        }
+        .print-btn:hover { background-color: var(--bfar-light-blue); }
+
+        /* --- THE MAGIC PRINT FIX --- */
+        @media print {
+            @page { 
+                margin: 0; 
+                size: A4 portrait; 
+            }
+            html, body { 
+                padding: 0 !important; 
+                margin: 0 !important;
+                background-color: white !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                overflow: hidden !important; /* Forces death upon page 2 */
+            }
+            .paper-container { 
+                box-shadow: none !important; 
+                width: 210mm !important;
+                height: 297mm !important; 
+                border: none !important; 
+                margin: 0 !important;
+                position: relative !important; 
+                overflow: hidden !important; 
+            }
+            .bg-top { position: absolute !important; top: 0 !important; left: 0 !important; }
+            .bg-bottom { position: absolute !important; bottom: 0 !important; right: 0 !important; }
+            .paper-content { padding: 30px 40px 20px 40px !important; }
+
+            /* ── NEW: hide the print button when actually printing ── */
+            .print-btn-wrap { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-wrap" role="complementary" aria-label="Print controls">
+<button class="print-btn" id="printBtn" aria-label="Print this Travel Order">🖨️ Print</button>    </div>
+
+    <div class="paper-container" role="document" aria-label="Travel Order Document">
+        
+        <img src="/images/uhi.png" class="bg-top" alt="" role="presentation">
+        <img src="/images/uhitddd.png" class="bg-bottom" alt="" role="presentation">
+
+        <div class="paper-content">
+
+            <div class="header-section">
+                <div class="header-logos-left">
+                    <img src="/images/bp.png" alt="Bagong Pilipinas logo">
+                    <img src="/images/dabfar.png" alt="DA-BFAR logo">
+                </div>
+                <div class="header-text">
+                    Republic of the Philippines<br>
+                    Department of Agriculture<br>
+                    <div class="agency-name">Bureau of Fisheries and Aquatic Resources</div>
+                    <div class="region-name">REGIONAL FISHERIES OFFICE - MIMAROPA</div>
+                    Barangay Sapul, Calapan City 5200, Oriental Mindoro<br>
+                    <span class="contact-info">Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189</span><br>
+                    <span class="emails" style="color: blue;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
+                </div>
+                <div class="header-logos-right">
+                    <img src="/images/genderdev.png" alt="Gender and Development logo">
+                </div>
+            </div>
+
+            <div class="section-title">TRAVEL ORDER</div>
+
+            <div class="meta-info">
+                <div class="meta-row">
+                    <span>T.O Control No.:</span>
+                    <span><%= order.to_no %></span>
+                </div>
+                <div class="meta-row underline">
+                    <span>Date:</span>
+                    <span><%= new Date(order.created_at).toLocaleDateString() %></span>
+                </div>
+                <div class="meta-row" style="margin-top: 8px;">
+                    <span style="font-style: italic;">Salary per diem: </span>
+                    <span style="text-decoration: underline; margin-left: 5px;"><%= order.salary_per_diem %></span>
+                </div>
+                <% if (order.office_station) { %>
+                <div class="meta-row" style="margin-top: 5px;">
+                    <span style="font-style: italic;">Office Station: </span>
+                    <span style="text-decoration: underline; margin-left: 5px;"><%= order.office_station %></span>
+                </div>
+                <% } %>
+            </div>
+
+            <div class="form-grid">
+                
+          <div class="label" style="align-items: flex-start; padding-top: 2px;">Name/s:</div>
+<div class="value" style="align-items: flex-start; padding: 2px 5px; display: flex; flex-wrap: wrap; gap: 2px 6px; font-weight:bold; text-transform:uppercase; font-size: 9.5pt;">
+    <% employees.forEach((emp, idx) => { %>
+        <span style="white-space: nowrap;"><%= emp.full_name %><%= idx < employees.length - 1 ? ',' : '' %></span>
+    <% }) %>
+</div>
+
+
+                <div class="label" style="align-items: flex-start; padding-top: 2px;">Position/s:</div>
+                <div class="value" style="align-items: flex-start; padding: 2px 5px; display: flex; flex-wrap: wrap; gap: 2px 6px; font-size: 9.5pt;">
+                    <% employees.forEach((emp, idx) => { %>
+                        <span style="white-space: nowrap;"><%= emp.position %><%= idx < employees.length - 1 ? ',' : '' %></span>
+                    <% }) %>
+                </div>
+
+                <div class="label">Departure:</div>
+                <div class="split-row">
+                    <div class="value"><%= order.travel_date ? new Date(order.travel_date).toLocaleDateString() : '-' %></div>
+                    <div class="label-mid">Return<br>Date:</div>
+                    <div class="value"><%= order.return_date ? new Date(order.return_date).toLocaleDateString() : '-' %></div>
+                </div>
+
+                <div class="label">Destination:</div>
+                <div class="value"><%= order.destination %></div>
+
+                <div class="label" style="align-items: flex-start; padding-top: 5px;">Specific Purpose of the<br>Travel/Trip:</div>
+                <div class="value" style="align-items: flex-start; padding-top: 5px; min-height: 35px;"><%= order.specific_purpose %></div>
+
+                <div class="label">Objective/s:</div>
+                <div class="value"><%= order.objectives %></div>
+
+                <div class="label">Per Diems Allowed:</div>
+                <div class="value"><%= order.per_diems_allowed %></div>
+
+                <div class="label" style="align-items: flex-start; padding-top: 5px;">Appropriation To Which Travel<br>Should Be Charged:</div>
+                <div class="value" style="align-items: flex-start; padding-top: 5px;"><%= order.appropriation %></div>
+
+                <div class="label" style="align-items: flex-start; padding-top: 5px;">Remarks or Special<br>Instructions:</div>
+                <div class="value" style="align-items: flex-start; padding-top: 5px;"><%= order.remarks %></div>
+
+                <div class="label">Contact Number:</div>
+                <div class="value"><strong><%= order.contact_number || '' %></strong></div>
+
+            </div>
+
+            <div class="signature-area">
+                <div class="sign-box-left">
+                    <% if (order.recommending_approval) { %>
+                    <div class="sign-section">
+                        <div class="sign-label">RECOMMENDING APPROVAL:</div>
+                        <div class="sign-name"><%= order.recommending_approval %></div>
+                        <% if (order.recommending_position) { %>
+                            <div class="sign-title"><%= order.recommending_position %></div>
+                        <% } %>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="sign-box-right">
+                    <div class="sign-label">APPROVED BY:</div>
+                    <div class="sign-name"><%= order.approved_by || ''%></div>
+                    <div class="sign-title">OIC, Regional Director</div>
+                </div>
+            </div>
+
+            <div class="footer-text">
+                <span>🌐 www.mimaropa.bfar.da.gov.ph</span>
+                <span><strong style="font-family: serif; font-size: 12pt;">ⓕ</strong> BFAR Mimaropa Region</span>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+<script nonce="<%= nonce %>">
+    window.onload = function() { window.print(); };
+    document.getElementById('printBtn').addEventListener('click', function() { window.print(); });
+</script>
+</html>

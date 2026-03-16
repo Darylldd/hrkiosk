@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Select Employee – Create Gov't Payslip</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; background: #f4f6f8; padding: 30px; }
+
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.1);
+    padding: 30px 32px;
+  }
+
+  h2 {
+    color: #1a5276;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  /* Search box */
+  #searchBox {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    outline: none;
+    transition: border .2s;
+  }
+  #searchBox:focus { border-color: #1a5276; }
+
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fff;
+    outline: none;
+    transition: border .2s;
+    height: 200px;
+  }
+  select:focus { border-color: #1a5276; }
+
+  .hint { font-size: 11px; color: #aaa; margin-top: 4px; margin-bottom: 18px; }
+
+  .actions { display: flex; gap: 10px; margin-top: 20px; }
+
+  .btn-primary {
+    flex: 1;
+    background: #1a5276;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-primary:hover { background: #154360; }
+
+  .btn-cancel {
+    flex: 1;
+    background: none;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    line-height: 1.4;
+  }
+  .btn-cancel:hover { background: #f5f5f5; }
+
+  .empty { color: #aaa; font-size: 12px; padding: 10px 0; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>📑 Create Gov't Payslip</h2>
+  <p class="subtitle">Search and select the employee first.</p>
+
+  <label for="searchBox">Search Employee</label>
+  <input type="text" id="searchBox" placeholder="Type name or position…" autocomplete="off">
+
+  <label for="employeeSelect">Select Employee</label>
+  <select id="employeeSelect" size="6">
+    <% if (!employees || employees.length === 0) { %>
+      <option disabled>No employees found.</option>
+    <% } else { %>
+      <% employees.forEach(emp => { %>
+        <option value="<%= emp.id %>">
+          <%= emp.first_name %> <%= emp.middle_name || '' %> <%= emp.last_name %>
+          <% if (emp.position) { %> — <%= emp.position %><% } %>
+        </option>
+      <% }); %>
+    <% } %>
+  </select>
+  <p class="hint">Click a name to select, then press Proceed.</p>
+
+  <div class="actions">
+ <button class="btn-primary" id="proceedBtn">Proceed </button>
+    <a class="btn-cancel" href="/dashboard">Cancel</a>
+  </div>
+</div>
+
+<!-- change script -->
+<script nonce="<%= nonce %>">
+    const searchBox      = document.getElementById('searchBox');
+    const employeeSelect = document.getElementById('employeeSelect');
+
+    const allOptions = Array.from(employeeSelect.options).map(o => ({
+        value: o.value,
+        text:  o.text.trim()
+    }));
+
+    searchBox.addEventListener('input', () => {
+        const q = searchBox.value.toLowerCase().trim();
+        employeeSelect.innerHTML = '';
+        const filtered = q ? allOptions.filter(o => o.text.toLowerCase().includes(q)) : allOptions;
+        if (filtered.length === 0) {
+            const opt = document.createElement('option');
+            opt.disabled = true; opt.text = 'No results found.';
+            employeeSelect.appendChild(opt);
+        } else {
+            filtered.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.value; opt.text = o.text;
+                employeeSelect.appendChild(opt);
+            });
+        }
+    });
+
+    function proceed() {
+        const selected = employeeSelect.value;
+        if (!selected) { alert('Please select an employee first.'); return; }
+        window.location.href = '/admin/payslip/create?employee_id=' + encodeURIComponent(selected);
+    }
+
+    document.getElementById('proceedBtn').addEventListener('click', proceed);
+    employeeSelect.addEventListener('dblclick', proceed);
+</script>
+
+</body>
+</html>

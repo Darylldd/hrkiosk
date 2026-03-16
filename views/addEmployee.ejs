@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Employee</title>
+</head>
+<body>
+
+<h1>Add New Employee</h1>
+<p>Bureau of Fisheries and Aquatic Resources · MIMAROPA Region</p>
+
+<form action="/employees/add" method="POST" enctype="multipart/form-data">
+
+  <!-- IDENTITY -->
+  <fieldset>
+    <legend>Identity &amp; Access</legend>
+
+    <label>Employee No *<br>
+      <input name="employee_no" placeholder="e.g. 2024-001" required>
+    </label><br>
+
+    <label>Employee ID<br>
+      <input name="employee_id" placeholder="System ID">
+    </label><br>
+
+    <label>Account No<br>
+      <input name="account_no" placeholder="Bank account">
+    </label><br>
+
+    <label>PIN *<br>
+      <input name="pin" type="password" placeholder="••••" required>
+    </label><br>
+
+    <label>Profile Picture<br>
+      <input type="file" name="profile_pic" accept="image/*">
+    </label><br>
+    <small>JPG, PNG or GIF · max 2 MB</small>
+  </fieldset>
+
+  <!-- PERSONAL INFORMATION -->
+  <fieldset>
+    <legend>Personal Information</legend>
+
+    <label>First Name<br>
+      <input name="first_name" placeholder="Given name">
+    </label><br>
+
+    <label>Middle Name<br>
+      <input name="middle_name" placeholder="Middle name">
+    </label><br>
+
+    <label>Last Name<br>
+      <input name="last_name" placeholder="Surname">
+    </label><br>
+
+    <label>Birthdate<br>
+      <input type="date" name="birthdate">
+    </label><br>
+
+    <label>Civil Status<br>
+      <div class="combo-wrap"
+        data-name="civil_status"
+        data-placeholder="e.g. Single"
+        data-options='["Single","Married","Widowed","Separated"]'>
+      </div>
+    </label><br>
+
+    <label>Sex<br>
+      <div class="combo-wrap"
+        data-name="sex"
+        data-placeholder="e.g. Male"
+        data-options='["Male","Female"]'>
+      </div>
+    </label>
+  </fieldset>
+
+  <!-- EMPLOYMENT -->
+  <fieldset>
+    <legend>Employment Details</legend>
+
+    <label>Department / Office<br>
+      <div class="combo-wrap"
+        data-name="department"
+        data-placeholder="Select or type department"
+        data-groups='[
+          {"label":"Office / Department","options":["Finance and Administrative Section (FAS)","HRMU","Records","Budget","Accounting","Cashier","Property Unit","General Service Unit (GSU)","Office of the Regional Director","Planning Unit (SAAD / FishCore)","Legal Unit","Regional Fisheries Information Management Unit (RFIMU)","BAC Secretariat","Fisheries Inspection and Quarantine Unit (FIQU)","Fisheries Management Regulatory and Enforcement Division (FMRED)","Fisheries Production and Support Service Division (FPSSD)","Regional Fisheries Training and Fisherfolk Coordination Division (RFTFCD)"]},
+          {"label":"PFO — Provincial Fisheries Offices","options":["Provincial Fisheries Office - Occidental Mindoro","Provincial Fisheries Office - Oriental Mindoro","Provincial Fisheries Office - Marinduque","Provincial Fisheries Office - Romblon","Provincial Fisheries Office - Northern Palawan","Provincial Fisheries Office - Southern Palawan"]},
+          {"label":"Technology Outreach Station","options":["Inland Sea-Ranching Station Puerto Palawan"]},
+          {"label":"Operating Unit","options":["Brackishwater Fisheries Research Station San Jose Uno Naujan Oriental Mindoro","Freshwater Tech Station (Barcenaga Naujan Oriental Mindoro)","Multi Species Marine Hatchery Station","Mindoro Shrimp Hatchery"]}
+        ]'>
+      </div>
+    </label><br>
+
+    <label>Position / Designation<br>
+      <div class="combo-wrap"
+        data-name="position"
+        data-placeholder="Select or type position"
+        data-options='["Director II","Administrative Officer V","Attorney II","Administrative Officer IV","Accountant I","Administrative Officer II","Legal Assistant I","Administrative Officer III","Administrative Officer I","Administrative Aide IV","Senior Fishing Regulations Officer","Veterinarian II","Fishing Regulations Officer II","Fishing Regulations Officer I","Aquaculturist I","Librarian I","Training Specialist I","Aquacultural Technician I","Farm Foreman","Farm Worker II","Security Guard I","Farm Worker I","Administrative Aide I","Chief Fishing Regulations Officer","Senior Aquaculturist","Aquaculturist II","Launch Service Supervisor","Administrative Assistant III","Watchman III","Chief Aquaculturist","Biologist I","Chemist I","Laboratory Technician II","Training Center Superintendent II","Community Development Officer II","Training Specialist II","Community Development Officer I","Agricultural Center Chief II","Aquacultural Technologist"]'>
+      </div>
+    </label><br>
+
+    <label>Employment Status<br>
+      <input name="status" placeholder="ACTIVE">
+    </label><br>
+
+    <label>Nature of Employment <br>
+      <div class="combo-wrap"
+        id="nature-combo"
+        data-name="nature_of_employment"
+        data-placeholder="Select nature of employment"
+        data-options='["Permanent","Casual","JO/COS"]'>
+      </div>
+    </label><br>
+
+    <label id="date-hired-label">Date Hired<br>
+      <input type="date" name="date_hired" id="date-hired-input">
+    </label>
+  </fieldset>
+
+  <!-- GOVERNMENT IDs -->
+  <fieldset>
+    <legend>Government IDs</legend>
+
+    <label>TIN<br>
+      <input name="tin" placeholder="000-000-000">
+    </label><br>
+
+    <label>PhilHealth No.<br>
+      <input name="philhealth_no" placeholder="00-000000000-0">
+    </label><br>
+
+    <label>GSIS No.<br>
+      <input name="gsis_no" placeholder="GSIS number">
+    </label><br>
+
+    <label>SSS No.<br>
+      <input name="sss_no" placeholder="00-0000000-0">
+    </label>
+  </fieldset>
+
+  <!-- CONTACT -->
+  <fieldset>
+    <legend>Contact Information</legend>
+
+    <label>Email Address<br>
+      <input type="email" name="email" placeholder="name@bfar.da.gov.ph">
+    </label><br>
+
+    <label>Contact No.<br>
+      <input name="contact_no" placeholder="+63 9XX XXX XXXX">
+    </label><br>
+
+    <label>Emergency Contact Name<br>
+      <input name="emergency_contact_name" placeholder="Full name">
+    </label><br>
+
+    <label>Emergency Contact Phone<br>
+      <input name="emergency_contact_phone" placeholder="+63 9XX XXX XXXX">
+    </label>
+  </fieldset>
+
+  <br>
+  <a href="/dashboard">Back to Dashboard</a>
+  &nbsp;
+  <button type="submit">Save Employee</button>
+
+</form>
+
+<script>
+(function() {
+  const DATE_LABEL_MAP = {
+    'permanent': 'Date of Original Appointment',
+    'casual':    'Date of Appointment',
+    'jo/cos':    'Date Hired'
+  };
+
+ function updateDateLabel(natureValue) {
+  const label = document.getElementById('date-hired-label');
+  const input = document.getElementById('date-hired-input');
+  if (!label || !input) return;
+
+  const key = (natureValue || '').toLowerCase();
+  const text = DATE_LABEL_MAP[key] || 'Date Hired';
+
+  label.innerHTML = text + '<br>';
+  label.appendChild(input);
+}
+
+  function buildCombo(wrap) {
+    const name        = wrap.dataset.name        || '';
+    const placeholder = wrap.dataset.placeholder || '';
+    const rawOptions  = wrap.dataset.options  ? JSON.parse(wrap.dataset.options)  : null;
+    const rawGroups   = wrap.dataset.groups   ? JSON.parse(wrap.dataset.groups)   : null;
+    const isNature    = (name === 'nature_of_employment');
+
+    const hidden = Object.assign(document.createElement('input'), { type: 'hidden', name });
+    wrap.appendChild(hidden);
+
+    const input = Object.assign(document.createElement('input'), {
+      type: 'text', placeholder, autocomplete: 'off'
+    });
+    wrap.appendChild(input);
+
+    const dd = document.createElement('select');
+    dd.size = 5;
+    dd.style.display = 'none';
+    dd.style.display = 'none';
+    wrap.appendChild(dd);
+
+    // Use a plain <select> for the dropdown list
+    function render(query) {
+      dd.innerHTML = '';
+      const q = query.trim().toLowerCase();
+
+      function makeOpt(label) {
+        const o = document.createElement('option');
+        o.textContent = label;
+        o.value = label;
+        dd.appendChild(o);
+      }
+
+      if (rawGroups) {
+        rawGroups.forEach(g => {
+          const matched = g.options.filter(o => !q || o.toLowerCase().includes(q));
+          if (!matched.length) return;
+          const og = document.createElement('optgroup');
+          og.label = g.label;
+          matched.forEach(l => {
+            const o = document.createElement('option');
+            o.textContent = l; o.value = l;
+            og.appendChild(o);
+          });
+          dd.appendChild(og);
+        });
+      } else if (rawOptions) {
+        rawOptions.filter(o => !q || o.toLowerCase().includes(q)).forEach(makeOpt);
+      }
+
+      dd.style.display = dd.options.length ? 'block' : 'none';
+    }
+
+    function pick(val) {
+      input.value  = val;
+      hidden.value = val;
+      dd.style.display = 'none';
+      input.focus();
+      if (isNature) updateDateLabel(val);
+    }
+
+    input.addEventListener('focus', () => render(input.value));
+    input.addEventListener('input', () => {
+      hidden.value = input.value;
+      render(input.value);
+      if (isNature) updateDateLabel(input.value);
+    });
+    input.addEventListener('blur', () => setTimeout(() => { dd.style.display = 'none'; }, 150));
+dd.addEventListener('change', () => {
+  pick(dd.value);
+});
+  }
+
+  document.querySelectorAll('.combo-wrap').forEach(buildCombo);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<h2>Employee List</h2>
+<a href="/dashboard"><button>Back to Dashboard</button></a>
+<a href="/employees/add"><button>Add Employee</button></a>
+<%
+function formatDate(date){
+    if(!date) return "N/A";
+    const d = new Date(date);
+    return d.toLocaleDateString('en-PH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+%>
+<table border="1" cellpadding="6">
+ <tr>
+    <th>Emp No</th>
+    <th>Full Name</th>
+    <th>Office/Dept</th>
+    <th>Status</th>
+    <th>Hired</th>
+    <th>Contact</th>
+    <th>Email</th>
+    <th>Action</th>
+</tr>
+ <% employees.forEach(emp => { %>
+<tr>
+    <td><%= emp.employee_no %></td>
+
+    <td>
+        <%= emp.first_name %>
+        <%= emp.middle_name ? emp.middle_name.charAt(0) + '.' : '' %>
+        <%= emp.last_name %>
+    </td>
+
+    <td><%= emp.department %></td>
+
+    <td><%= emp.status %></td>
+
+    <td>
+        <%= formatDate(
+            emp.date_of_original_appointment ||
+            emp.date_of_appointment ||
+            emp.date_hired
+        ) %>
+    </td>
+
+    <td><%= emp.contact_no %></td>
+
+    <td><%= emp.email %></td>
+
+    <td>
+        <button class="view-btn" data-id="<%= emp.id %>">View</button>
+    </td>
+</tr>
+<% }) %>
+</table>
+
+<!-- Modal -->
+<div id="employeeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+    <div style="background:white; width:600px; margin:50px auto; padding:20px; position:relative;">
+        <span id="closeModal" style="position:absolute; top:10px; right:15px; cursor:pointer;">&times;</span>
+        <h3>Employee Details</h3>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<script nonce="<%= nonce %>">
+    function formatDate(date) {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleDateString('en-PH', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+    const modal = document.getElementById('employeeModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+
+            // Fetch employee details from server
+            const res = await fetch(`/employees/${id}/view`);
+            const data = await res.json();
+
+            modalContent.innerHTML = `
+                <p><strong>Name:</strong> ${data.first_name} ${data.middle_name} ${data.last_name}</p>
+                <p><strong>Employee No:</strong> ${data.employee_no}</p>
+                <p><strong>Employee ID:</strong> ${data.employee_id}</p>
+                <p><strong>Account No:</strong> ${data.account_no}</p>
+                <p><strong>Department:</strong> ${data.department}</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+           <p><strong>Date Hired:</strong> ${
+    formatDate(
+        data.date_of_original_appointment ||
+        data.date_of_appointment ||
+        data.date_hired
+    )
+}</p>
+
+<p><strong>Birthdate:</strong> ${formatDate(data.birthdate)}</p>
+                <p><strong>Civil Status:</strong> ${data.civil_status}</p>
+                <p><strong>Sex:</strong> ${data.sex}</p>
+                <p><strong>TIN:</strong> ${data.tin}</p>
+                <p><strong>PhilHealth:</strong> ${data.philhealth_no}</p>
+                <p><strong>GSIS:</strong> ${data.gsis_no}</p>
+                <p><strong>SSS:</strong> ${data.sss_no}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Contact:</strong> ${data.contact_no}</p>
+                <p><strong>Emergency Contact:</strong> ${data.emergency_contact_name} (${data.emergency_contact_phone})</p>
+            `;
+
+            modal.style.display = 'block';
+        });
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if(e.target == modal){
+            modal.style.display = 'none';
+        }
+    });
+</script>

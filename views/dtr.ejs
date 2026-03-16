@@ -1,0 +1,43 @@
+<h2>Your Daily Time Records</h2>
+
+<!-- Smart Clock-in / Clock-out Buttons -->
+<% if (!todayRecord || !todayRecord.time_in) { %>
+    <form action="/dtr/clockin" method="POST" style="display:inline;">
+        <button type="submit">Time In</button>
+    </form>
+<% } else if (todayRecord.time_in && !todayRecord.time_out) { %>
+    <form action="/dtr/clockout" method="POST" style="display:inline;">
+        <button type="submit">Time Out</button>
+    </form>
+<% } else { %>
+    <p>You have already clocked out today ✅</p>
+<% } %>
+
+<!-- Show Hours -->
+<p>Hours Worked Today: <%= todayHours %> hrs</p>
+<p>Total Hours This Week: <%= weekHours %> hrs</p>
+
+<!-- DTR Table -->
+<table border="1" style="margin-top: 20px;">
+    <tr>
+        <th>Date</th>
+        <th>Time In</th>
+        <th>Time Out</th>
+        <th>Hours Worked</th>
+    </tr>
+    <% records.forEach(record => { 
+        let hours = '-';
+        if(record.time_in && record.time_out) {
+            hours = ((new Date(record.time_out) - new Date(record.time_in))/1000/3600).toFixed(2);
+        }
+    %>
+    <tr>
+        <td><%= record.date.toISOString().split('T')[0] %></td>
+        <td><%= record.time_in ? record.time_in.toLocaleTimeString() : '-' %></td>
+        <td><%= record.time_out ? record.time_out.toLocaleTimeString() : '-' %></td>
+        <td><%= hours %></td>
+    </tr>
+    <% }) %>
+</table>
+
+<a href="/dashboard" style="display:block; margin-top:20px;">Back to Dashboard</a>

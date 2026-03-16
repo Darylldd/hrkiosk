@@ -1,0 +1,104 @@
+<h2>All Employees DTR</h2>
+
+<p>Logged in as:
+    <strong><%= employee.first_name %> <%= employee.last_name %> (<%= employee.department %>)</strong>
+</p>
+
+<!-- ── Filter Bar ─────────────────────────────────────────── -->
+<form method="GET" style="
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    background: #f4f6f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+">
+    <span style="font-weight: bold; color: #333;">🗓 Filter by:</span>
+
+    <!-- Year -->
+    <label for="year">Year:</label>
+    <select name="year" id="year" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
+        <option value="<%= currentYear %>"     <%= selectedYear === currentYear     ? 'selected' : '' %>><%= currentYear %> (This Year)</option>
+        <option value="<%= currentYear - 1 %>" <%= selectedYear === currentYear - 1 ? 'selected' : '' %>><%= currentYear - 1 %> (Last Year)</option>
+    </select>
+
+    <!-- Month -->
+    <label for="month">Month:</label>
+    <select name="month" id="month" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
+        <option value="0"  <%= selectedMonth === '0'  ? 'selected' : '' %>>All Months</option>
+        <option value="1"  <%= selectedMonth === '1'  ? 'selected' : '' %>>January</option>
+        <option value="2"  <%= selectedMonth === '2'  ? 'selected' : '' %>>February</option>
+        <option value="3"  <%= selectedMonth === '3'  ? 'selected' : '' %>>March</option>
+        <option value="4"  <%= selectedMonth === '4'  ? 'selected' : '' %>>April</option>
+        <option value="5"  <%= selectedMonth === '5'  ? 'selected' : '' %>>May</option>
+        <option value="6"  <%= selectedMonth === '6'  ? 'selected' : '' %>>June</option>
+        <option value="7"  <%= selectedMonth === '7'  ? 'selected' : '' %>>July</option>
+        <option value="8"  <%= selectedMonth === '8'  ? 'selected' : '' %>>August</option>
+        <option value="9"  <%= selectedMonth === '9'  ? 'selected' : '' %>>September</option>
+        <option value="10" <%= selectedMonth === '10' ? 'selected' : '' %>>October</option>
+        <option value="11" <%= selectedMonth === '11' ? 'selected' : '' %>>November</option>
+        <option value="12" <%= selectedMonth === '12' ? 'selected' : '' %>>December</option>
+    </select>
+
+    <button type="submit" style="
+        padding: 6px 16px;
+        background: #2c75b6;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    ">Apply</button>
+</form>
+
+<!-- ── Results heading ────────────────────────────────────── -->
+<h3 style="color: #555; font-size: 14px; margin-bottom: 16px;">
+    Showing: 
+    <strong>
+        <%= selectedMonth === '0' ? 'All Months' : new Date(2000, parseInt(selectedMonth)-1).toLocaleString('default',{month:'long'}) %>
+        <%= selectedYear %>
+    </strong>
+</h3>
+
+<% if(users.length === 0){ %>
+    <p>No records found.</p>
+<% } %>
+
+<% users.forEach(user => { %>
+    <h3>
+        <%= user.name %> - <%= user.email %> (<%= user.department %>)
+    </h3>
+
+    <table border="1" style="margin-bottom:20px;">
+        <tr>
+            <th>Date</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Hours Worked</th>
+        </tr>
+
+        <%
+        let totalHours = 0;
+        user.records.forEach(record => {
+            if(record.hours !== '-') totalHours += parseFloat(record.hours);
+        %>
+        <tr>
+            <td><%= record.date.toISOString().split('T')[0] %></td>
+            <td><%= record.time_in  ? new Date(record.time_in).toLocaleTimeString()  : '-' %></td>
+            <td><%= record.time_out ? new Date(record.time_out).toLocaleTimeString() : '-' %></td>
+            <td><%= record.hours %></td>
+        </tr>
+        <% }) %>
+
+        <tr>
+            <td colspan="3"><strong>Total Hours</strong></td>
+            <td><strong><%= totalHours.toFixed(2) %> hrs</strong></td>
+        </tr>
+    </table>
+<% }) %>
+
+<a href="/dashboard">Back to Dashboard</a>

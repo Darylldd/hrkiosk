@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<style>
+  /* ── Modal overlay ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  .modal-box {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    min-width: 340px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .modal-box h3 {
+    margin-bottom: 1.2rem;
+    font-size: 17px;
+    color: #1a5276;
+  }
+
+  /* ── Payslip type cards ── */
+  .payslip-type-grid {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .type-card {
+    border: 2px solid #d0dce8;
+    border-radius: 8px;
+    padding: 14px 18px;
+    width: 140px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #1a5276;
+    font-weight: bold;
+    font-size: 13px;
+    transition: all .2s;
+    display: block;
+  }
+  .type-card:hover {
+    background: #1a5276;
+    color: #fff;
+    border-color: #1a5276;
+  }
+  .type-card .card-icon { font-size: 26px; display: block; margin-bottom: 6px; }
+  .type-card .card-label { display: block; font-size: 12px; margin-top: 4px; color: inherit; font-weight: normal; }
+
+  hr.modal-divider { border: none; border-top: 1px solid #eee; margin: 1rem 0; }
+
+  .btn-cancel {
+    margin-top: 6px;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 7px 22px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+  }
+  .btn-cancel:hover { background: #f5f5f5; }
+</style>
+</head>
+<body>
+
+<h2>Dashboard</h2>
+<h3>Welcome <%= employee.first_name %> <%= employee.last_name %> (<%= employee.department %>)</h3>
+
+<a href="/dtr"><button>Go to Daily Time Record (DTR)</button></a>
+
+<% if(
+employee.department === 'HR' ||
+employee.department === 'HRMU' ||
+employee.department === 'Finance and Administrative Section (FAS)' ||
+employee.department === 'admin'
+) { %>
+
+<a href="/admin/dtr">
+  <button>View All Employees DTR</button>
+</a>
+
+<% } %>
+
+<% if(employee.role === 'hr') { %>
+  <button id="profileBtn">Profile</button>
+<% } else { %>
+  <a href="/profile"><button>View My Profile</button></a>
+<% } %>
+
+<a href="/travel-orders" class="dashboard-btn">📄 Travel Orders</a>
+<button id="passlipBtn">📝 Submit Passlip</button>
+
+<% if(employee.role === 'hr') { %>
+  <button id="payslipBtn">Manage Payslips</button>
+<% } else { %>
+  <a href="/payslip/my"><button>View My Payslip</button></a>
+<% } %>
+
+<a href="/logout">Logout</a>
+
+
+<!-- ══════════════════════════════════════════
+     PASSLIP MODAL
+══════════════════════════════════════════ -->
+<div id="passlipModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Select Passlip Type</h3>
+    <a href="/passlip/form?type=regular"><button>Regular Employee</button></a>
+    <a href="/passlip/form?type=jocos"><button>JO &amp; COS</button></a>
+    <br><br>
+    <button class="btn-cancel" id="closeModal">Cancel</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAYSLIP MODAL  (two tabs: Create / List)
+══════════════════════════════════════════ -->
+<div id="payslipModalDashboard" class="modal-overlay">
+  <div class="modal-box" style="min-width:420px;">
+    <h3>Payslip Actions</h3>
+
+    <!-- ── Tab switcher ── -->
+    <div style="display:flex; border-bottom:2px solid #d0dce8; margin-bottom:16px;">
+      <button class="tab-btn active" data-tab="createTab"
+        style="flex:1; padding:9px; border:none; background:none; font-weight:bold; font-size:13px; cursor:pointer; color:#1a5276; border-bottom:3px solid #1a5276;">
+        ➕ Create Payslip
+      </button>
+      <button class="tab-btn" data-tab="listTab"
+        style="flex:1; padding:9px; border:none; background:none; font-weight:bold; font-size:13px; cursor:pointer; color:#888; border-bottom:3px solid transparent;">
+        📋 View / List
+      </button>
+    </div>
+
+    <!-- ── CREATE tab ── -->
+    <div id="createTab" class="tab-pane">
+      <p style="font-size:12px; color:#666; margin-bottom:14px;">Which payslip type do you want to create?</p>
+      <div class="payslip-type-grid">
+
+        <a href="/payslip/create" class="type-card">
+          <span class="card-icon">🧾</span>
+          Standard Payslip
+          <span class="card-label">Basic pay, deductions, net pay</span>
+        </a>
+
+        <a href="/admin/payslip/create" class="type-card">
+          <span class="card-icon">📑</span>
+          Gov't Payslip
+          <span class="card-label">GSIS, PERA, periods & more</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── LIST tab ── -->
+    <div id="listTab" class="tab-pane" style="display:none;">
+      <p style="font-size:12px; color:#666; margin-bottom:14px;">Which records do you want to view?</p>
+      <div class="payslip-type-grid">
+
+        <a href="/payslip/list" class="type-card">
+          <span class="card-icon">🗂️</span>
+          Standard Records
+          <span class="card-label">View all standard payslips</span>
+        </a>
+
+        <a href="/admin/payslip/list" class="type-card">
+          <span class="card-icon">📂</span>
+          Gov't Records
+          <span class="card-label">View all gov't payslips</span>
+        </a>
+
+      </div>
+    </div>
+
+    <hr class="modal-divider">
+    <button class="btn-cancel" id="closePayslipModalDashboard">Cancel</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PROFILE MODAL
+══════════════════════════════════════════ -->
+<div id="profileModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Profile Actions</h3>
+    <a href="/profile"><button>View My Profile</button></a>
+
+    <% if(employee.role === 'hr') { %>
+      <hr class="modal-divider">
+      <a href="/employees"><button>Employee List</button></a>
+      <a href="/employees/add"><button>Add New Employee</button></a>
+    <% } %>
+
+    <br><br>
+    <button class="btn-cancel" id="closeProfileModal">Cancel</button>
+  </div>
+</div>
+
+
+<script nonce="<%= nonce %>">
+// ── Generic modal helpers ──────────────────────────────────
+function openModal(el)  { el.style.display = 'flex'; }
+function closeModal(el) { el.style.display = 'none'; }
+
+// Click outside to close
+window.addEventListener('click', e => {
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    if (e.target === m) closeModal(m);
+  });
+});
+
+// ── Passlip modal ──────────────────────────────────────────
+document.getElementById('passlipBtn') .addEventListener('click', () => openModal(document.getElementById('passlipModal')));
+document.getElementById('closeModal') .addEventListener('click', () => closeModal(document.getElementById('passlipModal')));
+
+// ── Payslip modal ──────────────────────────────────────────
+const payslipModal = document.getElementById('payslipModalDashboard');
+
+document.getElementById('payslipBtn')
+  ?.addEventListener('click', () => openModal(payslipModal));
+
+document.getElementById('closePayslipModalDashboard')
+  .addEventListener('click', () => closeModal(payslipModal));
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // update active styles
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.style.color = '#888';
+      b.style.borderBottom = '3px solid transparent';
+    });
+    btn.style.color = '#1a5276';
+    btn.style.borderBottom = '3px solid #1a5276';
+
+    // show correct pane
+    document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+    document.getElementById(btn.dataset.tab).style.display = 'block';
+  });
+});
+
+// ── Profile modal ──────────────────────────────────────────
+document.getElementById('profileBtn')
+  ?.addEventListener('click', () => openModal(document.getElementById('profileModal')));
+
+document.getElementById('closeProfileModal')
+  .addEventListener('click', () => closeModal(document.getElementById('profileModal')));
+</script>
+
+</body>
+</html>

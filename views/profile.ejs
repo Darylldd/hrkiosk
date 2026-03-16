@@ -1,0 +1,88 @@
+<% if (msg) { %>
+<script>
+alert("<%= msg %>")
+</script>
+<% } %>
+
+<% if (error) { %>
+<script>
+alert("<%= error %>")
+</script>
+<% } %>
+
+<h2>Your Profile</h2>
+
+<form action="/profile" method="POST" enctype="multipart/form-data">
+
+<h3>Personal Information</h3>
+
+<label>First Name</label><br>
+<input type="text" name="first_name" value="<%= employee.first_name || '' %>" required><br><br>
+
+<label>Middle Name</label><br>
+<input type="text" name="middle_name" value="<%= employee.middle_name || '' %>"><br><br>
+
+<label>Last Name</label><br>
+<input type="text" name="last_name" value="<%= employee.last_name || '' %>" required><br><br>
+
+<label>Employee ID</label><br>
+<input type="text" name="employee_id" value="<%= employee.employee_id || '' %>"><br><br>
+
+<label>Department</label><br>
+<input type="text" name="department" value="<%= employee.department || '' %>"><br><br>
+
+<label>Position</label><br>
+<input type="text" name="position" value="<%= employee.position || '' %>"><br><br>
+
+
+<h3>Contact Information</h3>
+
+<label>Email</label><br>
+<input type="email" name="email" value="<%= employee.email || '' %>"><br><br>
+
+<label>Contact Number</label><br>
+<input type="text" name="contact_no" value="<%= employee.contact_no || '' %>"><br><br>
+
+<label>Account Number</label><br>
+<input type="text" name="account_no" value="<%= employee.account_no || '' %>"><br><br>
+
+
+<h3>Government Details</h3>
+
+<label>TIN</label><br>
+<input type="text" name="tin" value="<%= employee.tin || '' %>"><br><br>
+
+<label>PhilHealth No</label><br>
+<input type="text" name="philhealth_no" value="<%= employee.philhealth_no || '' %>"><br><br>
+
+<label>GSIS No</label><br>
+<input type="text" name="gsis_no" value="<%= employee.gsis_no || '' %>"><br><br>
+
+<label>SSS No</label><br>
+<input type="text" name="sss_no" value="<%= employee.sss_no || '' %>"><br><br>
+
+
+<h3>Emergency Contact</h3>
+
+<label>Contact Name</label><br>
+<input type="text" name="emergency_contact_name" value="<%= employee.emergency_contact_name || '' %>"><br><br>
+
+<label>Contact Phone</label><br>
+<input type="text" name="emergency_contact_phone" value="<%= employee.emergency_contact_phone || '' %>"><br><br>
+
+
+<h3>Profile Picture</h3>
+
+<% if(employee.profile_pic){ %>
+<img src="<%= employee.profile_pic %>" width="120" style="margin-bottom:10px;">
+<% } %>
+
+<input type="file" name="profile_pic" accept="image/*"><br><br>
+
+
+<button type="submit">Update Profile</button>
+
+</form>
+
+<br>
+<a href="/dashboard">Back to Dashboard</a>
