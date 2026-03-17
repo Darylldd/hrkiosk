@@ -1,81 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-<meta charset="UTF-8">
-<title>Payslip Records</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; background: #f4f6f8; padding: 24px; }
-  h2 { margin-bottom: 16px; color: #1a5276; }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .btn-create { background: #1a5276; color: #fff; padding: 8px 18px; border-radius: 4px; text-decoration: none; font-weight: bold; }
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-  th { background: #1a5276; color: #fff; padding: 10px 12px; text-align: left; }
-  td { padding: 9px 12px; border-bottom: 1px solid #eee; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f0f7ff; }
-  .actions a { margin-right: 8px; text-decoration: none; font-weight: bold; }
-  .view   { color: #1a5276; }
-  .print  { color: #e67e22; }
-  .email  { color: #27ae60; }
-  .delete { color: #e74c3c; }
-  .empty  { text-align: center; padding: 30px; color: #999; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gov't Payslip Records</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes modal-in { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .page-in   { animation: fade-in  0.35s ease forwards; }
+    .modal-anim{ animation: modal-in 0.25s ease forwards; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<div class="top-bar">
-  <h2>📄 Payslip Records</h2>
-  <a href="/admin/payslip/create" class="btn-create">+ Create New Payslip</a>
-   <a class="btn-cancel" href="/dashboard">Cancel</a>
-</div>
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <a href="/admin/payslip/create"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500 text-white shadow-sm hover:shadow transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span class="hidden sm:inline">New Payslip</span>
+        </a>
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Employee Name</th>
-      <th>Month</th>
-      <th>Year</th>
-      <th>Net Pay</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% if (!payslips || payslips.length === 0) { %>
-      <tr><td colspan="6" class="empty">No payslips found.</td></tr>
-    <% } else { %>
-      <% payslips.forEach((p, i) => { %>
-        <tr>
-          <td><%= i + 1 %></td>
-          <td><%= p.employee_name %></td>
-          <td><%= p.month %></td>
-          <td><%= p.year %></td>
-          <td>₱ <%= Number(p.net_pay || 0).toFixed(2) %></td>
-          <td class="actions">
-            <a href="/admin/payslip/<%= p.id %>/view"  class="view">View</a>
-            <a href="/admin/payslip/<%= p.id %>/print" class="print">Print</a>
-          <a href="/admin/payslip/<%= p.id %>/send-email" class="email email-link">Email</a>
-<form action="/admin/payslip/<%= p.id %>/delete" method="POST" style="display:inline;" class="delete-form">
-              <button type="submit" style="background:none;border:none;cursor:pointer;font-weight:bold;color:#e74c3c;font-size:13px;">Delete</button>
-            </form>
-          </td>
-        </tr>
-      <% }); %>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Gov't Payslip Records</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Government payslips with GSIS, PERA, and period deductions</p>
+    </div>
+
+    <!-- Flash alerts -->
+    <% if (locals.flash_success) { %>
+      <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-sm font-medium"><%= flash_success %></span>
+      </div>
     <% } %>
-  </tbody>
-</table>
-<script nonce="<%= nonce %>">
-    document.querySelectorAll('.email-link').forEach(a => {
-        a.addEventListener('click', e => {
-            if (!confirm('Send email to employee?')) e.preventDefault();
-        });
-    });
-    document.querySelectorAll('.delete-form').forEach(f => {
-        f.addEventListener('submit', e => {
-            if (!confirm('Delete this payslip?')) e.preventDefault();
-        });
-    });
-</script>
+    <% if (locals.flash_error) { %>
+      <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <span class="text-sm font-medium"><%= flash_error %></span>
+      </div>
+    <% } %>
 
+    <!-- Search -->
+    <div class="relative mb-4">
+      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
+      </span>
+      <input id="psSearch" type="text" placeholder="Search by name, month, or year..."
+        autocomplete="off"
+        class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-600
+               bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
+               placeholder-slate-400 dark:placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent shadow-sm transition" />
+      <button id="clearSearch" type="button" aria-label="Clear"
+        class="absolute inset-y-0 right-0 pr-3.5 items-center hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= payslips ? payslips.length : 0 %></span> record<%= (!payslips || payslips.length !== 1) ? 's' : '' %>
+    </p>
+
+    <!-- Table -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+              <th class="px-5 py-3 text-left font-semibold hidden sm:table-cell">#</th>
+              <th class="px-5 py-3 text-left font-semibold">Employee</th>
+              <th class="px-5 py-3 text-left font-semibold">Month</th>
+              <th class="px-5 py-3 text-left font-semibold hidden sm:table-cell">Year</th>
+              <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Net Pay</th>
+              <th class="px-5 py-3 text-right font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            <% if (!payslips || payslips.length === 0) { %>
+              <tr><td colspan="6" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">No payslips found.</td></tr>
+            <% } %>
+            <% if (payslips) { payslips.forEach((p, i) => { %>
+            <tr class="ps-row hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100"
+                data-search="<%= (p.employee_name + ' ' + p.month + ' ' + p.year).toLowerCase() %>">
+              <td class="px-5 py-3.5 text-slate-400 dark:text-slate-500 text-xs hidden sm:table-cell"><%= i + 1 %></td>
+              <td class="px-5 py-3.5 font-medium text-slate-700 dark:text-slate-200"><%= p.employee_name %></td>
+              <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300"><%= p.month %></td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden sm:table-cell"><%= p.year %></td>
+              <td class="px-5 py-3.5 hidden md:table-cell">
+                <span class="font-semibold text-navy-600 dark:text-navy-300 font-mono text-xs">
+                  ₱ <%= Number(p.net_pay || 0).toLocaleString('en-PH', {minimumFractionDigits:2}) %>
+                </span>
+              </td>
+              <td class="px-5 py-3.5 text-right">
+                <div class="inline-flex items-center gap-1.5">
+                  <a href="/admin/payslip/<%= p.id %>/view"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    View
+                  </a>
+                  <a href="/admin/payslip/<%= p.id %>/print" target="_blank"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    Print
+                  </a>
+                  <button class="email-btn inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
+                    data-id="<%= p.id %>">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Email
+                  </button>
+                  <button class="delete-btn inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
+                    data-id="<%= p.id %>" data-name="<%= p.employee_name %> — <%= p.month %> <%= p.year %>">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }); } %>
+          </tbody>
+        </table>
+      </div>
+      <div id="noResults" style="display:none;" class="px-5 py-14 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
+        <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">No payslips match your search.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete confirm modal -->
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-anim bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 w-full max-w-sm p-6">
+      <h3 class="font-display text-lg text-navy-700 dark:text-navy-200 mb-1">Delete Payslip</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Are you sure you want to delete:</p>
+      <p id="deleteLabel" class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-6"></p>
+      <div class="flex gap-3 justify-end">
+        <button id="deleteCancelBtn" class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">Cancel</button>
+        <form id="deleteForm" method="POST" style="display:inline;">
+          <button type="submit" class="px-5 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white shadow-sm hover:shadow transition-all duration-200">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email confirm modal -->
+  <div id="emailModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-anim bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 w-full max-w-sm p-6">
+      <h3 class="font-display text-lg text-navy-700 dark:text-navy-200 mb-2">Send Payslip</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">This will email the payslip PDF to the employee's registered address. Continue?</p>
+      <div class="flex gap-3 justify-end">
+        <button id="emailCancelBtn" class="px-4 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">Cancel</button>
+        <button id="emailConfirmBtn" class="px-5 py-2 rounded-lg text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm hover:shadow transition-all duration-200">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="emailToast" style="display:none;"
+    class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium">
+    <svg id="toastIcon" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Search
+    const psSearch  = document.getElementById('psSearch');
+    const clearBtn  = document.getElementById('clearSearch');
+    const countEl   = document.getElementById('rowCount');
+    const noResults = document.getElementById('noResults');
+    const rows      = document.querySelectorAll('.ps-row');
+    function runSearch() {
+      const q = psSearch.value.trim().toLowerCase();
+      clearBtn.classList.toggle('hidden', q === '');
+      clearBtn.classList.toggle('flex',   q !== '');
+      let shown = 0;
+      rows.forEach(r => { const m = (r.dataset.search||'').includes(q); r.style.display = m ? '' : 'none'; if(m) shown++; });
+      countEl.textContent = shown;
+      noResults.style.display = shown === 0 ? '' : 'none';
+    }
+    psSearch.addEventListener('input', runSearch);
+    clearBtn.addEventListener('click', () => { psSearch.value=''; psSearch.focus(); runSearch(); });
+
+    // Delete modal
+    const deleteModal  = document.getElementById('deleteModal');
+    const deleteForm   = document.getElementById('deleteForm');
+    const deleteLabel  = document.getElementById('deleteLabel');
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteLabel.textContent = btn.dataset.name;
+        deleteForm.action = '/admin/payslip/' + btn.dataset.id + '/delete';
+        deleteModal.classList.remove('hidden'); deleteModal.classList.add('flex');
+      });
+    });
+    document.getElementById('deleteCancelBtn').addEventListener('click', () => { deleteModal.classList.add('hidden'); deleteModal.classList.remove('flex'); });
+    deleteModal.addEventListener('click', e => { if(e.target===deleteModal){ deleteModal.classList.add('hidden'); deleteModal.classList.remove('flex'); } });
+
+    // Email modal
+    const emailModal   = document.getElementById('emailModal');
+    const emailConfirm = document.getElementById('emailConfirmBtn');
+    const emailCancel  = document.getElementById('emailCancelBtn');
+    let pendingId = null;
+    document.querySelectorAll('.email-btn').forEach(btn => {
+      btn.addEventListener('click', () => { pendingId = btn.dataset.id; emailModal.classList.remove('hidden'); emailModal.classList.add('flex'); });
+    });
+    emailCancel.addEventListener('click', () => { emailModal.classList.add('hidden'); emailModal.classList.remove('flex'); });
+    emailConfirm.addEventListener('click', () => {
+      emailModal.classList.add('hidden'); emailModal.classList.remove('flex');
+      fetch('/admin/payslip/' + pendingId + '/send-email')
+        .then(r => r.text())
+        .then(msg => showToast(msg, true))
+        .catch(() => showToast('Email sending failed.', false));
+    });
+
+    function showToast(msg, ok) {
+      const toast = document.getElementById('emailToast');
+      const icon  = document.getElementById('toastIcon');
+      const msgEl = document.getElementById('toastMsg');
+      icon.innerHTML = ok
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>';
+      icon.className = `w-5 h-5 shrink-0 ${ok ? 'text-emerald-500' : 'text-red-500'}`;
+      msgEl.textContent = msg;
+      toast.style.display = 'flex';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      [deleteModal, emailModal].forEach(m => { m.classList.add('hidden'); m.classList.remove('flex'); });
+    });
+  </script>
 </body>
 </html>

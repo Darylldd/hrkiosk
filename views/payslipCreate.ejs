@@ -1,253 +1,293 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll Input</title>
-    <style>
-        body {
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Payslip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
 
-        /* Input styling to fit within the table cells seamlessly */
-        .calc-input {
-            width: 90%;
-            padding: 4px 8px;
-            text-align: right;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-family: inherit;
-            font-size: 13px;
-        }
+    /* ── Payroll table (isolated, print-safe) ── */
+    .pr-table * { box-sizing: border-box; }
+    .pr-table { width:100%; border-collapse:collapse; border:2px solid #000; font-size:13px; font-family:Arial,sans-serif; }
+    .pr-table td { border:1px solid #000; vertical-align:top; color:#111; background:#fff; }
+    .pr-table .bg-blue { background-color:#c0ecf8 !important; font-weight:bold; text-align:center; padding:10px; color:#000; }
+    .pr-table .row-label { padding:8px 10px; border-bottom:1px solid #eee; font-family:Arial,sans-serif; font-size:13px; color:#111; }
+    .pr-table .row-label:last-child { border-bottom:none; }
+    .pr-table .calc-input {
+      width:90%; padding:4px 8px; text-align:right;
+      border:1px solid #ccc; border-radius:3px;
+      font-family:inherit; font-size:13px; background:#fff; color:#111;
+      display:block; margin:4px auto;
+    }
+    .pr-table .calc-input:focus { outline:none; border-color:#1a4d80; box-shadow:0 0 3px rgba(26,77,128,0.3); }
+    .pr-total { font-weight:bold; padding:10px; text-align:center; font-family:Arial,sans-serif; color:#111; }
+    .pr-netpay { font-weight:bold; padding:12px 10px; text-align:center; font-family:Arial,sans-serif; color:#0056b3; background-color:#c0ecf8 !important; }
 
-        .calc-input:focus {
-            outline: none;
-            border-color: #1a4d80;
-            box-shadow: 0 0 3px rgba(26, 77, 128, 0.3);
-        }
-
-        /* Buttons matching the image */
-        .btn {
-            font-family: inherit;
-            font-weight: bold;
-            font-size: 13px;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-gray { background-color: #6c757d; }
-        .btn-gray:hover { background-color: #5a6268; }
-        
-        .btn-green { background-color: #28a745; }
-        .btn-green:hover { background-color: #218838; }
-        
-        .btn-blue { background-color: #007bff; }
-        .btn-blue:hover { background-color: #0069d9; }
-
-        .btn-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-    </style>
+    /* ── Dark mode overrides ── */
+    .dark .pr-table { border-color:#475569; }
+    .dark .pr-table td { border-color:#475569; background:#1e293b; color:#e2e8f0; }
+    .dark .pr-table .bg-blue { background-color:#1e4060 !important; color:#bfdbfe; }
+    .dark .pr-table .row-label { color:#cbd5e1; border-bottom-color:#334155; }
+    .dark .pr-table .calc-input { background:#0f172a; border-color:#475569; color:#e2e8f0; }
+    .dark .pr-table .calc-input::placeholder { color:#64748b; }
+    .dark .pr-table .calc-input:focus { border-color:#4a72a0; box-shadow:0 0 3px rgba(74,114,160,0.4); }
+    .dark .pr-total { color:#e2e8f0; }
+    .dark .pr-netpay { background-color:#1e4060 !important; color:#93c5fd; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-    <div style="width: 800px; margin: 0 auto; font-family: Arial, sans-serif; padding: 40px; background-color: white; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        
-        <script nonce="<%= nonce %>">
+  <script nonce="<%= nonce %>">
     const employeesData = JSON.parse('<%- JSON.stringify(employees || []) %>');
-</script>
+  </script>
 
-            <img src="/images/uhi.png" alt="Header Graphic" style="position: absolute; top: 0; left: 0; width: 350px; height: auto; opacity: 0.9;">
-
-        <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 25px; position: relative; z-index: 1;">
-                <img src="/images/bp.png" alt="Bagong Pilipinas" style="height: 64.6px; margin-right: 15px;">
-                <img src="/images/dabfar.png" alt="BFAR" style="height: 65px; margin-right: 25px;">
-            
-            <div style="font-size: 12px; line-height: 1.3;">
-                <strong>Republic of the Philippines</strong><br>
-                Department of Agriculture<br>
-                <strong>BUREAU OF FISHERIES AND AQUATIC RESOURCES</strong><br>
-                <span style="color: #1a4d80; font-weight: bold; font-size: 14px;">REGIONAL FISHERIES OFFICE - MIMAROPA</span><br>
-                Sapul, Calapan City 5200, Oriental Mindoro<br>
-                Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189<br>
-                <span style="font-size: 11px; color: #0000EE; text-decoration: underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
-            </div>
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
         </div>
-
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; letter-spacing: 3px; font-weight: bold; color: #333;">PAYSLIP INPUT</h2>
-        </div>
-
-        <form action="/payslip/create" method="POST" id="payrollForm">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; font-size: 13px;">
-                <div style="line-height: 1.8;">
-                    <strong>Name:</strong> 
-                <select name="employee_id" id="employee_id" style="padding: 4px; font-weight: bold;" required>
-    <option value="">-- Select Employee --</option>
-
-    <% employees.forEach(emp => { 
-        const fullName = (emp.first_name || '') + ' ' + (emp.middle_name || '') + ' ' + (emp.last_name || '');
-    %>
-
-        <option 
-            value="<%= emp.id %>"
-            data-account="<%= emp.account_no || '' %>"
-        >
-            <%= fullName.toUpperCase() %>
-        </option>
-
-    <% }) %>
-
-</select>
-                    <br>
-                    <strong>Account No.:</strong> <span id="account_no_display">------</span>
-                </div>
-                
-                <div style="text-align: left;">
-                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">For the Month Of:</label>
-                    <input type="month" name="month" required style="padding: 4px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
-                    
-                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Payroll Type:</label>
-                    <select name="cutoff" required style="padding: 4px; width: 100%; box-sizing: border-box;">
-                        <option value="">Which Half</option>
-                        <option value="FIRST_HALF">1st Half</option>
-                        <option value="SECOND_HALF">2nd Half</option>
-                    </select>
-                </div>
-            </div>
-
-            <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px;">
-                <thead>
-                    <tr style="text-align: center; font-weight: bold; background-color: #c0ecf8;">
-                        <td style="border: 1px solid #000; width: 25%; padding: 10px;">EARNINGS</td>
-                        <td style="border: 1px solid #000; width: 20%; padding: 10px;">Amount</td>
-                        <td style="border: 1px solid #000; width: 35%; padding: 10px;">DEDUCTIONS</td>
-                        <td style="border: 1px solid #000; width: 20%; padding: 10px;">Amount</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border-right: 1px solid #000; padding: 10px; vertical-align: top;">
-                            Basic Pay
-                        </td>
-                        <td style="border-right: 1px solid #000; padding: 10px; text-align: center; vertical-align: top;">
-                            <input type="number" step="0.01" name="basic_pay" class="calc-input earn-input" placeholder="0.00" required>
-                        </td>
-                        
-                        <td style="border-right: 1px solid #000; padding: 0;">
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">LATE/ABSENCES</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MP1)</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MP2)</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (MPL)</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PAG-IBIG (Calamity Loan)</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">SSS</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">PHILHEALTH</div>
-                            <div style="border-bottom: 1px solid #eee; padding: 8px 10px;">TAX</div>
-                            <div style="padding: 8px 10px;">DISALLOWANCES</div>
-                        </td>
-                        
-                        <td style="border-right: 1px solid #000; padding: 10px; text-align: center; vertical-align: top;">
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="late_absences" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mp1" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mp2" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_mpl" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="pagibig_calamity" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="sss" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="philhealth" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="border-bottom: 1px solid #eee; padding: 4px 0;"><input type="number" step="0.01" name="tax" class="calc-input ded-input" placeholder="0.00"></div>
-                            <div style="padding: 4px 0;"><input type="number" step="0.01" name="disallowances" class="calc-input ded-input" placeholder="0.00"></div>
-                        </td>
-                    </tr>
-
-                    <tr style="font-weight: bold; border-top: 1px solid #000;">
-                        <td style="border: 1px solid #000; padding: 10px;">Total Earnings</td>
-                        <td style="border: 1px solid #000; padding: 10px; text-align: center;" id="display_total_earnings">0.00</td>
-                        <td style="border: 1px solid #000; padding: 10px; text-align: right;">Total Deductions</td>
-                        <td style="border: 1px solid #000; padding: 10px; text-align: center;" id="display_total_deductions">0.00</td>
-                    </tr>
-
-                    <tr>
-                        <td colspan="2" style="border: none;"></td>
-                        <td style="border: 1px solid #000; padding: 12px 10px; text-align: right; font-weight: bold; background-color: #c0ecf8;">Net Pay</td>
-                        <td style="border: 1px solid #000; padding: 12px 10px; text-align: center; font-weight: bold; background-color: #c0ecf8; color: #0056b3;" id="display_net_pay">
-                            0.00
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="btn-container">
-                <a href="/dashboard" class="btn btn-gray">Return</a>
-                <button type="submit" class="btn btn-green">Save Payroll</button>
-            </div>
-        </form>
-
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/payslip/list" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">All Payslips</span>
+        </a>
+      </div>
     </div>
-<script nonce="<%= nonce %>">
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Handle Account Number Auto-Fill
-            const empSelect = document.getElementById('employee_id');
-            const accDisplay = document.getElementById('account_no_display');
+  </header>
 
-            empSelect.addEventListener('change', (e) => {
-                const selectedId = e.target.value;
-                const employee = employeesData.find(emp => String(emp.id) === String(selectedId));
-                
-                if (employee && employee.account_no) {
-                    accDisplay.textContent = employee.account_no;
-                } else {
-                    accDisplay.textContent = '------';
-                }
-            });
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 page-in">
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Create Payslip</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Bureau of Fisheries and Aquatic Resources · MIMAROPA Region</p>
+    </div>
 
-            // 2. Handle Real-Time Math Calculations
-            const earnInputs = document.querySelectorAll('.earn-input');
-            const dedInputs = document.querySelectorAll('.ded-input');
-            
-            const displayEarn = document.getElementById('display_total_earnings');
-            const displayDed = document.getElementById('display_total_deductions');
-            const displayNet = document.getElementById('display_net_pay');
+    <form action="/payslip/create" method="POST" id="payrollForm" class="space-y-5">
 
-            function calculateTotals() {
-                let totalEarn = 0;
-                let totalDed = 0;
+      <!-- Employee & period -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Employee &amp; Period</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-                // Sum Earnings
-                earnInputs.forEach(input => {
-                    const val = parseFloat(input.value) || 0;
-                    totalEarn += val;
-                });
+          <div class="sm:col-span-2 lg:col-span-1">
+            <label for="employee_id" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              Employee <span class="text-red-400">*</span>
+            </label>
+            <select name="employee_id" id="employee_id" required
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition">
+              <option value="">-- Select Employee --</option>
+              <% employees.forEach(emp => {
+                const fullName = (emp.first_name||'') + ' ' + (emp.middle_name||'') + ' ' + (emp.last_name||'');
+              %>
+                <option value="<%= emp.id %>" data-account="<%= emp.account_no||'' %>">
+                  <%= fullName.trim().toUpperCase() %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
 
-                // Sum Deductions
-                dedInputs.forEach(input => {
-                    const val = parseFloat(input.value) || 0;
-                    totalDed += val;
-                });
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Account No.</label>
+            <div id="account_no_display"
+              class="px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-100 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-mono">
+              ——
+            </div>
+          </div>
 
-                // Net Pay
-                const netPay = totalEarn - totalDed;
+          <div>
+            <label for="month" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              Month <span class="text-red-400">*</span>
+            </label>
+            <input type="month" name="month" id="month" required
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
 
-                // Update UI formatting to 2 decimal places
-                displayEarn.textContent = totalEarn.toFixed(2);
-                displayDed.textContent = totalDed.toFixed(2);
-                displayNet.textContent = netPay.toFixed(2);
-            }
+          <div>
+            <label for="cutoff" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              Cutoff <span class="text-red-400">*</span>
+            </label>
+            <select name="cutoff" id="cutoff" required
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition">
+              <option value="">Which Half</option>
+              <option value="FIRST_HALF">1st Half</option>
+              <option value="SECOND_HALF">2nd Half</option>
+            </select>
+          </div>
 
-            // Bind events to all calculation inputs
-            const allInputs = document.querySelectorAll('.calc-input');
-            allInputs.forEach(input => {
-                input.addEventListener('input', calculateTotals);
-            });
-        });
-    </script>
+        </div>
+      </div>
+
+      <!-- Payroll table -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Earnings &amp; Deductions</h2>
+
+        <!-- Live totals bar -->
+        <div class="grid grid-cols-3 gap-4 mb-5">
+          <div class="bg-slate-50 dark:bg-slate-900 rounded-lg px-4 py-3 border border-slate-200 dark:border-slate-700">
+            <p class="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-0.5">Total Earnings</p>
+            <p id="live_earnings" class="text-lg font-bold text-slate-700 dark:text-slate-200 font-mono">0.00</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-900 rounded-lg px-4 py-3 border border-slate-200 dark:border-slate-700">
+            <p class="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-0.5">Total Deductions</p>
+            <p id="live_deductions" class="text-lg font-bold text-slate-700 dark:text-slate-200 font-mono">0.00</p>
+          </div>
+          <div class="bg-navy-50 dark:bg-navy-900/30 rounded-lg px-4 py-3 border border-navy-200 dark:border-navy-800">
+            <p class="text-xs text-navy-400 dark:text-navy-400 uppercase tracking-wide mb-0.5">Net Pay</p>
+            <p id="live_net" class="text-lg font-bold text-navy-700 dark:text-navy-200 font-mono">0.00</p>
+          </div>
+        </div>
+
+        <!-- The payroll table — styles isolated in .pr-table -->
+        <div class="overflow-x-auto">
+          <table class="pr-table">
+            <thead>
+              <tr>
+                <td class="bg-blue" style="width:25%;">EARNINGS</td>
+                <td class="bg-blue" style="width:20%;">Amount</td>
+                <td class="bg-blue" style="width:35%;">DEDUCTIONS</td>
+                <td class="bg-blue" style="width:20%;">Amount</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:10px; vertical-align:top;">Basic Pay</td>
+                <td style="padding:10px; vertical-align:top; text-align:center;">
+                  <input type="number" step="0.01" name="basic_pay" class="calc-input earn-input" placeholder="0.00" required>
+                </td>
+                <td style="padding:0;">
+                  <div class="row-label">LATE/ABSENCES</div>
+                  <div class="row-label">PAG-IBIG (MP1)</div>
+                  <div class="row-label">PAG-IBIG (MP2)</div>
+                  <div class="row-label">PAG-IBIG (MPL)</div>
+                  <div class="row-label">PAG-IBIG (Calamity Loan)</div>
+                  <div class="row-label">SSS</div>
+                  <div class="row-label">PHILHEALTH</div>
+                  <div class="row-label">TAX</div>
+                  <div class="row-label" style="border-bottom:none;">DISALLOWANCES</div>
+                </td>
+                <td style="padding:0; vertical-align:top;">
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="late_absences"    class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="pagibig_mp1"      class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="pagibig_mp2"      class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="pagibig_mpl"      class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="pagibig_calamity" class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="sss"              class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="philhealth"       class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="border-bottom:1px solid #eee;padding:4px 0;"><input type="number" step="0.01" name="tax"              class="calc-input ded-input" placeholder="0.00"></div>
+                  <div style="padding:4px 0;"><input type="number" step="0.01" name="disallowances" class="calc-input ded-input" placeholder="0.00"></div>
+                </td>
+              </tr>
+              <tr style="border-top:2px solid #000;">
+                <td class="pr-total">Total Earnings</td>
+                <td class="pr-total" id="display_total_earnings">0.00</td>
+                <td class="pr-total" style="text-align:right;">Total Deductions</td>
+                <td class="pr-total" id="display_total_deductions">0.00</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="border:none;"></td>
+                <td class="bg-blue" style="border:1px solid #000;padding:12px 10px;text-align:right;font-weight:bold;font-family:Arial,sans-serif;">Net Pay</td>
+                <td class="pr-netpay" id="display_net_pay">0.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <a href="/payslip/list" class="px-5 py-2.5 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">
+          Cancel
+        </a>
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Save Payslip
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Account number auto-fill
+      const empSelect  = document.getElementById('employee_id');
+      const accDisplay = document.getElementById('account_no_display');
+      empSelect.addEventListener('change', e => {
+        const emp = employeesData.find(x => String(x.id) === String(e.target.value));
+        accDisplay.textContent = emp?.account_no || '——';
+      });
+
+      // Live calculation
+      const earnInputs = document.querySelectorAll('.earn-input');
+      const dedInputs  = document.querySelectorAll('.ded-input');
+
+      const dispEarn = document.getElementById('display_total_earnings');
+      const dispDed  = document.getElementById('display_total_deductions');
+      const dispNet  = document.getElementById('display_net_pay');
+      const liveEarn = document.getElementById('live_earnings');
+      const liveDed  = document.getElementById('live_deductions');
+      const liveNet  = document.getElementById('live_net');
+
+      function calc() {
+        let earn = 0, ded = 0;
+        earnInputs.forEach(i => earn += parseFloat(i.value) || 0);
+        dedInputs.forEach(i  => ded  += parseFloat(i.value) || 0);
+        const net = earn - ded;
+        const fmt = n => n.toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
+        dispEarn.textContent = fmt(earn);
+        dispDed.textContent  = fmt(ded);
+        dispNet.textContent  = fmt(net);
+        liveEarn.textContent = fmt(earn);
+        liveDed.textContent  = fmt(ded);
+        liveNet.textContent  = fmt(net);
+        liveNet.closest('p').style.color = net < 0 ? '#ef4444' : '';
+      }
+
+      document.querySelectorAll('.calc-input').forEach(i => i.addEventListener('input', calc));
+    });
+  </script>
 </body>
 </html>

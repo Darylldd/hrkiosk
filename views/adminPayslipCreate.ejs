@@ -1,407 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Gov't Payslip</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-        .payslip-container {
-            background-color: #fff;
-            width: 900px;
-            padding: 20px 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-            box-sizing: border-box;
-        }
-        .top-banner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 35%;
-            height: auto;
-            max-height: 90px;
-            z-index: 1;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            font-size: 12px;
-        }
-        .header img {
-            height: 80px;
-        }
-        .header-text {
-            flex-grow: 1;
-            line-height: 1.4;
-        }
-        .header-text h3, .header-text h4, .header-text p {
-            margin: 2px 0;
-            font-weight: bold;
-        }
-        .header-text h3 { font-size: 14px; }
-        .header-text p.subtext { font-weight: normal; font-size: 11px; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Gov't Payslip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
 
-        .payslip-title {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .payslip-title h2 { margin: 0; font-size: 20px; letter-spacing: 5px; }
+    /* ── Gov't payslip document — isolated styles ── */
+    .gps-doc * { box-sizing: border-box; }
+    .gps-doc {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .gps-doc .top-banner { position:absolute; top:0; left:0; width:35%; max-height:90px; z-index:1; }
+    .gps-doc .gps-wrap   { position:relative; overflow:hidden; background:#fff; padding:20px 40px; }
 
-        .employee-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            align-items: center;
-        }
+    .gps-doc .header { display:flex; justify-content:space-between; align-items:center; margin-top:20px; position:relative; z-index:2; font-size:12px; }
+    .gps-doc .header img { height:80px; }
+    .gps-doc .header-text { flex-grow:1; line-height:1.4; text-align:center; }
+    .gps-doc .header-text h3 { font-size:14px; font-weight:bold; margin:2px 0; }
+    .gps-doc .header-text h4, .gps-doc .header-text p { margin:2px 0; font-weight:bold; }
+    .gps-doc .header-text p.subtext { font-weight:normal; font-size:11px; }
 
-        /* ── SCREENSHOT TOUCH: tighter border style on main table ── */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th, td {
-            border: 1px solid #555;
-            padding: 6px;
-        }
-        .no-border-table th, .no-border-table td {
-            border: none;
-            padding: 4px 6px;
-        }
-        .text-right { text-align: right; }
-        .bold { font-weight: bold; }
-        .valign-top { vertical-align: top; }
+    .gps-doc .payslip-title { text-align:center; margin:20px 0; }
+    .gps-doc .payslip-title h2 { font-size:20px; letter-spacing:5px; font-weight:bold; }
 
-        .main-table > tbody > tr > td.container-cell {
-            padding: 0;
-        }
+    .gps-doc .emp-row { display:grid; grid-template-columns:1fr 1fr; border:1px solid #555; border-bottom:none; font-size:12px; font-weight:bold; }
+    .gps-doc .emp-row:last-of-type { border-bottom:1px solid #555; }
+    .gps-doc .emp-cell { padding:4px 8px; display:flex; align-items:center; gap:6px; }
+    .gps-doc .emp-cell:first-child { border-right:1px solid #555; }
+    .gps-doc .emp-cell input[type="text"] { width:180px; padding:2px 4px; border:none; border-bottom:1px solid #888; font-size:12px; outline:none; background:transparent; font-family:Arial,sans-serif; color:inherit; }
 
-        /* ── SCREENSHOT TOUCH: dashed vertical separators between columns ── */
-        .main-table > thead > tr > th {
-            border: 1px solid #555;
-            background-color: #f9f9f9;
-            font-size: 12px;
-            text-align: center;
-        }
-        .main-table > thead > tr > th:not(:last-child) {
-            border-right: 1px dashed #777;
-        }
-        .main-table > tbody > tr > td.container-cell:not(:last-child) {
-            border-right: 1px dashed #777;
-        }
+    .gps-doc table { width:100%; border-collapse:collapse; font-size:12px; }
+    .gps-doc th, .gps-doc td { border:1px solid #555; padding:6px; }
+    .gps-doc .no-border-table th, .gps-doc .no-border-table td { border:none; padding:4px 6px; }
+    .gps-doc .text-right { text-align:right; }
+    .gps-doc .bold { font-weight:bold; }
+    .gps-doc .valign-top { vertical-align:top; }
+    .gps-doc .container-cell { padding:0; }
+    .gps-doc .main-table > thead > tr > th { background:#f9f9f9; text-align:center; }
+    .gps-doc .main-table > thead > tr > th:not(:last-child) { border-right:1px dashed #777; }
+    .gps-doc .main-table > tbody > tr > td.container-cell:not(:last-child) { border-right:1px dashed #777; }
 
-        /* ── SCREENSHOT TOUCH: totals row ── */
-        .totals-row td {
-            border-top: 2px solid #333;
-            border-bottom: 1px solid #555;
-            font-weight: bold;
-            font-size: 12px;
-            padding: 5px 8px;
-            background-color: #fafafa;
-        }
-        .totals-row td:not(:last-child) {
-            border-right: 1px dashed #777;
-        }
-        .totals-val {
-            display: inline-block;
-            border-bottom: 2px solid #333;
-            min-width: 80px;
-            text-align: right;
-            padding: 0 3px;
-        }
+    .gps-doc .deduction-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 15px; padding:8px; }
+    .gps-doc .deduction-item { display:flex; justify-content:space-between; align-items:center; font-size:11px; }
+    .gps-doc .deduction-item span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:5px; }
 
-        /* Form Specific Styles */
-        .input-field {
-            width: 80px;
-            padding: 3px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 11px;
-            text-align: right;
-        }
-        .input-field-text {
-            width: 150px;
-            padding: 3px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 11px;
-        }
-        .input-field:focus, .input-field-text:focus, .select-field:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-        .select-field {
-            padding: 4px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
+    .gps-doc .input-field {
+      width:80px; padding:3px; border:1px solid #ccc; border-radius:3px;
+      font-size:11px; text-align:right; font-family:Arial,sans-serif; color:#111; background:#fff;
+    }
+    .gps-doc .input-field-text {
+      flex:1; min-width:0; padding:3px; border:1px solid #ccc; border-radius:3px;
+      font-size:11px; font-family:Arial,sans-serif; color:#111; background:#fff;
+    }
+    .gps-doc .select-field { padding:4px; font-size:14px; border:1px solid #ccc; border-radius:3px; font-family:Arial,sans-serif; color:#111; background:#fff; }
+    .gps-doc .input-field:focus, .gps-doc .input-field-text:focus, .gps-doc .select-field:focus { outline:none; border-color:#4CAF50; }
 
-        /* 2-Column Grid for Deductions */
-        .deduction-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 15px;
-            padding: 8px;
-        }
-        .deduction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-        }
-        .deduction-item span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-right: 5px;
-        }
+    .gps-doc .add-btn {
+      background:#007bff; color:#fff; border:none; cursor:pointer;
+      padding:5px 10px; font-size:11px; border-radius:4px; font-family:Arial,sans-serif;
+    }
+    .gps-doc .remove-btn {
+      background:#d9534f; color:#fff; border:none; padding:3px 5px;
+      border-radius:3px; cursor:pointer; font-size:10px; font-family:Arial,sans-serif;
+    }
 
-        .actions {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .actions button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 4px;
-        }
-        .actions button.add-btn {
-            background-color: #007bff;
-            padding: 5px 10px;
-            font-size: 11px;
-            margin: 10px 0;
-        }
-        .actions a {
-            margin-left: 10px;
-            text-decoration: none;
-            color: #d9534f;
-            font-size: 14px;
-        }
-        .remove-btn {
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            padding: 3px 5px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ── SCREENSHOT TOUCH: employee info rows styled like the doc ── */
-        .emp-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border: 1px solid #555;
-            border-bottom: none;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .emp-row:last-child { border-bottom: 1px solid #555; }
-        .emp-cell {
-            padding: 4px 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .emp-cell:first-child { border-right: 1px solid #555; }
-        .emp-cell input[type="text"] {
-            width: 180px;
-            padding: 2px 4px;
-            border: none;
-            border-bottom: 1px solid #888;
-            font-size: 12px;
-            outline: none;
-            background: transparent;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    /* ── Dark mode for the embedded doc ── */
+    .dark .gps-doc .gps-wrap   { background:#1e293b; }
+    .dark .gps-doc .emp-row    { border-color:#475569; color:#e2e8f0; }
+    .dark .gps-doc .emp-cell:first-child { border-right-color:#475569; }
+    .dark .gps-doc .emp-cell input[type="text"] { border-bottom-color:#64748b; color:#e2e8f0; }
+    .dark .gps-doc th, .dark .gps-doc td { border-color:#475569; color:#e2e8f0; background:#1e293b; }
+    .dark .gps-doc .main-table > thead > tr > th { background:#1e4060; color:#bfdbfe; border-color:#475569; }
+    .dark .gps-doc .main-table > thead > tr > th:not(:last-child) { border-right-color:#64748b; }
+    .dark .gps-doc .main-table > tbody > tr > td.container-cell:not(:last-child) { border-right-color:#64748b; }
+    .dark .gps-doc .deduction-item { color:#cbd5e1; }
+    .dark .gps-doc .input-field      { background:#0f172a; border-color:#475569; color:#e2e8f0; }
+    .dark .gps-doc .input-field-text { background:#0f172a; border-color:#475569; color:#e2e8f0; }
+    .dark .gps-doc .select-field     { background:#0f172a; border-color:#475569; color:#e2e8f0; }
+    .dark .gps-doc .header-text h3,
+    .dark .gps-doc .header-text h4,
+    .dark .gps-doc .header-text p { color:#e2e8f0; }
+    .dark .gps-doc .header-text p.subtext { color:#94a3b8; }
+    .dark .gps-doc .payslip-title h2 { color:#e2e8f0; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<div class="payslip-container">
-    <img src="/images/uhi.png" class="top-banner" alt="Green and Yellow Banner">
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/admin/payslip/list" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">All Payslips</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-    <div class="header">
-        <img src="/images/ggggg.jpg" alt="DA and BFAR Logos">
-        <div class="header-text">
+  <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <div class="mb-5">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Create Gov't Payslip</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        For: <strong class="text-slate-700 dark:text-slate-200"><%= employee ? (employee.first_name + ' ' + (employee.middle_name||'') + ' ' + employee.last_name).trim() : '' %></strong>
+        <% if (employee?.position) { %> &mdash; <span class="text-slate-500"><%= employee.position %></span><% } %>
+      </p>
+    </div>
+
+    <!-- Gov't payslip document form -->
+    <div class="gps-doc bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="gps-wrap">
+
+        <img src="/images/uhi.png" class="top-banner" alt="">
+
+        <div class="header">
+          <img src="/images/dabfar.png" alt="DA and BFAR Logos">
+          <div class="header-text">
             <h4>Republic of the Philippines</h4>
             <h4>Department of Agriculture</h4>
             <h3>BUREAU OF FISHERIES AND AQUATIC RESOURCES</h3>
             <p>REGIONAL FISHERIES OFFICE - MIMAROPA</p>
             <p class="subtext">Sapul, Calapan City 5200, Oriental Mindoro</p>
             <p class="subtext">Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189</p>
-            <p class="subtext" style="color: blue;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</p>
-        </div>
-        <img src="/images/lho.png" alt="Bagong Pilipinas Logo">
-    </div>
-
-    <form action="/admin/payslip/preview" method="POST">
-        <input type="hidden" name="employee_id" value="<%= employee ? employee.id : '' %>">
-
-        <div class="payslip-title">
-            <h2>C R E A T E &nbsp;P A Y S L I P</h2>
-            <div style="margin-top: 10px;">
-                <select name="month" class="select-field" required>
-                    <option value="" disabled selected>Select Month</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
-                <input type="number" name="year" value="2025" class="select-field" style="width: 70px;" required>
-            </div>
+            <p class="subtext" style="color:blue;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</p>
+          </div>
+          <img src="/images/bp.png" alt="Bagong Pilipinas Logo">
         </div>
 
-        <!-- Employee info styled like screenshot rows -->
-        <div class="emp-row">
-            <div class="emp-cell">
-                EMPL NAME:&nbsp;<span><%= employee ? (employee.first_name + ' ' + (employee.middle_name || '') + ' ' + employee.last_name) : 'N/A' %></span>
-            </div>
-            <div class="emp-cell">
-                DIVISION:&nbsp;<input type="text" name="division">
-            </div>
-        </div>
-        <div class="emp-row">
-            <div class="emp-cell">
-                POSITION:&nbsp;<span><%= employee ? employee.position : 'N/A' %></span>
-            </div>
-            <div class="emp-cell">
-                SECTION:&nbsp;<input type="text" name="section">
-            </div>
-        </div>
+        <form action="/admin/payslip/preview" method="POST">
+          <input type="hidden" name="employee_id" value="<%= employee ? employee.id : '' %>">
 
-        <table class="main-table">
+          <div class="payslip-title">
+            <h2>C R E A T E &nbsp; P A Y S L I P</h2>
+            <div style="margin-top:10px;">
+              <select name="month" class="select-field" required>
+                <option value="" disabled selected>Select Month</option>
+                <% ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach(m => { %>
+                  <option value="<%= m %>"><%= m %></option>
+                <% }) %>
+              </select>
+              <input type="number" name="year" value="<%= new Date().getFullYear() %>" class="select-field" style="width:70px;" required>
+            </div>
+          </div>
+
+          <!-- Employee info rows -->
+          <div class="emp-row">
+            <div class="emp-cell">EMPL NAME:&nbsp;<span><%= employee ? (employee.first_name + ' ' + (employee.middle_name||'') + ' ' + employee.last_name) : 'N/A' %></span></div>
+            <div class="emp-cell">DIVISION:&nbsp;<input type="text" name="division"></div>
+          </div>
+          <div class="emp-row" style="border-bottom:1px solid #555;">
+            <div class="emp-cell">POSITION:&nbsp;<span><%= employee ? employee.position : 'N/A' %></span></div>
+            <div class="emp-cell">SECTION:&nbsp;<input type="text" name="section"></div>
+          </div>
+
+          <table class="main-table" style="margin-top:8px;">
             <thead>
-                <tr>
-                    <th style="width: 25%;">GROSS EARNINGS</th>
-                    <th style="width: 50%;">DEDUCTIONS</th>
-                    <th style="width: 25%;">PERIODS</th>
-                </tr>
+              <tr>
+                <th style="width:25%;">GROSS EARNINGS</th>
+                <th style="width:50%;">DEDUCTIONS</th>
+                <th style="width:25%;">PERIODS</th>
+              </tr>
             </thead>
             <tbody>
-                <tr>
-                    <!-- GROSS EARNINGS -->
-                    <td class="valign-top container-cell">
-                        <table class="no-border-table" style="width: 100%;">
-                            <tr>
-                                <td>Monthly Salary</td>
-                                <td class="text-right"><input type="number" step="0.01" name="monthly_salary" class="input-field" required></td>
-                            </tr>
-                            <tr>
-                                <td>PERA (Fixed)</td>
-                                <td class="text-right">&#8369; 2,000.00</td>
-                            </tr>
-                        </table>
-                    </td>
+              <tr>
+                <!-- Gross Earnings -->
+                <td class="valign-top container-cell">
+                  <table class="no-border-table" style="width:100%;">
+                    <tr><td>Monthly Salary</td><td class="text-right"><input type="number" step="0.01" name="monthly_salary" class="input-field" required></td></tr>
+                    <tr><td>PERA (Fixed)</td><td class="text-right">&#8369; 2,000.00</td></tr>
+                  </table>
+                </td>
 
-                    <!-- DEDUCTIONS -->
-                    <td class="valign-top container-cell">
-                        <div class="deduction-grid">
-                            <div class="deduction-item"><span>GSIS Per Share:</span> <input type="number" step="0.01" name="gsis_per_share" class="input-field"></div>
-                            <div class="deduction-item"><span>Medicare 5%:</span> <input type="number" step="0.01" name="medicare" class="input-field"></div>
-                            <div class="deduction-item"><span>Pag Ibig:</span> <input type="number" step="0.01" name="pagibig" class="input-field"></div>
-                            <div class="deduction-item"><span>Withholding Tax:</span> <input type="number" step="0.01" name="withholding_tax" class="input-field"></div>
-                            <div class="deduction-item"><span>403 Provident Fund:</span> <input type="number" step="0.01" name="provident_403" class="input-field"></div>
-                            <div class="deduction-item"><span>337 GSIS-Emerg:</span> <input type="number" step="0.01" name="gsis_emerg_337" class="input-field"></div>
-                            <div class="deduction-item"><span>346 GSIS-MPL:</span> <input type="number" step="0.01" name="gsis_mpl_346" class="input-field"></div>
-                            <div class="deduction-item"><span>440 HDMF-MPL:</span> <input type="number" step="0.01" name="hdmf_mpl_440" class="input-field"></div>
-                            <div class="deduction-item"><span>ISLAI-Premium:</span> <input type="number" step="0.01" name="islai_premium" class="input-field"></div>
-                            <div class="deduction-item"><span>ISLAI-Loan:</span> <input type="number" step="0.01" name="islai_loan" class="input-field"></div>
-                            <div class="deduction-item"><span>HDMF-CAL:</span> <input type="number" step="0.01" name="hdmf_cal" class="input-field"></div>
-                            <div class="deduction-item"><span>UCPB Loan:</span> <input type="number" step="0.01" name="ucpb_loan" class="input-field"></div>
-                            <div class="deduction-item"><span>ISLAI-Emergency:</span> <input type="number" step="0.01" name="islai_emergency" class="input-field"></div>
-                            <div class="deduction-item"><span>GSIS-CPL:</span> <input type="number" step="0.01" name="gsis_cpl" class="input-field"></div>
-                            <div class="deduction-item"><span>GSIS-MPL LITE:</span> <input type="number" step="0.01" name="gsis_mpl_lite" class="input-field"></div>
-                            <div class="deduction-item"><span>UCPB KASAMA MO:</span> <input type="number" step="0.01" name="ucpb_kasama_salary" class="input-field"></div>
-                            <div class="deduction-item"><span>GSIS-Policy Reg:</span> <input type="number" step="0.01" name="gsis_policy_regular" class="input-field"></div>
-                            <div class="deduction-item"><span>PAL-DA Capital:</span> <input type="number" step="0.01" name="palda_capital_share" class="input-field"></div>
-                            <div class="deduction-item"><span>PAL-DA CoopBank:</span> <input type="number" step="0.01" name="palda_coopbank_share" class="input-field"></div>
-                            <div class="deduction-item"><span>BFAR Coop Addt'l:</span> <input type="number" step="0.01" name="bfar_coop_additional" class="input-field"></div>
-                            <div class="deduction-item"><span>PAL-DA Regular:</span> <input type="number" step="0.01" name="palda_regular" class="input-field"></div>
-                        </div>
+                <!-- Deductions -->
+                <td class="valign-top container-cell">
+                  <div class="deduction-grid">
+                    <% [
+                      ['gsis_per_share','GSIS Per Share'],['medicare','Medicare 5%'],
+                      ['pagibig','Pag Ibig'],['withholding_tax','Withholding Tax'],
+                      ['provident_403','403 Provident Fund'],['gsis_emerg_337','337 GSIS-Emerg'],
+                      ['gsis_mpl_346','346 GSIS-MPL'],['hdmf_mpl_440','440 HDMF-MPL'],
+                      ['islai_premium','ISLAI-Premium'],['islai_loan','ISLAI-Loan'],
+                      ['hdmf_cal','HDMF-CAL'],['ucpb_loan','UCPB Loan'],
+                      ['islai_emergency','ISLAI-Emergency'],['gsis_cpl','GSIS-CPL'],
+                      ['gsis_mpl_lite','GSIS-MPL LITE'],['ucpb_kasama_salary','UCPB KASAMA MO'],
+                      ['gsis_policy_regular','GSIS-Policy Reg'],['palda_capital_share','PAL-DA Capital'],
+                      ['palda_coopbank_share','PAL-DA CoopBank'],['bfar_coop_additional','BFAR Coop Addt\'l'],
+                      ['palda_regular','PAL-DA Regular']
+                    ].forEach(([name, label]) => { %>
+                      <div class="deduction-item"><span><%= label %>:</span><input type="number" step="0.01" name="<%= name %>" class="input-field"></div>
+                    <% }) %>
+                  </div>
+                  <div id="deductions-container" style="padding:0 8px 4px;"></div>
+                  <div style="text-align:center;margin-bottom:10px;">
+                    <button type="button" class="add-btn" id="addDeductionBtn">+ Add Other Deduction</button>
+                  </div>
+                </td>
 
-                      <div id="deductions-container" style="padding: 0 8px 4px;"></div>
-
-                        <div style="text-align: center; margin-bottom: 10px;">
-<button type="button" class="add-btn" id="addDeductionBtn">+ Add Other Deduction</button>
-                        </div>
-                    </td>
-
-                    <!-- PERIODS -->
-                    <td class="valign-top container-cell">
-                        <table class="no-border-table" style="width: 100%;">
-                            <tr>
-                                <td class="bold">1ST PERIOD</td>
-                                <td class="text-right"><input type="number" step="0.01" name="first_period" class="input-field"></td>
-                            </tr>
-                            <tr>
-                                <td class="bold">2ND PERIOD</td>
-                                <td class="text-right"><input type="number" step="0.01" name="second_period" class="input-field"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-
-           
+                <!-- Periods -->
+                <td class="valign-top container-cell">
+                  <table class="no-border-table" style="width:100%;">
+                    <tr><td class="bold">1ST PERIOD</td><td class="text-right"><input type="number" step="0.01" name="first_period" class="input-field"></td></tr>
+                    <tr><td class="bold">2ND PERIOD</td><td class="text-right"><input type="number" step="0.01" name="second_period" class="input-field"></td></tr>
+                  </table>
+                </td>
+              </tr>
             </tbody>
-        </table>
+          </table>
 
-        <div class="actions">
-            <button type="submit">Preview Payslip</button>
-            <a href="/admin/payslip/list">Cancel</a>
+          <!-- Submit -->
+          <div style="text-align:center;margin:24px 0 8px;">
+            <button type="submit"
+              style="padding:10px 28px;background:#1a5276;color:#fff;border:none;border-radius:8px;
+                     font-size:14px;font-weight:bold;cursor:pointer;font-family:'DM Sans',Arial,sans-serif;
+                     letter-spacing:0.3px;">
+              Preview Payslip
+            </button>
+            <a href="/admin/payslip/list"
+              style="margin-left:12px;font-size:13px;color:#64748b;text-decoration:none;font-family:'DM Sans',Arial,sans-serif;">
+              Cancel
+            </a>
+          </div>
+        </form>
+
+      </div><!-- /gps-wrap -->
+    </div><!-- /gps-doc -->
+
+  </main>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    function addDeduction() {
+      const container = document.getElementById('deductions-container');
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:4px;gap:5px;';
+      row.innerHTML = `
+        <input type="text" name="deduction_name[]" class="input-field-text" placeholder="Name / Code" required>
+        <div style="display:flex;align-items:center;gap:3px;">
+          <input type="number" step="0.01" name="deduction_amount[]" class="input-field" placeholder="0.00" required>
+          <button type="button" class="remove-btn" title="Remove">&#215;</button>
         </div>
-    </form>
-</div>
-
-<script nonce="<%= nonce %>">
-function addDeduction() {
-    const container = document.getElementById('deductions-container');
-    const row = document.createElement('div');
-    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:4px;";
-    row.innerHTML = `
-        <input type="text" name="deduction_name[]" class="input-field-text" style="flex:1; min-width:0; margin-right:5px;" placeholder="Name include Code if needed" required>
-        <div style="display:flex; align-items:center; gap:3px;">
-            <input type="number" step="0.01" name="deduction_amount[]" class="input-field" placeholder="0.00" required>
-            <button type="button" class="remove-btn" title="Remove">✕</button>
-        </div>
-    `;
-    // attach remove listener instead of inline onclick
-    row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
-    container.appendChild(row);
-}
-document.getElementById('addDeductionBtn').addEventListener('click', addDeduction);
-</script>
-
+      `;
+      row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+      container.appendChild(row);
+    }
+    document.getElementById('addDeductionBtn').addEventListener('click', addDeduction);
+  </script>
 </body>
 </html>

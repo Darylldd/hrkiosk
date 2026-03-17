@@ -1,70 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="">
 <head>
-    <title>My Payslips</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Payslips</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes modal-in { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .page-in   { animation: fade-in  0.35s ease forwards; }
+    .modal-anim{ animation: modal-in 0.25s ease forwards; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<h2>My Payslips</h2>
-
-<a href="/dashboard"><button>Back to Dashboard</button></a>
-
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Month</th>
-        <th>Cutoff</th>
-        <th>Action</th>
-    </tr>
-
-    <% if(payslips.length === 0) { %>
-        <tr>
-            <td colspan="3">No payslips available</td>
-        </tr>
-    <% } %>
-
-    <% payslips.forEach(p => { %>
-        <tr>
-            <td><%= p.month %></td>
-            <td><%= p.cutoff %></td>
-            <td>
-<button class="view-btn" data-id="<%= p.id %>">View</button>
-            </td>
-        </tr>
-    <% }) %>
-
-</table>
-<div id="payslipModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-
-    <div style="background:white; padding:20px; width:70%; max-height:80%; overflow:auto; border-radius:10px;">
-
-        <button onclick="closePayslip()" style="float:right;">Close</button>
-
-        <div id="payslipContent">
-            Loading payslip...
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
         </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 page-in">
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">My Payslips</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">View and print your payslip records</p>
     </div>
 
-</div>
-<script nonce="<%= nonce %>">
+    <!-- Flash alerts -->
+    <% if (locals.flash_success) { %>
+      <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl
+           bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-sm font-medium"><%= flash_success %></span>
+      </div>
+    <% } %>
+    <% if (locals.flash_error) { %>
+      <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl
+           bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <span class="text-sm font-medium"><%= flash_error %></span>
+      </div>
+    <% } %>
+
+    <!-- Table card -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+              <th class="px-5 py-3 text-left font-semibold">Month</th>
+              <th class="px-5 py-3 text-left font-semibold">Cutoff</th>
+              <th class="px-5 py-3 text-right font-semibold">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            <% if (payslips.length === 0) { %>
+              <tr>
+                <td colspan="3" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
+                  No payslips available yet.
+                </td>
+              </tr>
+            <% } %>
+            <% payslips.forEach(p => { %>
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
+              <td class="px-5 py-3.5 font-medium text-slate-700 dark:text-slate-200"><%= p.month %></td>
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= p.cutoff === 'FIRST_HALF'
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800'
+                    : 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-800' %>">
+                  <%= p.cutoff === 'FIRST_HALF' ? '1st Half' : '2nd Half' %>
+                </span>
+              </td>
+              <td class="px-5 py-3.5 text-right">
+                <button class="view-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                       border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                       text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
+                       dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200"
+                  data-id="<%= p.id %>">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  View
+                </button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Payslip modal -->
+  <div id="payslipModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-anim bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700
+                w-full max-w-3xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700 shrink-0">
+        <h3 class="font-display text-lg text-navy-700 dark:text-navy-200">Payslip</h3>
+        <button id="closeBtn" aria-label="Close"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="payslipContent" class="overflow-y-auto flex-1 p-2">
+        <div class="flex items-center justify-center py-12">
+          <svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    const modal   = document.getElementById('payslipModal');
+    const content = document.getElementById('payslipContent');
+
     document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => openPayslip(btn.dataset.id));
+      btn.addEventListener('click', () => openPayslip(btn.dataset.id));
     });
+
     function openPayslip(id) {
-        fetch('/payslip/' + id)
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('payslipContent').innerHTML = html;
-                document.getElementById('payslipModal').style.display = 'flex';
-            });
+      content.innerHTML = `<div class="flex items-center justify-center py-12"><svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg></div>`;
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      fetch('/payslip/' + id)
+        .then(res => res.text())
+        .then(h => { content.innerHTML = h; })
+        .catch(() => { content.innerHTML = '<p class="text-center text-red-500 text-sm py-8">Failed to load payslip.</p>'; });
     }
-    function closePayslip() {
-        document.getElementById('payslipModal').style.display = 'none';
-    }
+
+    function closePayslip() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+
     document.getElementById('closeBtn').addEventListener('click', closePayslip);
-    window.addEventListener('click', e => {
-        if (e.target === document.getElementById('payslipModal')) closePayslip();
-    });
-</script>
+    modal.addEventListener('click', e => { if (e.target === modal) closePayslip(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closePayslip(); });
+  </script>
 </body>
 </html>

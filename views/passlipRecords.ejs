@@ -1,36 +1,211 @@
-<h2><%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %> Passlips</h2>
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passlip Records</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',
+              400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',
+              800:'#0b2640',900:'#06192e',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
+  </style>
+</head>
 
-<a href="/dashboard" class="btn">← Back to Dashboard</a>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-top:1rem;">
-    <thead>
-        <tr>
-            <th>Passlip No</th>
-            <th>Date</th>
-            <th>Employee Name</th>
-            <th>Employee ID</th>
-            <th>Department</th>
-            <th>Office / Agency</th>
-            <th>Purpose</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if(records.length === 0){ %>
-            <tr>
-                <td colspan="7" style="text-align:center;">No records found</td>
+  <!-- ── Nav ────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <!-- Type badge -->
+        <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                     <%= type === 'regular' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800' %>">
+          <%= type === 'regular' ? 'Regular' : 'JO & COS' %>
+        </span>
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
+                 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Body ───────────────────────────────────────────── -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">
+        <%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %> Passlips
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">All submitted pass slip records</p>
+    </div>
+
+    <!-- Search -->
+    <div class="relative mb-4">
+      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+        </svg>
+      </span>
+      <input id="recordSearch" type="text"
+        placeholder="Search by name, passlip no., department, or purpose..."
+        autocomplete="off"
+        class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl
+               border border-slate-200 dark:border-slate-600
+               bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
+               placeholder-slate-400 dark:placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
+               shadow-sm transition" />
+      <button id="clearSearch" type="button" aria-label="Clear search"
+        class="absolute inset-y-0 right-0 pr-3.5 items-center hidden
+               text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Count -->
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= records.length %></span> record<%= records.length !== 1 ? 's' : '' %>
+    </p>
+
+    <!-- Table card -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider
+                       text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+              <th class="px-5 py-3 text-left font-semibold">Passlip No</th>
+              <th class="px-5 py-3 text-left font-semibold">Date</th>
+              <th class="px-5 py-3 text-left font-semibold">Employee</th>
+              <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Emp ID</th>
+              <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Department</th>
+              <th class="px-5 py-3 text-left font-semibold hidden lg:table-cell">Office / Agency</th>
+              <th class="px-5 py-3 text-left font-semibold hidden lg:table-cell">Purpose</th>
             </tr>
-        <% } else { %>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            <% if (records.length === 0) { %>
+              <tr>
+                <td colspan="7" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
+                  No records found.
+                </td>
+              </tr>
+            <% } %>
             <% records.forEach(r => { %>
-                <tr>
-                    <td><%= r.passlip_no %></td>
-                    <td><%= new Date(r.pass_date).toLocaleDateString() %></td>
-                    <td><%= r.employee_name %></td>
-                    <td><%= r.employee_id %></td>
-                    <td><%= r.department %></td>
-                    <td><%= r.office_visit %></td>
-                    <td><%= r.purpose %></td>
-                </tr>
+            <tr class="record-row hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100"
+                data-search="<%= (r.passlip_no + ' ' + r.employee_name + ' ' + (r.employee_id||'') + ' ' + r.department + ' ' + r.office_visit + ' ' + r.purpose).toLowerCase() %>">
+              <td class="px-5 py-3.5 font-semibold text-navy-600 dark:text-navy-300 whitespace-nowrap">
+                <%= r.passlip_no %>
+              </td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
+                <%= new Date(r.pass_date).toLocaleDateString() %>
+              </td>
+              <td class="px-5 py-3.5 font-medium text-slate-700 dark:text-slate-200">
+                <%= r.employee_name %>
+              </td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell">
+                <%= r.employee_id || '—' %>
+              </td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell max-w-[140px] truncate">
+                <%= r.department %>
+              </td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[160px] truncate">
+                <%= r.office_visit %>
+              </td>
+              <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[200px] truncate">
+                <%= r.purpose %>
+              </td>
+            </tr>
             <% }) %>
-        <% } %>
-    </tbody>
-</table>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No search match -->
+      <div id="noResults" style="display:none;" class="px-5 py-14 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+        </svg>
+        <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">No records match your search.</p>
+        <p class="text-slate-300 dark:text-slate-600 text-xs mt-1">Try a different name, number, or department.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    // Theme
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Search
+    const searchInput = document.getElementById('recordSearch');
+    const clearBtn    = document.getElementById('clearSearch');
+    const countEl     = document.getElementById('rowCount');
+    const noResults   = document.getElementById('noResults');
+    const rows        = document.querySelectorAll('.record-row');
+
+    function runSearch() {
+      const q = searchInput.value.trim().toLowerCase();
+      clearBtn.classList.toggle('hidden', q === '');
+      clearBtn.classList.toggle('flex',   q !== '');
+      let shown = 0;
+      rows.forEach(row => {
+        const match = (row.dataset.search || '').includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) shown++;
+      });
+      countEl.textContent = shown;
+      noResults.style.display = shown === 0 ? '' : 'none';
+    }
+    searchInput.addEventListener('input', runSearch);
+    clearBtn.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); runSearch(); });
+  </script>
+</body>
+</html>

@@ -1,561 +1,481 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pass Slip</title>
-    <style>
-        /* Base Styles & Typography */
-        * {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        body {
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pass Slip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',
+              400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',
+              800:'#0b2640',900:'#06192e',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
 
-        /* Main Form Container */
-        .paper-container {
-            max-width: 850px;
-            margin: 0 auto;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-            /* overflow hidden keeps the absolute corners from spilling out */
-            overflow: hidden; 
-        }
+    @keyframes fade-in    { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
+    @keyframes slide-down { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes slide-in-right { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0); } }
 
-        /* --- CORNER BANNERS --- */
-        .top-left-banner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            max-width: 400px;
-            z-index: 1;
-        }
-        .bottom-right-banner {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 50%;
-            max-width: 400px;
-            z-index: 1;
-        }
+    .page-in   { animation: fade-in    0.35s ease forwards; }
+    .alert-in  { animation: slide-down 0.3s  ease forwards; }
+    .toast-in  { animation: slide-in-right 0.4s ease forwards; }
 
-        /* Content Wrapper to stay above background banners */
-        .paper-content {
-            position: relative;
-            z-index: 2;
-            padding: 40px 40px 30px 40px;
-        }
+    /* ── Keep the passlip document's own styles isolated ── */
+    .passlip-doc * { box-sizing: border-box; }
+    .passlip-doc { font-family: Arial, sans-serif; }
+    .passlip-doc input[type="text"] {
+      border: none;
+      border-bottom: 1px solid #000;
+      background: transparent;
+      font-size: 14px;
+      padding: 2px 5px;
+      outline: none;
+      color: #000;
+      font-family: "Times New Roman", Times, serif;
+    }
+    .passlip-doc .form-border { border: 2px solid #0e0e0e; margin-bottom: 10px; background-color: rgba(255,255,255,0.97); }
+    .passlip-doc .form-border, .passlip-doc .form-border * { font-family: "Times New Roman", Times, serif; color: #000; }
+    .passlip-doc .section { padding: 30px; position: relative; }
+    .passlip-doc .section-divider { border-top: 2px solid #0e0e0e; }
+    .passlip-doc .section-title { text-align:center; color:#4a86e8 !important; font-weight:bold; font-size:20px; margin:0 0 30px 0; letter-spacing:1px; }
+    .passlip-doc .control-no { position:absolute; top:20px; right:30px; font-size:13px; display:flex; align-items:center; gap:10px; }
+    .passlip-doc .control-no input { width:120px; }
+    .passlip-doc .flex-row { display:flex; justify-content:space-between; margin-bottom:15px; }
+    .passlip-doc .input-group { display:flex; align-items:center; gap:10px; }
+    .passlip-doc .input-group label { font-size:13px; white-space:nowrap; font-weight:bold; }
+    .passlip-doc .input-group input { flex-grow:1; }
+    .passlip-doc .pass-slip-top { display:flex; justify-content:space-between; }
+    .passlip-doc .left-fields { width:65%; display:flex; flex-direction:column; gap:15px; }
+    .passlip-doc .right-checkboxes { width:30%; display:flex; flex-direction:column; gap:10px; padding-top:20px; font-size:14px; font-weight:bold; }
+    .passlip-doc .checkbox-item { display:flex; align-items:center; gap:8px; }
+    .passlip-doc .checkbox-item input[type="checkbox"] { width:18px; height:18px; border:2px solid #4a86e8; }
+    .passlip-doc .purpose-section { margin-top:25px; }
+    .passlip-doc .purpose-lines { display:flex; flex-direction:column; gap:25px; margin-top:10px; }
+    .passlip-doc .signatures { display:flex; justify-content:space-between; margin-top:50px; text-align:center; }
+    .passlip-doc .sig-box { width:45%; border-top:1px solid #000; padding-top:5px; font-size:12px; font-style:italic; }
+    .passlip-doc .cert-paragraph { font-size:14px; line-height:2.2; text-align:justify; }
+    .passlip-doc .cert-name-highlight { border-bottom:1px solid #000; padding:0 10px; margin:0 5px; font-weight:bold; display:inline-block; }
+    .passlip-doc .sub-label { display:block; text-align:center; font-size:11px; font-style:italic; margin-top:-10px; margin-bottom:20px; }
+    .passlip-doc .header-section { display:flex; align-items:center; justify-content:center; margin-bottom:25px; position:relative; }
+    .passlip-doc .logos { display:flex; align-items:center; gap:15px; position:absolute; left:0; top:50%; transform:translateY(-50%); }
+    .passlip-doc .logos img { max-height:75px; }
+    .passlip-doc .header-text { text-align:center; font-size:11px; line-height:1.4; color:#555; padding-left:180px; font-family:Arial,sans-serif; }
+    .passlip-doc .header-text strong { color:#333; font-size:13px; font-weight:700; }
+    .passlip-doc .footer-info { display:flex; align-items:center; gap:20px; font-size:12px; color:#666; padding:10px 0; margin-bottom:10px; font-family:Arial,sans-serif; }
+    .passlip-doc .top-left-banner { position:absolute; top:0; left:0; width:50%; max-width:400px; z-index:1; }
+    .passlip-doc .bottom-right-banner { position:absolute; bottom:0; right:0; width:50%; max-width:400px; z-index:1; }
+    .passlip-doc .paper-inner { position:relative; z-index:2; padding:40px 40px 30px 40px; }
+    .passlip-doc .paper-wrap { position:relative; overflow:hidden; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
 
-        /* Header Section */
-        .header-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            position: relative;
-        }
-        .logos {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .logos img {
-            max-height: 75px;
-        }
-        .header-text {
-            text-align: center;
-            font-size: 11px;
-            line-height: 1.4;
-            color: #555;
-            padding-left: 180px; /* Pushes text to the right to clear logos */
-        }
-        .header-text strong {
-            color: #333;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        /* Form Wrapper & Borders */
-        .form-border {
-            border: 2px solid #0e0e0e;
-            margin-bottom: 10px;
-            background-color: rgba(255, 255, 255, 0.95); /* Slight opacity makes text readable if overlapping banners */
-        }
-
-        /* --- FONT & COLOR RULE FOR PASS SLIP & CERTIFICATION --- */
-        .form-border, 
-        .form-border * {
-            font-family: "Times New Roman", Times, serif;
-            color: #000; /* Forces all text inside to be solid black */
-        }
-
-        .section {
-            padding: 30px;
-            position: relative;
-        }
-        .section-divider {
-            border-top: 2px solid #0e0e0e;
-        }
-        .section-title {
-            text-align: center;
-            color: #4a86e8 !important; /* Kept blue to match the original form image */
-            font-weight: bold;
-            font-size: 20px;
-            margin-top: 0;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-        }
-
-        /* Form Controls & Layout */
-        .control-no {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .control-no input {
-            width: 120px;
-        }
-
-        .flex-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        
-        /* Styled Inputs */
-        input[type="text"] {
-            border: none;
-            border-bottom: 1px solid #000;
-            background: transparent;
-            font-size: 14px;
-            padding: 2px 5px;
-            outline: none;
-            color: #000;
-        }
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .input-group label {
-            font-size: 13px;
-            white-space: nowrap;
-            font-weight: bold;
-        }
-        .input-group input {
-            flex-grow: 1;
-        }
-
-        /* Top Pass Slip specific layout */
-        .pass-slip-top {
-            display: flex;
-            justify-content: space-between;
-        }
-        .left-fields {
-            width: 65%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .right-checkboxes {
-            width: 30%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-top: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #4a86e8;
-        }
-
-        .purpose-section {
-            margin-top: 25px;
-        }
-        .purpose-lines {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            margin-top: 10px;
-        }
-        
-        /* Signatures */
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 50px;
-            text-align: center;
-        }
-        .sig-box {
-            width: 45%;
-            border-top: 1px solid #000;
-            padding-top: 5px;
-            font-size: 12px;
-            font-style: italic;
-        }
-
-        /* Certification Section */
-        .cert-paragraph {
-            font-size: 14px;
-            line-height: 2.2;
-            text-align: justify;
-        }
-        
-        /* New style for the bold, auto-fitting name */
-        .cert-name-highlight {
-            border-bottom: 1px solid #000;
-            padding: 0 10px;
-            margin: 0 5px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        .sub-label {
-            display: block;
-            text-align: center;
-            font-size: 11px;
-            font-style: italic;
-            margin-top: -10px;
-            margin-bottom: 20px;
-        }
-
-        /* Footer */
-        .footer-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 12px;
-            color: #666; /* Kept grayish as it's outside the border */
-            padding: 10px 0;
-            margin-bottom: 20px;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-        .btn {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: #2c75b6;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-        .btn:hover { background-color: #1a5b92; }
-        .btn-secondary { background-color: #666; }
-        .btn-secondary:hover { background-color: #444; }
-
-        /* Alerts */
-        .msg-alert {
-            padding: 10px; margin-bottom: 15px; border-radius: 4px; text-align: center;
-        }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        /* Modal Styles */
-        .modal {
-            display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-            overflow: auto; background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888;
-            width: 90%; max-width: 1000px; border-radius: 5px;
-        }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close:hover { color: black; }
-
-        /* Print formatting */
-        @media print {
-            body { background: #fff; padding: 0; }
-            .paper-container { box-shadow: none; max-width: 100%; }
-            .no-print, .action-buttons { display: none !important; }
-            input[type="text"] { border-bottom: 1px solid #000; }
-              #filingToast { display: none !important; }
-        }
-        @keyframes slideIn {
-    from { opacity: 0; transform: translateX(60px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-    </style>
+    @media print {
+      .no-print { display:none !important; }
+      #filingToast { display:none !important; }
+      body { background:#fff; padding:0; }
+      .passlip-doc .paper-wrap { box-shadow:none; }
+      .passlip-doc input[type="text"] { border-bottom:1px solid #000; }
+    }
+  </style>
 </head>
-<body>
-<!-- ── Toast Notification (top-right, Facebook-style) ── -->
-<div id="filingToast" style="
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    background: #fff;
-    border-left: 4px solid #f9a825;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 14px 16px 14px 16px;
-    max-width: 300px;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    color: #333;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    animation: slideIn 0.4s ease;
-">
-    <span style="font-size: 20px; line-height: 1;">📅</span>
-    <div style="flex: 1;">
-        <div style="font-weight: bold; margin-bottom: 3px; color: #e65100;">Filing Notice</div>
-        <div><%= filingLabel %></div>
-        <div style="margin-top: 4px; color: #555;">Date on slip: <strong><%= today %></strong></div>
+
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
+
+  <!-- ── Filing toast (top-right) ───────────────────────── -->
+  <div id="filingToast"
+    class="toast-in fixed top-20 right-4 z-50 bg-white dark:bg-slate-800
+           border-l-4 border-amber-400 rounded-xl shadow-xl
+           flex items-start gap-3 px-4 py-3.5 max-w-xs no-print">
+    <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <div class="flex-1 min-w-0">
+      <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-0.5">Filing Notice</p>
+      <p class="text-xs text-slate-700 dark:text-slate-200"><%= filingLabel %></p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Date on slip: <strong class="text-slate-600 dark:text-slate-300"><%= today %></strong></p>
     </div>
-    <span onclick="document.getElementById('filingToast').style.display='none'" 
-          style="cursor:pointer; color:#aaa; font-size:18px; line-height:1; margin-left:4px;">&times;</span>
-</div>
+    <button onclick="document.getElementById('filingToast').style.display='none'"
+      class="text-slate-300 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-300 transition shrink-0 mt-0.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
 
-<% if (msg) { %>
-    <div class="msg-alert <%= msgType %>"><%- msg %></div>
-<% } %>
+  <!-- ── Nav ────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <!-- Type badge -->
+        <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                     <%= type === 'regular' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800' %>">
+          <%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %>
+        </span>
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
+                 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-<div class="action-buttons no-print">
-    <button id="openModalBtn" class="btn btn-secondary">View Recorded Passlips</button>
-    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
-</div>
+  <!-- ── Body ───────────────────────────────────────────── -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 page-in">
 
-<div class="paper-container">
-    
-    <img src="/images/uhi.png" class="top-left-banner" alt="Top Left Banner">
+    <!-- Page title -->
+    <div class="mb-5 no-print">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Pass Slip</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Submit a pass slip for <span class="font-medium text-slate-700 dark:text-slate-300"><%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %></span>
+      </p>
+    </div>
 
-    <img src="/images/uhitddd.png" class="bottom-right-banner" alt="Bottom Right Banner">
+    <!-- ── Alert banner ────────────────────────────────── -->
+    <% if (locals.msg && msg) { %>
+      <% const isErr = msgType === 'error'; %>
+      <div role="alert" class="alert-in mb-5 no-print flex items-start gap-3 px-4 py-3 rounded-xl
+           <%= isErr
+             ? 'bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
+             : 'bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400' %>">
+        <% if (isErr) { %>
+          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <% } else { %>
+          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <% } %>
+        <span class="text-sm font-medium"><%- msg %></span>
+      </div>
+    <% } %>
 
-    <div class="paper-content">
-        
-        <form method="POST">
-            
+    <!-- ── Action bar ──────────────────────────────────── -->
+    <div class="flex flex-wrap items-center gap-3 mb-5 no-print">
+      <button id="openModalBtn"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+               hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/20
+               transition-all duration-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        View Recorded Passlips
+      </button>
+     
+    </div>
+
+
+
+    <div class="passlip-doc">
+      <form method="POST">
+
+        <div class="paper-wrap">
+          <img src="/images/uhi.png"      class="top-left-banner"     alt="">
+          <img src="/images/uhitddd.png"  class="bottom-right-banner" alt="">
+
+          <div class="paper-inner">
+
             <div class="header-section">
-                <div class="logos">
-                    <img src="/images/bp.png" alt="Bagong Pilipinas">
-                    <img src="/images/dabfar.png" alt="DA / BFAR">
-                </div>
-                <div class="header-text">
-                    Republic of the Philippines<br>
-                    Department of Agriculture<br>
-                    <strong>BUREAU OF FISHERIES AND AQUATIC RESOURCES</strong><br>
-                    REGIONAL FISHERIES OFFICE-MIMAROPA<br>
-                    Barangay Sapul, Calapan City, Oriental Mindoro, 5200<br>
-                    Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189<br>
-                    <span style="color: blue; text-decoration: underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
-                </div>
+              <div class="logos">
+                <img src="/images/bp.png"     alt="Bagong Pilipinas">
+                <img src="/images/dabfar.png" alt="DA / BFAR">
+              </div>
+              <div class="header-text">
+                Republic of the Philippines<br>
+                Department of Agriculture<br>
+                <strong>BUREAU OF FISHERIES AND AQUATIC RESOURCES</strong><br>
+                REGIONAL FISHERIES OFFICE-MIMAROPA<br>
+                Barangay Sapul, Calapan City, Oriental Mindoro, 5200<br>
+                Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189<br>
+                <span style="color:blue;text-decoration:underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
+              </div>
             </div>
 
             <div class="form-border">
-                <div class="section">
-                    <div class="control-no">
-                        <label>Control No:</label>
-                        <input type="text" name="passlip_no" value="<%= previewNo %>" readonly>
-                    </div>
-
-                    <h2 class="section-title">PASS SLIP</h2>
-
-                    <div class="pass-slip-top">
-                        <div class="left-fields">
-                            <div class="input-group">
-                                <label>DATE:</label>
-                                <input type="text" value="<%= today %>" readonly>
-                            </div>
-                            <div class="input-group">
-                                <label>NAME:</label>
-<input type="text" value="<%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %>" readonly>
-                                <input type="hidden" name="employee_id" value="<%= employee.employee_id %>">
-                            </div>
-                            <div class="input-group">
-                                <label>DIVISION:</label>
-                                <input type="text" name="department" value="<%= employee.department || '' %>" required>
-                            </div>
-                            <div class="input-group">
-                                <label>OFFICE/AGENCY TO VISIT:</label>
-                                <input type="text" name="office_visit" required>
-                            </div>
-                        </div>
-                        
-                        <div class="right-checkboxes">
-                            <div class="checkbox-item">
-                                <input type="checkbox" <%= type === 'regular' ? 'checked' : '' %> disabled> 
-                                <span>Permanent</span>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" <%= type !== 'regular' ? 'checked' : '' %> disabled> 
-                                <span>COS</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="purpose-section">
-                        <div class="input-group">
-                            <label>PURPOSE (specific):</label>
-                        </div>
-                        <div class="purpose-lines">
-                            <input type="text" name="purpose" required style="width: 100%;">
-                            <input type="text" style="width: 100%;" class="no-print-border">
-                            <input type="text" style="width: 100%;" class="no-print-border">
-                        </div>
-                    </div>
-
-                    <div class="signatures">
-                        <div class="sig-box">Signature over printed name of employee</div>
-                        <div class="sig-box">Signature over printed name of Immediate Supervisor</div>
-                    </div>
+              <div class="section">
+                <div class="control-no">
+                  <label>Control No:</label>
+                  <input type="text" name="passlip_no" value="<%= previewNo %>" readonly>
                 </div>
 
-                <div class="section section-divider">
-                    <h2 class="section-title">CERTIFICATION</h2>
-                    
-                    <div class="cert-paragraph">
-                        This is to certify that Mr./Ms. 
-                        <strong class="cert-name-highlight"><%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %></strong> 
-                        of the Bureau of Fisheries and Aquatic Resources (BFAR) has personally appeared at the 
-                        <input type="text" style="width: 80%; margin-top: 15px;" readonly placeholder=""> 
-                        on the above stated purpose.
-                    </div>
-                    <span class="sub-label">(Name of office)</span>
+                <h2 class="section-title">PASS SLIP</h2>
 
-                    <div class="flex-row" style="margin-top: 30px;">
-                        <div class="input-group" style="width: 48%;">
-                            <label>Actual time of visit (log in):</label>
-                            <input type="text">
-                        </div>
-                        <div class="input-group" style="width: 48%;">
-                            <label>Actual time finished (log out):</label>
-                            <input type="text">
-                        </div>
+                <div class="pass-slip-top">
+                  <div class="left-fields">
+                    <div class="input-group">
+                      <label>DATE:</label>
+                      <input type="text" value="<%= today %>" readonly>
                     </div>
+                    <div class="input-group">
+                      <label>NAME:</label>
+                      <input type="text" value="<%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %>" readonly>
+                      <input type="hidden" name="employee_id" value="<%= employee.employee_id %>">
+                    </div>
+                    <div class="input-group">
+                      <label>DIVISION:</label>
+                      <input type="text" name="department" value="<%= employee.department || '' %>" required>
+                    </div>
+                    <div class="input-group">
+                      <label>OFFICE/AGENCY TO VISIT:</label>
+                      <input type="text" name="office_visit" required>
+                    </div>
+                  </div>
 
-                    <div class="input-group" style="margin-top: 25px; margin-bottom: 20px;">
-                        <label>Name and signature of staff who assisted:</label>
-                        <input type="text">
+                  <div class="right-checkboxes">
+                    <div class="checkbox-item">
+                      <input type="checkbox" <%= type === 'regular' ? 'checked' : '' %> disabled>
+                      <span>Permanent</span>
                     </div>
-
-                    <div class="input-group" style="margin-bottom: 20px;">
-                        <label>Position:</label>
-                        <input type="text" style="width: 50%;">
+                    <div class="checkbox-item">
+                      <input type="checkbox" <%= type !== 'regular' ? 'checked' : '' %> disabled>
+                      <span>COS</span>
                     </div>
-
-                    <div class="flex-row">
-                        <div class="input-group" style="width: 48%;">
-                            <label>Mobile No:</label>
-                            <input type="text">
-                        </div>
-                        <div class="input-group" style="width: 48%;">
-                            <label>Telephone No:</label>
-                            <input type="text">
-                        </div>
-                    </div>
+                  </div>
                 </div>
-            </div>
+
+                <div class="purpose-section">
+                  <div class="input-group">
+                    <label>PURPOSE (specific):</label>
+                  </div>
+                  <div class="purpose-lines">
+                    <input type="text" name="purpose" required style="width:100%;">
+                    <input type="text" style="width:100%;">
+                    <input type="text" style="width:100%;">
+                  </div>
+                </div>
+
+                <div class="signatures">
+                  <div class="sig-box">Signature over printed name of employee</div>
+                  <div class="sig-box">Signature over printed name of Immediate Supervisor</div>
+                </div>
+              </div><!-- /section -->
+
+              <div class="section section-divider">
+                <h2 class="section-title">CERTIFICATION</h2>
+
+                <div class="cert-paragraph">
+                  This is to certify that Mr./Ms.
+                  <strong class="cert-name-highlight"><%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %></strong>
+                  of the Bureau of Fisheries and Aquatic Resources (BFAR) has personally appeared at the
+                  <input type="text" style="width:80%;margin-top:15px;" readonly placeholder="">
+                  on the above stated purpose.
+                </div>
+                <span class="sub-label">(Name of office)</span>
+
+                <div class="flex-row" style="margin-top:30px;">
+                  <div class="input-group" style="width:48%;">
+                    <label>Actual time of visit (log in):</label>
+                    <input type="text">
+                  </div>
+                  <div class="input-group" style="width:48%;">
+                    <label>Actual time finished (log out):</label>
+                    <input type="text">
+                  </div>
+                </div>
+
+                <div class="input-group" style="margin-top:25px;margin-bottom:20px;">
+                  <label>Name and signature of staff who assisted:</label>
+                  <input type="text">
+                </div>
+
+                <div class="input-group" style="margin-bottom:20px;">
+                  <label>Position:</label>
+                  <input type="text" style="width:50%;">
+                </div>
+
+                <div class="flex-row">
+                  <div class="input-group" style="width:48%;">
+                    <label>Mobile No:</label>
+                    <input type="text">
+                  </div>
+                  <div class="input-group" style="width:48%;">
+                    <label>Telephone No:</label>
+                    <input type="text">
+                  </div>
+                </div>
+              </div><!-- /section -->
+            </div><!-- /form-border -->
 
             <div class="footer-info">
-                <span>🌐 www.mimaropa.bfar.da.gov.ph</span>
-                <span>ⓕ BFAR Mimaropa Region</span>
+              <span>🌐 www.mimaropa.bfar.da.gov.ph</span>
+              <span>ⓕ BFAR Mimaropa Region</span>
             </div>
-            
-            <div class="action-buttons no-print" style="margin-top: 20px;">
-                <button type="submit" class="btn" style="padding: 15px 30px; font-size: 16px;">Submit Passlip Application</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div id="passlipModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 style="margin-top: 0; color:#2c75b6;"><%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %> Passlips Database</h3>
-        <table border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-top:1rem; border-collapse: collapse;">
-            <thead style="background-color: #f4f4f4;">
-                <tr>
-                    <th>Passlip No</th>
-                    <th>Date</th>
-                    <th>Employee Name</th>
-                    <th>Employee ID</th>
-                    <th>Department</th>
-                    <th>Office / Agency</th>
-                    <th>Purpose</th>
-                    <th>Action</th>
-                </tr>
+            <!-- Submit inside the doc so it's part of the form -->
+            <div class="no-print" style="text-align:center;margin:16px 0 8px;">
+              <button type="submit"
+                class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold
+                       bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                       text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
+                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Submit Passlip Application
+              </button>
+            </div>
+
+          </div><!-- /paper-inner -->
+        </div><!-- /paper-wrap -->
+
+      </form>
+    </div><!-- /passlip-doc -->
+
+  </main>
+
+
+  <!-- ══════════════════════════════════════════
+       RECORDS MODAL
+  ══════════════════════════════════════════ -->
+  <div id="passlipModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700
+                w-full max-w-5xl max-h-[90vh] flex flex-col"
+         style="animation: fade-in 0.25s ease forwards;">
+
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700 shrink-0">
+        <div>
+          <h3 class="font-display text-lg text-navy-700 dark:text-navy-200">Recorded Passlips</h3>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+            <%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %> — all submissions
+          </p>
+        </div>
+        <button id="closeModal" aria-label="Close"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200
+                 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal table -->
+      <div class="overflow-y-auto flex-1">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-slate-700/80 text-xs uppercase tracking-wider
+                          text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+              <tr>
+                <th class="px-5 py-3 text-left font-semibold">Passlip No</th>
+                <th class="px-5 py-3 text-left font-semibold">Date</th>
+                <th class="px-5 py-3 text-left font-semibold">Employee</th>
+                <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Emp ID</th>
+                <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Department</th>
+                <th class="px-5 py-3 text-left font-semibold hidden lg:table-cell">Office / Agency</th>
+                <th class="px-5 py-3 text-left font-semibold hidden lg:table-cell">Purpose</th>
+                <th class="px-5 py-3 text-right font-semibold">Action</th>
+              </tr>
             </thead>
-            <tbody>
-                <% if(records && records.length === 0){ %>
-                    <tr>
-                        <td colspan="7" style="text-align:center;">No records found</td>
-                    </tr>
-                <% } else if(records){ %>
-                    <% records.forEach(r => { %>
-                        <tr>
-                            <td><%= r.passlip_no %></td>
-                            <td><%= new Date(r.pass_date).toLocaleDateString() %></td>
-                            <td><%= r.employee_name %></td>
-                            <td><%= r.employee_id %></td>
-                            <td><%= r.department %></td>
-                            <td><%= r.office_visit %></td>
-                            <td><%= r.purpose %></td>
-                            <td>
-    <a href="/passlip/print/<%= r.id %>?type=<%= type %>" 
-       target="_blank" 
-       class="btn btn-secondary">
-        Print
-    </a>
-</td>
-                        </tr>
-                    <% }) %>
-                <% } %>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+              <% if (!records || records.length === 0) { %>
+                <tr>
+                  <td colspan="8" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
+                    No passlip records found.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% records.forEach(r => { %>
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
+                  <td class="px-5 py-3.5 font-semibold text-navy-600 dark:text-navy-300 whitespace-nowrap">
+                    <%= r.passlip_no %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
+                    <%= new Date(r.pass_date).toLocaleDateString() %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-700 dark:text-slate-200 font-medium">
+                    <%= r.employee_name %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
+                    <%= r.employee_id || '—' %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs max-w-[140px] truncate">
+                    <%= r.department %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[150px] truncate">
+                    <%= r.office_visit %>
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[200px] truncate">
+                    <%= r.purpose %>
+                  </td>
+                  <td class="px-5 py-3.5 text-right">
+                    <a href="/passlip/print/<%= r.id %>?type=<%= type %>" target="_blank"
+                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium
+                             border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                             text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
+                             dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                      Print
+                    </a>
+                  </td>
+                </tr>
+                <% }) %>
+              <% } %>
             </tbody>
-        </table>
+          </table>
+        </div>
+      </div>
+
     </div>
-</div>
+  </div>
 
-<script nonce="<%= nonce %>">
-    const modal = document.getElementById("passlipModal");
-    const btn = document.getElementById("openModalBtn");
-    const span = document.getElementsByClassName("close")[0];
 
-    btn.addEventListener('click', function(e) {
-        e.preventDefault(); 
-        modal.style.display = "block";
+  <script nonce="<%= nonce %>">
+    // ── Theme ──────────────────────────────────────────────────
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+    // ── Records modal ──────────────────────────────────────────
+    const modal = document.getElementById('passlipModal');
+    document.getElementById('openModalBtn').addEventListener('click', () => {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    });
+    document.getElementById('closeModal').addEventListener('click', () => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
 
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
+    
+  </script>
 </body>
 </html>

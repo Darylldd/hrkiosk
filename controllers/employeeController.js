@@ -104,7 +104,7 @@ exports.createEmployee = async (req, res) => {
         Employee.create(employeeData, (err) => {
             if (err) {
                 console.error('createEmployee DB error:', err);
-                // FIX: don't leak raw DB errors to the user
+            
                 return res.status(500).send('Error saving employee. Please try again.');
             }
             res.redirect('/employees');

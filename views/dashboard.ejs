@@ -1,262 +1,500 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard</title>
-<style>
-  /* ── Modal overlay ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.45);
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-  }
-  .modal-box {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    min-width: 340px;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  }
-  .modal-box h3 {
-    margin-bottom: 1.2rem;
-    font-size: 17px;
-    color: #1a5276;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:  '#eef2f7',
+              100: '#d5e0ed',
+              200: '#abc1db',
+              300: '#7599be',
+              400: '#4a72a0',
+              500: '#1a5276',
+              600: '#154464',
+              700: '#103552',
+              800: '#0b2640',
+              900: '#06192e',
+            },
+          },
+          keyframes: {
+            'slide-up': {
+              '0%':   { opacity: '0', transform: 'translateY(12px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'modal-in': {
+              '0%':   { opacity: '0', transform: 'scale(0.96) translateY(8px)' },
+              '100%': { opacity: '1', transform: 'scale(1)   translateY(0)' },
+            },
+          },
+          animation: {
+            'slide-up': 'slide-up 0.35s ease forwards',
+            'modal-in': 'modal-in 0.25s ease forwards',
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
 
-  /* ── Payslip type cards ── */
-  .payslip-type-grid {
-    display: flex;
-    gap: 14px;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  .type-card {
-    border: 2px solid #d0dce8;
-    border-radius: 8px;
-    padding: 14px 18px;
-    width: 140px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #1a5276;
-    font-weight: bold;
-    font-size: 13px;
-    transition: all .2s;
-    display: block;
-  }
-  .type-card:hover {
-    background: #1a5276;
-    color: #fff;
-    border-color: #1a5276;
-  }
-  .type-card .card-icon { font-size: 26px; display: block; margin-bottom: 6px; }
-  .type-card .card-label { display: block; font-size: 12px; margin-top: 4px; color: inherit; font-weight: normal; }
-
-  hr.modal-divider { border: none; border-top: 1px solid #eee; margin: 1rem 0; }
-
-  .btn-cancel {
-    margin-top: 6px;
-    background: none;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 7px 22px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #555;
-  }
-  .btn-cancel:hover { background: #f5f5f5; }
-</style>
+    /* Stagger card animations */
+    .action-card:nth-child(1) { animation-delay: 0.05s; }
+    .action-card:nth-child(2) { animation-delay: 0.10s; }
+    .action-card:nth-child(3) { animation-delay: 0.15s; }
+    .action-card:nth-child(4) { animation-delay: 0.20s; }
+    .action-card:nth-child(5) { animation-delay: 0.25s; }
+    .action-card:nth-child(6) { animation-delay: 0.30s; }
+    .action-card:nth-child(7) { animation-delay: 0.35s; }
+    .action-card { opacity: 0; }
+  </style>
 </head>
-<body>
 
-<h2>Dashboard</h2>
-<h3>Welcome <%= employee.first_name %> <%= employee.last_name %> (<%= employee.department %>)</h3>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<a href="/dtr"><button>Go to Daily Time Record (DTR)</button></a>
+  <!-- ══════════════════════════════════════════
+       TOP NAVIGATION BAR
+  ══════════════════════════════════════════ -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 
-<% if(
-employee.department === 'HR' ||
-employee.department === 'HRMU' ||
-employee.department === 'Finance and Administrative Section (FAS)' ||
-employee.department === 'admin'
-) { %>
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block">Employee Portal</span>
+      </div>
 
-<a href="/admin/dtr">
-  <button>View All Employees DTR</button>
-</a>
+      <!-- User info + actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Department badge -->
+        <span class="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-navy-50 dark:bg-navy-900/50 text-navy-600 dark:text-navy-300 border border-navy-100 dark:border-navy-800">
+          <%= employee.department %>
+        </span>
 
-<% } %>
+        <!-- Dark mode toggle -->
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700
+                 text-slate-500 dark:text-slate-400 hover:text-navy-500 dark:hover:text-navy-300
+                 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700
+                 transition-all duration-200">
+          <svg id="iconSun" class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg id="iconMoon" class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
 
-<% if(employee.role === 'hr') { %>
-  <button id="profileBtn">Profile</button>
-<% } else { %>
-  <a href="/profile"><button>View My Profile</button></a>
-<% } %>
-
-<a href="/travel-orders" class="dashboard-btn">📄 Travel Orders</a>
-<button id="passlipBtn">📝 Submit Passlip</button>
-
-<% if(employee.role === 'hr') { %>
-  <button id="payslipBtn">Manage Payslips</button>
-<% } else { %>
-  <a href="/payslip/my"><button>View My Payslip</button></a>
-<% } %>
-
-<a href="/logout">Logout</a>
-
-
-<!-- ══════════════════════════════════════════
-     PASSLIP MODAL
-══════════════════════════════════════════ -->
-<div id="passlipModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3>Select Passlip Type</h3>
-    <a href="/passlip/form?type=regular"><button>Regular Employee</button></a>
-    <a href="/passlip/form?type=jocos"><button>JO &amp; COS</button></a>
-    <br><br>
-    <button class="btn-cancel" id="closeModal">Cancel</button>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════
-     PAYSLIP MODAL  (two tabs: Create / List)
-══════════════════════════════════════════ -->
-<div id="payslipModalDashboard" class="modal-overlay">
-  <div class="modal-box" style="min-width:420px;">
-    <h3>Payslip Actions</h3>
-
-    <!-- ── Tab switcher ── -->
-    <div style="display:flex; border-bottom:2px solid #d0dce8; margin-bottom:16px;">
-      <button class="tab-btn active" data-tab="createTab"
-        style="flex:1; padding:9px; border:none; background:none; font-weight:bold; font-size:13px; cursor:pointer; color:#1a5276; border-bottom:3px solid #1a5276;">
-        ➕ Create Payslip
-      </button>
-      <button class="tab-btn" data-tab="listTab"
-        style="flex:1; padding:9px; border:none; background:none; font-weight:bold; font-size:13px; cursor:pointer; color:#888; border-bottom:3px solid transparent;">
-        📋 View / List
-      </button>
-    </div>
-
-    <!-- ── CREATE tab ── -->
-    <div id="createTab" class="tab-pane">
-      <p style="font-size:12px; color:#666; margin-bottom:14px;">Which payslip type do you want to create?</p>
-      <div class="payslip-type-grid">
-
-        <a href="/payslip/create" class="type-card">
-          <span class="card-icon">🧾</span>
-          Standard Payslip
-          <span class="card-label">Basic pay, deductions, net pay</span>
+        <!-- Logout -->
+        <a href="/logout"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400
+                 border border-slate-200 dark:border-slate-700
+                 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20
+                 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span class="hidden sm:inline">Logout</span>
         </a>
-
-        <a href="/admin/payslip/create" class="type-card">
-          <span class="card-icon">📑</span>
-          Gov't Payslip
-          <span class="card-label">GSIS, PERA, periods & more</span>
-        </a>
-
       </div>
     </div>
+  </header>
 
-    <!-- ── LIST tab ── -->
-    <div id="listTab" class="tab-pane" style="display:none;">
-      <p style="font-size:12px; color:#666; margin-bottom:14px;">Which records do you want to view?</p>
-      <div class="payslip-type-grid">
+  <!-- ══════════════════════════════════════════
+       PAGE BODY
+  ══════════════════════════════════════════ -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <a href="/payslip/list" class="type-card">
-          <span class="card-icon">🗂️</span>
-          Standard Records
-          <span class="card-label">View all standard payslips</span>
-        </a>
-
-        <a href="/admin/payslip/list" class="type-card">
-          <span class="card-icon">📂</span>
-          Gov't Records
-          <span class="card-label">View all gov't payslips</span>
-        </a>
-
-      </div>
+    <!-- Welcome banner -->
+    <div class="mb-8 bg-gradient-to-r from-navy-600 to-navy-500 dark:from-navy-700 dark:to-navy-600 rounded-2xl px-6 py-5 text-white shadow-lg">
+      <p class="text-navy-200 dark:text-navy-300 text-sm font-medium mb-0.5">Welcome back</p>
+      <h2 class="font-display text-xl sm:text-2xl">
+        <%= employee.first_name %> <%= employee.last_name %>
+      </h2>
+      <p class="mt-1 text-sm text-navy-200 dark:text-navy-300">
+        <%= employee.position || employee.department %>
+      </p>
     </div>
 
-    <hr class="modal-divider">
-    <button class="btn-cancel" id="closePayslipModalDashboard">Cancel</button>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════
-     PROFILE MODAL
-══════════════════════════════════════════ -->
-<div id="profileModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3>Profile Actions</h3>
-    <a href="/profile"><button>View My Profile</button></a>
-
-    <% if(employee.role === 'hr') { %>
-      <hr class="modal-divider">
-      <a href="/employees"><button>Employee List</button></a>
-      <a href="/employees/add"><button>Add New Employee</button></a>
+    <!-- Flash messages -->
+    <% if (locals.error) { %>
+      <div role="alert"
+        class="mb-6 flex items-start gap-3 px-4 py-3 rounded-xl
+               bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800
+               text-red-700 dark:text-red-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <span class="text-sm font-medium"><%= error %></span>
+      </div>
     <% } %>
 
-    <br><br>
-    <button class="btn-cancel" id="closeProfileModal">Cancel</button>
+    <% if (locals.success) { %>
+      <div role="alert"
+        class="mb-6 flex items-start gap-3 px-4 py-3 rounded-xl
+               bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800
+               text-green-700 dark:text-green-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-sm font-medium"><%= success %></span>
+      </div>
+    <% } %>
+
+    <!-- Section label -->
+    <h3 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4">Quick Actions</h3>
+
+    <!-- ── Action cards grid ──────────────────────────────── -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+
+      <!-- DTR -->
+      <a href="/dtr" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200">
+        <span class="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+          </svg>
+        </span>
+        <div>
+          <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">My DTR</p>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">Daily time record</p>
+        </div>
+      </a>
+
+      <!-- Admin DTR — only for authorized departments -->
+      <% if (['HR','HRMU','Finance and Administrative Section (FAS)','admin'].includes(employee.department)) { %>
+        <a href="/admin/dtr" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200">
+          <span class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">All DTR</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">All employees</p>
+          </div>
+        </a>
+      <% } %>
+
+      <!-- Profile -->
+      <% if (employee.role === 'hr') { %>
+        <button id="profileBtn" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200 text-left w-full">
+      <% } else { %>
+        <a href="/profile" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200">
+      <% } %>
+          <span class="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Profile</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight"><%= employee.role === 'hr' ? 'Manage profiles' : 'View my profile' %></p>
+          </div>
+      <% if (employee.role === 'hr') { %>
+        </button>
+      <% } else { %>
+        </a>
+      <% } %>
+
+      <!-- Travel Orders -->
+      <a href="/travel-orders" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200">
+        <span class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </span>
+        <div>
+          <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Travel Orders</p>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">View & manage TOs</p>
+        </div>
+      </a>
+
+      <!-- Passlip -->
+      <button id="passlipBtn" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200 text-left w-full">
+        <span class="p-2.5 rounded-lg bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </span>
+        <div>
+          <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Passlip</p>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">Submit a passlip</p>
+        </div>
+      </button>
+
+      <!-- Payslip -->
+      <% if (employee.role === 'hr') { %>
+        <button id="payslipBtn" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200 text-left w-full">
+      <% } else { %>
+        <a href="/payslip/my" class="action-card animate-slide-up group flex flex-col items-start gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-navy-300 dark:hover:border-navy-600 hover:shadow-md transition-all duration-200">
+      <% } %>
+          <span class="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Payslip</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-tight"><%= employee.role === 'hr' ? 'Manage payslips' : 'View my payslip' %></p>
+          </div>
+      <% if (employee.role === 'hr') { %>
+        </button>
+      <% } else { %>
+        </a>
+      <% } %>
+
+    </div><!-- /grid -->
+  </main>
+
+
+  <!-- ══════════════════════════════════════════
+       PASSLIP MODAL
+  ══════════════════════════════════════════ -->
+  <div id="passlipModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 w-full max-w-sm p-6 animate-modal-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-display text-lg text-navy-700 dark:text-navy-200">Select Passlip Type</h3>
+        <button class="modal-close-btn p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition" data-modal="passlipModal" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2.5">
+        <a href="/passlip/form?type=regular"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium transition-all duration-200 group">
+          <span class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </span>
+          Regular Employee
+        </a>
+        <a href="/passlip/form?type=jocos"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium transition-all duration-200 group">
+          <span class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </span>
+          JO &amp; COS
+        </a>
+      </div>
+    </div>
   </div>
-</div>
 
 
-<script nonce="<%= nonce %>">
-// ── Generic modal helpers ──────────────────────────────────
-function openModal(el)  { el.style.display = 'flex'; }
-function closeModal(el) { el.style.display = 'none'; }
+  <!-- ══════════════════════════════════════════
+       PAYSLIP MODAL  (Create / List tabs)
+  ══════════════════════════════════════════ -->
+  <div id="payslipModalDashboard" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 w-full max-w-md p-6 animate-modal-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-display text-lg text-navy-700 dark:text-navy-200">Payslip Actions</h3>
+        <button class="modal-close-btn p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition" data-modal="payslipModalDashboard" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
 
-// Click outside to close
-window.addEventListener('click', e => {
-  document.querySelectorAll('.modal-overlay').forEach(m => {
-    if (e.target === m) closeModal(m);
-  });
-});
+      <!-- Tabs -->
+      <div class="flex gap-1 p-1 bg-slate-100 dark:bg-slate-700/50 rounded-xl mb-5">
+        <button data-tab="createTab"
+          class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200
+                 bg-white dark:bg-slate-700 text-navy-600 dark:text-navy-300 shadow-sm">
+          Create Payslip
+        </button>
+        <button data-tab="listTab"
+          class="tab-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200
+                 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+          View / List
+        </button>
+      </div>
 
-// ── Passlip modal ──────────────────────────────────────────
-document.getElementById('passlipBtn') .addEventListener('click', () => openModal(document.getElementById('passlipModal')));
-document.getElementById('closeModal') .addEventListener('click', () => closeModal(document.getElementById('passlipModal')));
+      <!-- Create tab -->
+      <div id="createTab" class="tab-pane grid grid-cols-2 gap-3">
+        <a href="/payslip/create"
+          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-center text-sm font-medium transition-all duration-200 group">
+          <span class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white group-hover:border-navy-500 transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+          </span>
+          <span>Standard<br /><span class="text-xs font-normal text-slate-400 dark:text-slate-500">Basic pay &amp; deductions</span></span>
+        </a>
+        <a href="/admin/payslip/create"
+          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-center text-sm font-medium transition-all duration-200 group">
+          <span class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white group-hover:border-navy-500 transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+          </span>
+          <span>Gov&apos;t<br /><span class="text-xs font-normal text-slate-400 dark:text-slate-500">GSIS, PERA &amp; more</span></span>
+        </a>
+      </div>
 
-// ── Payslip modal ──────────────────────────────────────────
-const payslipModal = document.getElementById('payslipModalDashboard');
+      <!-- List tab -->
+      <div id="listTab" class="tab-pane hidden grid grid-cols-2 gap-3">
+        <a href="/payslip/list"
+          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-center text-sm font-medium transition-all duration-200 group">
+          <span class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white group-hover:border-navy-500 transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+          </span>
+          <span>Standard<br /><span class="text-xs font-normal text-slate-400 dark:text-slate-500">All standard records</span></span>
+        </a>
+        <a href="/admin/payslip/list"
+          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-center text-sm font-medium transition-all duration-200 group">
+          <span class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white group-hover:border-navy-500 transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
+          </span>
+          <span>Gov&apos;t<br /><span class="text-xs font-normal text-slate-400 dark:text-slate-500">All gov&apos;t records</span></span>
+        </a>
+      </div>
+    </div>
+  </div>
 
-document.getElementById('payslipBtn')
-  ?.addEventListener('click', () => openModal(payslipModal));
 
-document.getElementById('closePayslipModalDashboard')
-  .addEventListener('click', () => closeModal(payslipModal));
+  <!-- ══════════════════════════════════════════
+       PROFILE MODAL
+  ══════════════════════════════════════════ -->
+  <div id="profileModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 w-full max-w-sm p-6 animate-modal-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-display text-lg text-navy-700 dark:text-navy-200">Profile Actions</h3>
+        <button class="modal-close-btn p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition" data-modal="profileModal" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2.5">
+        <a href="/profile"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium transition-all duration-200 group">
+          <span class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </span>
+          View My Profile
+        </a>
+        <% if (employee.role === 'hr') { %>
+          <a href="/employees"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium transition-all duration-200 group">
+            <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </span>
+            Employee List
+          </a>
+          <a href="/employees/add"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/30 text-slate-700 dark:text-slate-200 text-sm font-medium transition-all duration-200 group">
+            <span class="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400 flex items-center justify-center group-hover:bg-navy-500 group-hover:text-white transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+            </span>
+            Add New Employee
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
 
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    // update active styles
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.style.color = '#888';
-      b.style.borderBottom = '3px solid transparent';
+
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    // ── Theme ──────────────────────────────────────────────────
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
-    btn.style.color = '#1a5276';
-    btn.style.borderBottom = '3px solid #1a5276';
 
-    // show correct pane
-    document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-    document.getElementById(btn.dataset.tab).style.display = 'block';
-  });
-});
+    // ── Modal helpers ──────────────────────────────────────────
+    function openModal(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
 
-// ── Profile modal ──────────────────────────────────────────
-document.getElementById('profileBtn')
-  ?.addEventListener('click', () => openModal(document.getElementById('profileModal')));
+    // Close on backdrop click
+    document.querySelectorAll('[id$="Modal"], [id$="ModalDashboard"]').forEach(m => {
+      m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+    });
 
-document.getElementById('closeProfileModal')
-  .addEventListener('click', () => closeModal(document.getElementById('profileModal')));
-</script>
+    // Close buttons
+    document.querySelectorAll('.modal-close-btn').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.modal));
+    });
 
+    // Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('[id$="Modal"],[id$="ModalDashboard"]').forEach(m => {
+          if (!m.classList.contains('hidden')) closeModal(m.id);
+        });
+      }
+    });
+
+    // Open triggers
+    document.getElementById('passlipBtn')?.addEventListener('click', () => openModal('passlipModal'));
+    document.getElementById('payslipBtn')?.addEventListener('click', () => openModal('payslipModalDashboard'));
+    document.getElementById('profileBtn')?.addEventListener('click', () => openModal('profileModal'));
+
+    // ── Payslip tabs ───────────────────────────────────────────
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update tab styles
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('bg-white', 'dark:bg-slate-700', 'text-navy-600', 'dark:text-navy-300', 'shadow-sm');
+          b.classList.add('text-slate-500', 'dark:text-slate-400');
+        });
+        btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-navy-600', 'dark:text-navy-300', 'shadow-sm');
+        btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+
+        // Show correct pane
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+        document.getElementById(btn.dataset.tab).classList.remove('hidden');
+      });
+    });
+  </script>
 </body>
 </html>

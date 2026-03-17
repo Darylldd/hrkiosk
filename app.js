@@ -25,9 +25,19 @@ app.use((req, res, next) => {
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", `'nonce-${res.locals.nonce}'`],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", "data:"],
+                scriptSrc: [
+                    "'self'",
+                    "'unsafe-inline'",          
+                    "https://cdn.tailwindcss.com",
+                    "https://unpkg.com"
+                ],
+                styleSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://fonts.googleapis.com"
+                ],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                imgSrc: ["'self'", "data:"]
             }
         }
     })(req, res, next);
@@ -35,7 +45,7 @@ app.use((req, res, next) => {
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 1000,
     message: 'Too many login attempts. Please try again later.',
     standardHeaders: true,
     legacyHeaders: false,

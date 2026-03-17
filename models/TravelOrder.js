@@ -37,7 +37,9 @@ const TravelOrder = {
         db.query(sql, params, callback);
     },
 
-    findAll: (search, callback) => {
+    // employeeId = null  → HR/admin: returns all records
+    // employeeId = <id>  → regular employee: returns only their own records
+    findAll: (search, employeeId, callback) => {
         let sql = `
             SELECT 
                 t.to_no,
@@ -54,16 +56,31 @@ const TravelOrder = {
         `;
 
         const params = [];
+        const conditions = [];
+
+        // Scope to the current employee when they are not HR/admin
+        if (employeeId) {
+            conditions.push(`t.to_no IN (
+                SELECT to_no FROM travel_orders WHERE employee_id = ?
+            )`);
+            params.push(employeeId);
+        }
+
+        // Optional keyword search
         if (search) {
-            sql += `
-                WHERE t.to_no LIKE ? 
-                   OR t.destination LIKE ? 
-                   OR e.first_name LIKE ?
-                   OR e.last_name LIKE ?
-                   OR e.department LIKE ?
-            `;
+            conditions.push(`(
+                t.to_no LIKE ? 
+                OR t.destination LIKE ? 
+                OR e.first_name LIKE ?
+                OR e.last_name LIKE ?
+                OR e.department LIKE ?
+            )`);
             const s = `%${search}%`;
             params.push(s, s, s, s, s);
+        }
+
+        if (conditions.length) {
+            sql += ' WHERE ' + conditions.join(' AND ');
         }
 
         sql += ` GROUP BY t.to_no ORDER BY MAX(t.id) DESC`;
@@ -83,19 +100,19 @@ const TravelOrder = {
         db.query(sql, [id], callback);
     },
 
-findByToId: (id, callback) => {
-    const sql = `
-        SELECT t.*,
-               e.id AS employee_id,
-           CONCAT(e.first_name, ' ', e.last_name) AS full_name,
-               e.department,    e.position
-        FROM travel_orders t
-        LEFT JOIN employees e ON e.id = t.employee_id
-        WHERE t.id = ? OR t.to_no = (SELECT to_no FROM travel_orders WHERE id = ?)
-        ORDER BY t.id
-    `;
-    db.query(sql, [id, id], callback);
-}
+    findByToId: (id, callback) => {
+        const sql = `
+            SELECT t.*,
+                   e.id AS employee_id,
+                   CONCAT(e.first_name, ' ', e.last_name) AS full_name,
+                   e.department, e.position
+            FROM travel_orders t
+            LEFT JOIN employees e ON e.id = t.employee_id
+            WHERE t.id = ? OR t.to_no = (SELECT to_no FROM travel_orders WHERE id = ?)
+            ORDER BY t.id
+        `;
+        db.query(sql, [id, id], callback);
+    }
 };
 
 module.exports = TravelOrder;

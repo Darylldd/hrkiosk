@@ -1,267 +1,459 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Employee</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',
+              400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',
+              800:'#0b2640',900:'#06192e',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
+
+    /* ── Combo-wrap styling ── */
+    .combo-wrap { position: relative; }
+    .combo-wrap input[type="text"] {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.875rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #0b2640;
+      outline: none;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .dark .combo-wrap input[type="text"] {
+      border-color: #475569;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .combo-wrap input[type="text"]:focus {
+      border-color: transparent;
+      box-shadow: 0 0 0 2px #4a72a0;
+    }
+    .combo-wrap select {
+      position: absolute;
+      left: 0; right: 0;
+      top: calc(100% + 4px);
+      z-index: 50;
+      border-radius: 0.5rem;
+      border: 1px solid #d0dce8;
+      background: #fff;
+      color: #1a202c;
+      font-size: 0.8125rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      overflow-y: auto;
+      max-height: 220px;
+    }
+    .dark .combo-wrap select {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #475569;
+    }
+    .combo-wrap select option,
+    .combo-wrap select optgroup { padding: 6px 10px; }
+    .combo-wrap select option:hover,
+    .combo-wrap select option:checked {
+      background: #1a5276;
+      color: #fff;
+    }
+
+    input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #f8fafc inset !important; -webkit-text-fill-color:#0b2640 !important; }
+    .dark input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #0f172a inset !important; -webkit-text-fill-color:#e2e8f0 !important; }
+  </style>
 </head>
-<body>
 
-<h1>Add New Employee</h1>
-<p>Bureau of Fisheries and Aquatic Resources · MIMAROPA Region</p>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<form action="/employees/add" method="POST" enctype="multipart/form-data">
-
-  <!-- IDENTITY -->
-  <fieldset>
-    <legend>Identity &amp; Access</legend>
-
-    <label>Employee No *<br>
-      <input name="employee_no" placeholder="e.g. 2024-001" required>
-    </label><br>
-
-    <label>Employee ID<br>
-      <input name="employee_id" placeholder="System ID">
-    </label><br>
-
-    <label>Account No<br>
-      <input name="account_no" placeholder="Bank account">
-    </label><br>
-
-    <label>PIN *<br>
-      <input name="pin" type="password" placeholder="••••" required>
-    </label><br>
-
-    <label>Profile Picture<br>
-      <input type="file" name="profile_pic" accept="image/*">
-    </label><br>
-    <small>JPG, PNG or GIF · max 2 MB</small>
-  </fieldset>
-
-  <!-- PERSONAL INFORMATION -->
-  <fieldset>
-    <legend>Personal Information</legend>
-
-    <label>First Name<br>
-      <input name="first_name" placeholder="Given name">
-    </label><br>
-
-    <label>Middle Name<br>
-      <input name="middle_name" placeholder="Middle name">
-    </label><br>
-
-    <label>Last Name<br>
-      <input name="last_name" placeholder="Surname">
-    </label><br>
-
-    <label>Birthdate<br>
-      <input type="date" name="birthdate">
-    </label><br>
-
-    <label>Civil Status<br>
-      <div class="combo-wrap"
-        data-name="civil_status"
-        data-placeholder="e.g. Single"
-        data-options='["Single","Married","Widowed","Separated"]'>
+  <!-- ── Nav ────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
+                 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
       </div>
-    </label><br>
+    </div>
+  </header>
 
-    <label>Sex<br>
-      <div class="combo-wrap"
-        data-name="sex"
-        data-placeholder="e.g. Male"
-        data-options='["Male","Female"]'>
+  <!-- ── Body ───────────────────────────────────────────── -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Add New Employee</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Bureau of Fisheries and Aquatic Resources · MIMAROPA Region</p>
+    </div>
+
+    <form action="/employees/add" method="POST" enctype="multipart/form-data" class="space-y-5">
+
+      <!-- ── Shared input class helper (used inline below) ── -->
+
+      <!-- Identity & Access -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Identity &amp; Access</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+          <div>
+            <label for="employee_no" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              Employee No <span class="text-red-400">*</span>
+            </label>
+            <input id="employee_no" name="employee_no" type="text" placeholder="e.g. 2024-001" required
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+          <div>
+            <label for="employee_id" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Employee ID</label>
+            <input id="employee_id" name="employee_id" type="text" placeholder="System ID"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+          <div>
+            <label for="account_no" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Account No</label>
+            <input id="account_no" name="account_no" type="text" placeholder="Bank account"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+          <div>
+            <label for="pin" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              PIN <span class="text-red-400">*</span>
+            </label>
+            <div class="relative">
+              <input id="pin" name="pin" type="password" placeholder="Min. 4 characters" required
+                class="w-full pl-3 pr-10 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                       bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+              <button type="button" id="togglePin" aria-label="Show PIN"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-navy-500 transition-colors">
+                <svg id="eyeOpen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <svg id="eyeClosed" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Profile Picture</label>
+            <label for="profile_pic_add" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900
+                   text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Choose Photo
+            </label>
+            <input id="profile_pic_add" type="file" name="profile_pic" accept="image/*" class="hidden" />
+            <p id="picFileName" class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">JPG, PNG or GIF · max 2 MB</p>
+          </div>
+
+        </div>
       </div>
-    </label>
-  </fieldset>
 
-  <!-- EMPLOYMENT -->
-  <fieldset>
-    <legend>Employment Details</legend>
+      <!-- Personal Information -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Personal Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-    <label>Department / Office<br>
-      <div class="combo-wrap"
-        data-name="department"
-        data-placeholder="Select or type department"
-        data-groups='[
-          {"label":"Office / Department","options":["Finance and Administrative Section (FAS)","HRMU","Records","Budget","Accounting","Cashier","Property Unit","General Service Unit (GSU)","Office of the Regional Director","Planning Unit (SAAD / FishCore)","Legal Unit","Regional Fisheries Information Management Unit (RFIMU)","BAC Secretariat","Fisheries Inspection and Quarantine Unit (FIQU)","Fisheries Management Regulatory and Enforcement Division (FMRED)","Fisheries Production and Support Service Division (FPSSD)","Regional Fisheries Training and Fisherfolk Coordination Division (RFTFCD)"]},
-          {"label":"PFO — Provincial Fisheries Offices","options":["Provincial Fisheries Office - Occidental Mindoro","Provincial Fisheries Office - Oriental Mindoro","Provincial Fisheries Office - Marinduque","Provincial Fisheries Office - Romblon","Provincial Fisheries Office - Northern Palawan","Provincial Fisheries Office - Southern Palawan"]},
-          {"label":"Technology Outreach Station","options":["Inland Sea-Ranching Station Puerto Palawan"]},
-          {"label":"Operating Unit","options":["Brackishwater Fisheries Research Station San Jose Uno Naujan Oriental Mindoro","Freshwater Tech Station (Barcenaga Naujan Oriental Mindoro)","Multi Species Marine Hatchery Station","Mindoro Shrimp Hatchery"]}
-        ]'>
+          <% [
+            { label:'First Name',  name:'first_name',  ph:'Given name' },
+            { label:'Middle Name', name:'middle_name', ph:'Middle name' },
+            { label:'Last Name',   name:'last_name',   ph:'Surname' },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5"><%= f.label %></label>
+            <input id="<%= f.name %>" name="<%= f.name %>" type="text" placeholder="<%= f.ph %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+
+          <div>
+            <label for="birthdate" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Birthdate</label>
+            <input id="birthdate" name="birthdate" type="date"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Civil Status</label>
+            <div class="combo-wrap" data-name="civil_status" data-placeholder="e.g. Single" data-options='["Single","Married","Widowed","Separated"]'></div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Sex</label>
+            <div class="combo-wrap" data-name="sex" data-placeholder="e.g. Male" data-options='["Male","Female"]'></div>
+          </div>
+
+        </div>
       </div>
-    </label><br>
 
-    <label>Position / Designation<br>
-      <div class="combo-wrap"
-        data-name="position"
-        data-placeholder="Select or type position"
-        data-options='["Director II","Administrative Officer V","Attorney II","Administrative Officer IV","Accountant I","Administrative Officer II","Legal Assistant I","Administrative Officer III","Administrative Officer I","Administrative Aide IV","Senior Fishing Regulations Officer","Veterinarian II","Fishing Regulations Officer II","Fishing Regulations Officer I","Aquaculturist I","Librarian I","Training Specialist I","Aquacultural Technician I","Farm Foreman","Farm Worker II","Security Guard I","Farm Worker I","Administrative Aide I","Chief Fishing Regulations Officer","Senior Aquaculturist","Aquaculturist II","Launch Service Supervisor","Administrative Assistant III","Watchman III","Chief Aquaculturist","Biologist I","Chemist I","Laboratory Technician II","Training Center Superintendent II","Community Development Officer II","Training Specialist II","Community Development Officer I","Agricultural Center Chief II","Aquacultural Technologist"]'>
+      <!-- Employment Details -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Employment Details</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Department / Office</label>
+            <div class="combo-wrap" data-name="department" data-placeholder="Select or type department"
+              data-groups='[
+                {"label":"Office / Department","options":["Finance and Administrative Section (FAS)","HRMU","Records","Budget","Accounting","Cashier","Property Unit","General Service Unit (GSU)","Office of the Regional Director","Planning Unit (SAAD / FishCore)","Legal Unit","Regional Fisheries Information Management Unit (RFIMU)","BAC Secretariat","Fisheries Inspection and Quarantine Unit (FIQU)","Fisheries Management Regulatory and Enforcement Division (FMRED)","Fisheries Production and Support Service Division (FPSSD)","Regional Fisheries Training and Fisherfolk Coordination Division (RFTFCD)"]},
+                {"label":"PFO — Provincial Fisheries Offices","options":["Provincial Fisheries Office - Occidental Mindoro","Provincial Fisheries Office - Oriental Mindoro","Provincial Fisheries Office - Marinduque","Provincial Fisheries Office - Romblon","Provincial Fisheries Office - Northern Palawan","Provincial Fisheries Office - Southern Palawan"]},
+                {"label":"Technology Outreach Station","options":["Inland Sea-Ranching Station Puerto Palawan"]},
+                {"label":"Operating Unit","options":["Brackishwater Fisheries Research Station San Jose Uno Naujan Oriental Mindoro","Freshwater Tech Station (Barcenaga Naujan Oriental Mindoro)","Multi Species Marine Hatchery Station","Mindoro Shrimp Hatchery"]}
+              ]'>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Position / Designation</label>
+            <div class="combo-wrap" data-name="position" data-placeholder="Select or type position"
+              data-options='["Director II","Administrative Officer V","Attorney II","Administrative Officer IV","Accountant I","Administrative Officer II","Legal Assistant I","Administrative Officer III","Administrative Officer I","Administrative Aide IV","Senior Fishing Regulations Officer","Veterinarian II","Fishing Regulations Officer II","Fishing Regulations Officer I","Aquaculturist I","Librarian I","Training Specialist I","Aquacultural Technician I","Farm Foreman","Farm Worker II","Security Guard I","Farm Worker I","Administrative Aide I","Chief Fishing Regulations Officer","Senior Aquaculturist","Aquaculturist II","Launch Service Supervisor","Administrative Assistant III","Watchman III","Chief Aquaculturist","Biologist I","Chemist I","Laboratory Technician II","Training Center Superintendent II","Community Development Officer II","Training Specialist II","Community Development Officer I","Agricultural Center Chief II","Aquacultural Technologist"]'>
+            </div>
+          </div>
+
+          <div>
+            <label for="status" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Employment Status</label>
+            <input id="status" name="status" type="text" placeholder="ACTIVE"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Nature of Employment</label>
+            <div class="combo-wrap" id="nature-combo" data-name="nature_of_employment"
+              data-placeholder="Select nature of employment"
+              data-options='["Permanent","Casual","JO/COS"]'>
+            </div>
+          </div>
+
+          <div>
+            <label id="date-hired-label" for="date-hired-input"
+              class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Date Hired</label>
+            <input type="date" name="date_hired" id="date-hired-input"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+
+        </div>
       </div>
-    </label><br>
 
-    <label>Employment Status<br>
-      <input name="status" placeholder="ACTIVE">
-    </label><br>
-
-    <label>Nature of Employment <br>
-      <div class="combo-wrap"
-        id="nature-combo"
-        data-name="nature_of_employment"
-        data-placeholder="Select nature of employment"
-        data-options='["Permanent","Casual","JO/COS"]'>
+      <!-- Government IDs -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Government IDs</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <% [
+            { label:'TIN',           name:'tin',           ph:'000-000-000' },
+            { label:'PhilHealth No', name:'philhealth_no', ph:'00-000000000-0' },
+            { label:'GSIS No',       name:'gsis_no',       ph:'GSIS number' },
+            { label:'SSS No',        name:'sss_no',        ph:'00-0000000-0' },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5"><%= f.label %></label>
+            <input id="<%= f.name %>" name="<%= f.name %>" type="text" placeholder="<%= f.ph %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+        </div>
       </div>
-    </label><br>
 
-    <label id="date-hired-label">Date Hired<br>
-      <input type="date" name="date_hired" id="date-hired-input">
-    </label>
-  </fieldset>
+      <!-- Contact Information -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Contact Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <% [
+            { label:'Email Address',          name:'email',                   type:'email', ph:'name@bfar.da.gov.ph' },
+            { label:'Contact No',             name:'contact_no',              type:'text',  ph:'+63 9XX XXX XXXX' },
+            { label:'Emergency Contact Name', name:'emergency_contact_name',  type:'text',  ph:'Full name' },
+            { label:'Emergency Contact Phone',name:'emergency_contact_phone', type:'text',  ph:'+63 9XX XXX XXXX' },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5"><%= f.label %></label>
+            <input id="<%= f.name %>" name="<%= f.name %>" type="<%= f.type %>" placeholder="<%= f.ph %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+        </div>
+      </div>
 
-  <!-- GOVERNMENT IDs -->
-  <fieldset>
-    <legend>Government IDs</legend>
+      <!-- Submit bar -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <a href="/employees" class="px-5 py-2.5 rounded-xl text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">
+          Cancel
+        </a>
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          Save Employee
+        </button>
+      </div>
 
-    <label>TIN<br>
-      <input name="tin" placeholder="000-000-000">
-    </label><br>
+    </form>
+  </main>
 
-    <label>PhilHealth No.<br>
-      <input name="philhealth_no" placeholder="00-000000000-0">
-    </label><br>
-
-    <label>GSIS No.<br>
-      <input name="gsis_no" placeholder="GSIS number">
-    </label><br>
-
-    <label>SSS No.<br>
-      <input name="sss_no" placeholder="00-0000000-0">
-    </label>
-  </fieldset>
-
-  <!-- CONTACT -->
-  <fieldset>
-    <legend>Contact Information</legend>
-
-    <label>Email Address<br>
-      <input type="email" name="email" placeholder="name@bfar.da.gov.ph">
-    </label><br>
-
-    <label>Contact No.<br>
-      <input name="contact_no" placeholder="+63 9XX XXX XXXX">
-    </label><br>
-
-    <label>Emergency Contact Name<br>
-      <input name="emergency_contact_name" placeholder="Full name">
-    </label><br>
-
-    <label>Emergency Contact Phone<br>
-      <input name="emergency_contact_phone" placeholder="+63 9XX XXX XXXX">
-    </label>
-  </fieldset>
-
-  <br>
-  <a href="/dashboard">Back to Dashboard</a>
-  &nbsp;
-  <button type="submit">Save Employee</button>
-
-</form>
-
-<script>
-(function() {
-  const DATE_LABEL_MAP = {
-    'permanent': 'Date of Original Appointment',
-    'casual':    'Date of Appointment',
-    'jo/cos':    'Date Hired'
-  };
-
- function updateDateLabel(natureValue) {
-  const label = document.getElementById('date-hired-label');
-  const input = document.getElementById('date-hired-input');
-  if (!label || !input) return;
-
-  const key = (natureValue || '').toLowerCase();
-  const text = DATE_LABEL_MAP[key] || 'Date Hired';
-
-  label.innerHTML = text + '<br>';
-  label.appendChild(input);
-}
-
-  function buildCombo(wrap) {
-    const name        = wrap.dataset.name        || '';
-    const placeholder = wrap.dataset.placeholder || '';
-    const rawOptions  = wrap.dataset.options  ? JSON.parse(wrap.dataset.options)  : null;
-    const rawGroups   = wrap.dataset.groups   ? JSON.parse(wrap.dataset.groups)   : null;
-    const isNature    = (name === 'nature_of_employment');
-
-    const hidden = Object.assign(document.createElement('input'), { type: 'hidden', name });
-    wrap.appendChild(hidden);
-
-    const input = Object.assign(document.createElement('input'), {
-      type: 'text', placeholder, autocomplete: 'off'
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    // ── Theme ──────────────────────────────────────────────────
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
-    wrap.appendChild(input);
 
-    const dd = document.createElement('select');
-    dd.size = 5;
-    dd.style.display = 'none';
-    dd.style.display = 'none';
-    wrap.appendChild(dd);
+    // ── PIN toggle ─────────────────────────────────────────────
+    const pinInput  = document.getElementById('pin');
+    const eyeOpen   = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+    document.getElementById('togglePin').addEventListener('click', () => {
+      const hidden = pinInput.type === 'password';
+      pinInput.type = hidden ? 'text' : 'password';
+      eyeOpen.classList.toggle('hidden',  hidden);
+      eyeClosed.classList.toggle('hidden', !hidden);
+    });
 
-    // Use a plain <select> for the dropdown list
-    function render(query) {
-      dd.innerHTML = '';
-      const q = query.trim().toLowerCase();
+    // ── File name display ──────────────────────────────────────
+    document.getElementById('profile_pic_add').addEventListener('change', function () {
+      const label = document.getElementById('picFileName');
+      label.textContent = this.files[0] ? this.files[0].name : 'JPG, PNG or GIF · max 2 MB';
+    });
 
-      function makeOpt(label) {
-        const o = document.createElement('option');
-        o.textContent = label;
-        o.value = label;
-        dd.appendChild(o);
+    // ── Combo-wrap (preserved original logic) ─────────────────
+    (function () {
+      const DATE_LABEL_MAP = {
+        'permanent': 'Date of Original Appointment',
+        'casual':    'Date of Appointment',
+        'jo/cos':    'Date Hired',
+      };
+
+      function updateDateLabel(val) {
+        const label = document.getElementById('date-hired-label');
+        const input = document.getElementById('date-hired-input');
+        if (!label || !input) return;
+        const key  = (val || '').toLowerCase();
+        label.textContent = DATE_LABEL_MAP[key] || 'Date Hired';
       }
 
-      if (rawGroups) {
-        rawGroups.forEach(g => {
-          const matched = g.options.filter(o => !q || o.toLowerCase().includes(q));
-          if (!matched.length) return;
-          const og = document.createElement('optgroup');
-          og.label = g.label;
-          matched.forEach(l => {
-            const o = document.createElement('option');
-            o.textContent = l; o.value = l;
-            og.appendChild(o);
-          });
-          dd.appendChild(og);
+      function buildCombo(wrap) {
+        const name        = wrap.dataset.name        || '';
+        const placeholder = wrap.dataset.placeholder || '';
+        const rawOptions  = wrap.dataset.options  ? JSON.parse(wrap.dataset.options)  : null;
+        const rawGroups   = wrap.dataset.groups   ? JSON.parse(wrap.dataset.groups)   : null;
+        const isNature    = (name === 'nature_of_employment');
+
+        const hidden = Object.assign(document.createElement('input'), { type:'hidden', name });
+        wrap.appendChild(hidden);
+
+        const input = Object.assign(document.createElement('input'), { type:'text', placeholder, autocomplete:'off' });
+        wrap.appendChild(input);
+
+        const dd = document.createElement('select');
+        dd.size = 6;
+        dd.style.display = 'none';
+        wrap.appendChild(dd);
+
+        function render(query) {
+          dd.innerHTML = '';
+          const q = query.trim().toLowerCase();
+
+          if (rawGroups) {
+            rawGroups.forEach(g => {
+              const matched = g.options.filter(o => !q || o.toLowerCase().includes(q));
+              if (!matched.length) return;
+              const og = document.createElement('optgroup');
+              og.label = g.label;
+              matched.forEach(l => {
+                const o = document.createElement('option');
+                o.textContent = l; o.value = l;
+                og.appendChild(o);
+              });
+              dd.appendChild(og);
+            });
+          } else if (rawOptions) {
+            rawOptions.filter(o => !q || o.toLowerCase().includes(q)).forEach(l => {
+              const o = document.createElement('option');
+              o.textContent = l; o.value = l;
+              dd.appendChild(o);
+            });
+          }
+          dd.style.display = dd.options.length ? 'block' : 'none';
+        }
+
+        function pick(val) {
+          input.value  = val;
+          hidden.value = val;
+          dd.style.display = 'none';
+          input.focus();
+          if (isNature) updateDateLabel(val);
+        }
+
+        input.addEventListener('focus', () => render(input.value));
+        input.addEventListener('input', () => {
+          hidden.value = input.value;
+          render(input.value);
+          if (isNature) updateDateLabel(input.value);
         });
-      } else if (rawOptions) {
-        rawOptions.filter(o => !q || o.toLowerCase().includes(q)).forEach(makeOpt);
+        input.addEventListener('blur', () => setTimeout(() => { dd.style.display = 'none'; }, 160));
+        dd.addEventListener('change', () => pick(dd.value));
       }
 
-      dd.style.display = dd.options.length ? 'block' : 'none';
-    }
-
-    function pick(val) {
-      input.value  = val;
-      hidden.value = val;
-      dd.style.display = 'none';
-      input.focus();
-      if (isNature) updateDateLabel(val);
-    }
-
-    input.addEventListener('focus', () => render(input.value));
-    input.addEventListener('input', () => {
-      hidden.value = input.value;
-      render(input.value);
-      if (isNature) updateDateLabel(input.value);
-    });
-    input.addEventListener('blur', () => setTimeout(() => { dd.style.display = 'none'; }, 150));
-dd.addEventListener('change', () => {
-  pick(dd.value);
-});
-  }
-
-  document.querySelectorAll('.combo-wrap').forEach(buildCombo);
-})();
-</script>
+      document.querySelectorAll('.combo-wrap').forEach(buildCombo);
+    })();
+  </script>
 </body>
 </html>

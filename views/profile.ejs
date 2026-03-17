@@ -1,88 +1,267 @@
-<% if (msg) { %>
-<script>
-alert("<%= msg %>")
-</script>
-<% } %>
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',
+              400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',
+              800:'#0b2640',900:'#06192e',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in   { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
+    @keyframes slide-down{ from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .page-in   { animation: fade-in    0.35s ease forwards; }
+    .alert-in  { animation: slide-down 0.3s  ease forwards; }
+    input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #f8fafc inset !important; -webkit-text-fill-color:#0b2640 !important; }
+    .dark input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #0f172a inset !important; -webkit-text-fill-color:#e2e8f0 !important; }
+  </style>
+</head>
 
-<% if (error) { %>
-<script>
-alert("<%= error %>")
-</script>
-<% } %>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<h2>Your Profile</h2>
+  <!-- ── Nav ────────────────────────────────────────────── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
+                 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-<form action="/profile" method="POST" enctype="multipart/form-data">
+  <!-- ── Body ───────────────────────────────────────────── -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 page-in">
 
-<h3>Personal Information</h3>
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">My Profile</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Update your personal information and account details</p>
+    </div>
 
-<label>First Name</label><br>
-<input type="text" name="first_name" value="<%= employee.first_name || '' %>" required><br><br>
+    <!-- Alerts -->
+    <% if (locals.msg) { %>
+      <div role="alert" class="alert-in mb-6 flex items-start gap-3 px-4 py-3 rounded-xl
+           bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-sm font-medium"><%= msg %></span>
+      </div>
+    <% } %>
+    <% if (locals.error) { %>
+      <div role="alert" class="alert-in mb-6 flex items-start gap-3 px-4 py-3 rounded-xl
+           bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
+        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <span class="text-sm font-medium"><%= error %></span>
+      </div>
+    <% } %>
 
-<label>Middle Name</label><br>
-<input type="text" name="middle_name" value="<%= employee.middle_name || '' %>"><br><br>
+    <form action="/profile" method="POST" enctype="multipart/form-data" class="space-y-5">
 
-<label>Last Name</label><br>
-<input type="text" name="last_name" value="<%= employee.last_name || '' %>" required><br><br>
+      <!-- Profile picture -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4">Profile Picture</h2>
+        <div class="flex items-center gap-5">
+          <div class="shrink-0">
+            <% if (employee.profile_pic) { %>
+              <img id="picPreview" src="<%= employee.profile_pic %>" alt="Profile"
+                class="w-20 h-20 rounded-full object-cover border-2 border-navy-200 dark:border-navy-700 shadow" />
+            <% } else { %>
+              <div id="picPreview" class="w-20 h-20 rounded-full bg-navy-100 dark:bg-navy-900 border-2 border-navy-200 dark:border-navy-700
+                   flex items-center justify-center text-2xl font-bold text-navy-500 dark:text-navy-300 shadow select-none">
+                <%= (employee.first_name || '?').charAt(0).toUpperCase() %>
+              </div>
+            <% } %>
+          </div>
+          <div>
+            <label for="profile_pic" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                   border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900
+                   text-slate-600 dark:text-slate-300 hover:border-navy-400 dark:hover:border-navy-500
+                   hover:text-navy-600 dark:hover:text-navy-300 transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Change Photo
+            </label>
+            <input id="profile_pic" type="file" name="profile_pic" accept="image/*" class="hidden" />
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">JPG, PNG or GIF · max 2 MB</p>
+          </div>
+        </div>
+      </div>
 
-<label>Employee ID</label><br>
-<input type="text" name="employee_id" value="<%= employee.employee_id || '' %>"><br><br>
+      <!-- Personal Information -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Personal Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <% [
+            { label:'First Name',  name:'first_name',  val:employee.first_name,  req:true },
+            { label:'Middle Name', name:'middle_name', val:employee.middle_name, req:false },
+            { label:'Last Name',   name:'last_name',   val:employee.last_name,   req:true },
+            { label:'Employee ID', name:'employee_id', val:employee.employee_id, req:false },
+            { label:'Department',  name:'department',  val:employee.department,  req:false },
+            { label:'Position',    name:'position',    val:employee.position,    req:false },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+              <%= f.label %><% if(f.req){ %><span class="text-red-400 ml-0.5">*</span><% } %>
+            </label>
+            <input id="<%= f.name %>" type="text" name="<%= f.name %>"
+              value="<%= f.val || '' %>" <%= f.req ? 'required' : '' %>
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+        </div>
+      </div>
 
-<label>Department</label><br>
-<input type="text" name="department" value="<%= employee.department || '' %>"><br><br>
+      <!-- Contact Information -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Contact Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <% [
+            { label:'Email',          name:'email',      type:'email', val:employee.email },
+            { label:'Contact Number', name:'contact_no', type:'text',  val:employee.contact_no },
+            { label:'Account Number', name:'account_no', type:'text',  val:employee.account_no },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5"><%= f.label %></label>
+            <input id="<%= f.name %>" type="<%= f.type %>" name="<%= f.name %>"
+              value="<%= f.val || '' %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+        </div>
+      </div>
 
-<label>Position</label><br>
-<input type="text" name="position" value="<%= employee.position || '' %>"><br><br>
+      <!-- Government Details -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Government Details</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <% [
+            { label:'TIN',           name:'tin',           val:employee.tin },
+            { label:'PhilHealth No', name:'philhealth_no', val:employee.philhealth_no },
+            { label:'GSIS No',       name:'gsis_no',       val:employee.gsis_no },
+            { label:'SSS No',        name:'sss_no',        val:employee.sss_no },
+          ].forEach(f => { %>
+          <div>
+            <label for="<%= f.name %>" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5"><%= f.label %></label>
+            <input id="<%= f.name %>" type="text" name="<%= f.name %>"
+              value="<%= f.val || '' %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <% }) %>
+        </div>
+      </div>
 
+      <!-- Emergency Contact -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-5">Emergency Contact</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label for="emergency_contact_name" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Contact Name</label>
+            <input id="emergency_contact_name" type="text" name="emergency_contact_name"
+              value="<%= employee.emergency_contact_name || '' %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+          <div>
+            <label for="emergency_contact_phone" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">Contact Phone</label>
+            <input id="emergency_contact_phone" type="text" name="emergency_contact_phone"
+              value="<%= employee.emergency_contact_phone || '' %>"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+        </div>
+      </div>
 
-<h3>Contact Information</h3>
+      <!-- Submit -->
+      <div class="flex justify-end">
+        <button type="submit"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
+                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Update Profile
+        </button>
+      </div>
 
-<label>Email</label><br>
-<input type="email" name="email" value="<%= employee.email || '' %>"><br><br>
+    </form>
+  </main>
 
-<label>Contact Number</label><br>
-<input type="text" name="contact_no" value="<%= employee.contact_no || '' %>"><br><br>
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    // Theme
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
 
-<label>Account Number</label><br>
-<input type="text" name="account_no" value="<%= employee.account_no || '' %>"><br><br>
-
-
-<h3>Government Details</h3>
-
-<label>TIN</label><br>
-<input type="text" name="tin" value="<%= employee.tin || '' %>"><br><br>
-
-<label>PhilHealth No</label><br>
-<input type="text" name="philhealth_no" value="<%= employee.philhealth_no || '' %>"><br><br>
-
-<label>GSIS No</label><br>
-<input type="text" name="gsis_no" value="<%= employee.gsis_no || '' %>"><br><br>
-
-<label>SSS No</label><br>
-<input type="text" name="sss_no" value="<%= employee.sss_no || '' %>"><br><br>
-
-
-<h3>Emergency Contact</h3>
-
-<label>Contact Name</label><br>
-<input type="text" name="emergency_contact_name" value="<%= employee.emergency_contact_name || '' %>"><br><br>
-
-<label>Contact Phone</label><br>
-<input type="text" name="emergency_contact_phone" value="<%= employee.emergency_contact_phone || '' %>"><br><br>
-
-
-<h3>Profile Picture</h3>
-
-<% if(employee.profile_pic){ %>
-<img src="<%= employee.profile_pic %>" width="120" style="margin-bottom:10px;">
-<% } %>
-
-<input type="file" name="profile_pic" accept="image/*"><br><br>
-
-
-<button type="submit">Update Profile</button>
-
-</form>
-
-<br>
-<a href="/dashboard">Back to Dashboard</a>
+    // Live photo preview
+    document.getElementById('profile_pic').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('picPreview');
+        if (preview.tagName === 'IMG') {
+          preview.src = e.target.result;
+        } else {
+          // Replace initials div with an img
+          const img = document.createElement('img');
+          img.id = 'picPreview';
+          img.src = e.target.result;
+          img.alt = 'Profile';
+          img.className = 'w-20 h-20 rounded-full object-cover border-2 border-navy-200 dark:border-navy-700 shadow';
+          preview.replaceWith(img);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>

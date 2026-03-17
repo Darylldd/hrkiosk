@@ -1,12 +1,22 @@
 const TravelOrder = require('../models/TravelOrder');
-const Employee = require('../models/Employee');
+const Employee    = require('../models/Employee');
+
+// HR and admin departments that can see all travel orders
+const PRIVILEGED_DEPARTMENTS = ['hrmu', 'admin'];
 
 exports.showTravelOrders = (req, res) => {
     const search    = req.query.search || '';
     const previewId = parseInt(req.query.preview_id, 10) || 0;
     const employee  = req.session.employee;
 
-    TravelOrder.findAll(search, (err, orders) => {
+    // HR/admin see everything (employeeId = null); everyone else sees only
+    // travel orders that include their own employee_id in the group.
+    const isPrivileged = PRIVILEGED_DEPARTMENTS.includes(
+        (employee.department || '').toLowerCase()
+    );
+    const employeeId = isPrivileged ? null : employee.id;
+
+    TravelOrder.findAll(search, employeeId, (err, orders) => {
         if (err) return res.status(500).send('Error fetching travel orders.');
 
         let preview = '';
@@ -22,7 +32,6 @@ exports.showTravelOrders = (req, res) => {
 };
 
 exports.showUploadForm = (req, res) => {
-    // Auth is now handled by middleware — no department check needed here
     Employee.getAll((err, employees) => {
         if (err) return res.status(500).send('Error loading employees.');
         res.render('uploadTravelOrder', { employees, msg: '', order: {} });
@@ -38,7 +47,7 @@ exports.uploadTravelOrder = (req, res) => {
         const empIds = (Array.isArray(req.body.employee_ids)
             ? req.body.employee_ids
             : [req.body.employee_ids]
-        ).map(id => parseInt(id, 10)).filter(id => !isNaN(id) && id > 0); // FIX: validate as integers
+        ).map(id => parseInt(id, 10)).filter(id => !isNaN(id) && id > 0);
 
         const pos = Array.isArray(req.body.positions)
             ? req.body.positions
@@ -56,7 +65,7 @@ exports.uploadTravelOrder = (req, res) => {
         const file_path = '/uploads/travel_orders/' + req.file.filename;
 
         const inserts = empIds.map((emp_id, idx) => ({
-            employee_id: emp_id,
+            employee_id:            emp_id,
             to_no:                  req.body.to_no,
             travel_date:            req.body.travel_date,
             return_date:            req.body.return_date,

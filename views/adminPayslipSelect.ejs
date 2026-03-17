@@ -1,168 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-<meta charset="UTF-8">
-<title>Select Employee – Create Gov't Payslip</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; font-size: 13px; background: #f4f6f8; padding: 30px; }
-
-  .card {
-    max-width: 520px;
-    margin: 0 auto;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.1);
-    padding: 30px 32px;
-  }
-
-  h2 {
-    color: #1a5276;
-    font-size: 18px;
-    margin-bottom: 6px;
-  }
-  .subtitle {
-    color: #888;
-    font-size: 12px;
-    margin-bottom: 24px;
-  }
-
-  label {
-    display: block;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 6px;
-  }
-
-  /* Search box */
-  #searchBox {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-bottom: 10px;
-    outline: none;
-    transition: border .2s;
-  }
-  #searchBox:focus { border-color: #1a5276; }
-
-  select {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 13px;
-    background: #fff;
-    outline: none;
-    transition: border .2s;
-    height: 200px;
-  }
-  select:focus { border-color: #1a5276; }
-
-  .hint { font-size: 11px; color: #aaa; margin-top: 4px; margin-bottom: 18px; }
-
-  .actions { display: flex; gap: 10px; margin-top: 20px; }
-
-  .btn-primary {
-    flex: 1;
-    background: #1a5276;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .btn-primary:hover { background: #154360; }
-
-  .btn-cancel {
-    flex: 1;
-    background: none;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #555;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    line-height: 1.4;
-  }
-  .btn-cancel:hover { background: #f5f5f5; }
-
-  .empty { color: #aaa; font-size: 12px; padding: 10px 0; text-align: center; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Employee — Gov't Payslip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-<div class="card">
-  <h2>📑 Create Gov't Payslip</h2>
-  <p class="subtitle">Search and select the employee first.</p>
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-  <label for="searchBox">Search Employee</label>
-  <input type="text" id="searchBox" placeholder="Type name or position…" autocomplete="off">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 page-in flex items-start justify-center">
+    <div class="w-full max-w-lg">
 
-  <label for="employeeSelect">Select Employee</label>
-  <select id="employeeSelect" size="6">
-    <% if (!employees || employees.length === 0) { %>
-      <option disabled>No employees found.</option>
-    <% } else { %>
-      <% employees.forEach(emp => { %>
-        <option value="<%= emp.id %>">
-          <%= emp.first_name %> <%= emp.middle_name || '' %> <%= emp.last_name %>
-          <% if (emp.position) { %> — <%= emp.position %><% } %>
-        </option>
-      <% }); %>
-    <% } %>
-  </select>
-  <p class="hint">Click a name to select, then press Proceed.</p>
+      <div class="mb-6">
+        <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Create Gov't Payslip</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Search and select an employee to begin</p>
+      </div>
 
-  <div class="actions">
- <button class="btn-primary" id="proceedBtn">Proceed </button>
-    <a class="btn-cancel" href="/dashboard">Cancel</a>
-  </div>
-</div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 space-y-5">
 
-<!-- change script -->
-<script nonce="<%= nonce %>">
+        <!-- Search -->
+        <div>
+          <label for="searchBox" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+            Search Employee
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
+            </span>
+            <input type="text" id="searchBox" placeholder="Type name or position…" autocomplete="off"
+              class="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                     bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                     placeholder-slate-400 dark:placeholder-slate-500
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition" />
+          </div>
+        </div>
+
+        <!-- Employee listbox -->
+        <div>
+          <label for="employeeSelect" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
+            Select Employee
+          </label>
+          <select id="employeeSelect" size="7"
+            class="w-full rounded-lg border border-slate-200 dark:border-slate-600
+                   bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100
+                   text-sm focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent transition">
+            <% if (!employees || employees.length === 0) { %>
+              <option disabled>No employees found.</option>
+            <% } else { %>
+              <% employees.forEach(emp => { %>
+                <option value="<%= emp.id %>">
+                  <%= emp.first_name %> <%= emp.middle_name || '' %> <%= emp.last_name %><% if (emp.position) { %> — <%= emp.position %><% } %>
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Click a name to select, then press Proceed. You can also double-click to proceed immediately.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-1">
+          <button id="proceedBtn"
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold
+                   bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                   text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            Proceed
+          </button>
+          <a href="/dashboard"
+            class="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-medium
+                   border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                   text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">
+            Cancel
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
     const searchBox      = document.getElementById('searchBox');
     const employeeSelect = document.getElementById('employeeSelect');
-
-    const allOptions = Array.from(employeeSelect.options).map(o => ({
-        value: o.value,
-        text:  o.text.trim()
-    }));
+    const allOptions     = Array.from(employeeSelect.options).map(o => ({ value: o.value, text: o.text.trim() }));
 
     searchBox.addEventListener('input', () => {
-        const q = searchBox.value.toLowerCase().trim();
-        employeeSelect.innerHTML = '';
-        const filtered = q ? allOptions.filter(o => o.text.toLowerCase().includes(q)) : allOptions;
-        if (filtered.length === 0) {
-            const opt = document.createElement('option');
-            opt.disabled = true; opt.text = 'No results found.';
-            employeeSelect.appendChild(opt);
-        } else {
-            filtered.forEach(o => {
-                const opt = document.createElement('option');
-                opt.value = o.value; opt.text = o.text;
-                employeeSelect.appendChild(opt);
-            });
-        }
+      const q = searchBox.value.toLowerCase().trim();
+      employeeSelect.innerHTML = '';
+      const filtered = q ? allOptions.filter(o => o.text.toLowerCase().includes(q)) : allOptions;
+      if (filtered.length === 0) {
+        const opt = document.createElement('option');
+        opt.disabled = true; opt.text = 'No results found.';
+        employeeSelect.appendChild(opt);
+      } else {
+        filtered.forEach(o => {
+          const opt = document.createElement('option');
+          opt.value = o.value; opt.text = o.text;
+          employeeSelect.appendChild(opt);
+        });
+      }
     });
 
     function proceed() {
-        const selected = employeeSelect.value;
-        if (!selected) { alert('Please select an employee first.'); return; }
-        window.location.href = '/admin/payslip/create?employee_id=' + encodeURIComponent(selected);
+      const selected = employeeSelect.value;
+      if (!selected) {
+        // Flash the border red briefly instead of alert()
+        employeeSelect.classList.add('ring-2', 'ring-red-400');
+        setTimeout(() => employeeSelect.classList.remove('ring-2', 'ring-red-400'), 1500);
+        return;
+      }
+      window.location.href = '/admin/payslip/create?employee_id=' + encodeURIComponent(selected);
     }
 
     document.getElementById('proceedBtn').addEventListener('click', proceed);
     employeeSelect.addEventListener('dblclick', proceed);
-</script>
-
+  </script>
 </body>
 </html>

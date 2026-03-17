@@ -154,7 +154,7 @@
 <div class="no-print">
   <span>🖨 Print View — <%= payslip.month %> <%= payslip.year %></span>
 <button class="btn btn-print" id="printBtn">🖨 Print</button>
-<button class="btn btn-back" id="backBtn">← Back</button>
+<button class="btn btn-back" id="backBtn">✕ Close</button>
 </div>
 
 <!-- Payslip Document -->
@@ -302,7 +302,7 @@
 </div>
 <script nonce="<%= nonce %>">
     document.getElementById('printBtn').addEventListener('click', function() { window.print(); });
-    document.getElementById('backBtn').addEventListener('click', function() { history.back(); });
+  document.getElementById('backBtn').addEventListener('click', function() { window.close(); });
 </script>
 </body>
 </html>

@@ -120,6 +120,13 @@ const Employee = {
             data.profile_pic,
             id
         ], callback);
+    },
+       updatePin: (id, pin, callback) => {
+        const argon2 = require('argon2');
+        argon2.hash(pin).then((hashed) => {
+            const sql = `UPDATE employees SET pin = ? WHERE id = ?`;
+            db.query(sql, [hashed, id], callback);
+        }).catch(callback);
     }
 
 };

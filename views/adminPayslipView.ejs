@@ -1,299 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-<meta charset="UTF-8">
-<title>Payslip – <%= payslip.employee_name %></title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-  }
-
-  /* ── Action Bar ── */
-  .preview-actions {
-      width: 900px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-bottom: none;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-  }
-  .preview-actions span { font-size: 13px; font-weight: bold; flex: 1; color: #333; }
-  .btn { padding: 7px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-block; }
-  .btn-print  { background: #f39c12; color: #fff; }
-  .btn-email  { background: #4CAF50; color: #fff; }
-  .btn-back   { background: #7f8c8d; color: #fff; }
-  .btn-delete { background: #d9534f; color: #fff; }
-
-  /* ── Payslip Container ── */
-  .payslip-container {
-      background-color: #fff;
-      width: 900px;
-      padding: 20px 40px 30px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      position: relative;
-  }
-  .top-banner {
-      position: absolute;
-      top: 0; left: 0;
-      width: 35%; height: auto; max-height: 90px;
-      z-index: 1;
-  }
-
-  /* ── Header ── */
-  .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-      position: relative;
-      z-index: 2;
-      font-size: 12px;
-  }
-  .header img { height: 80px; }
-  .header-text { flex-grow: 1; text-align: center; line-height: 1.45; }
-  .header-text h3, .header-text h4, .header-text p { margin: 1px 0; font-weight: bold; }
-  .header-text h3 { font-size: 14px; }
-  .header-text p.subtext { font-weight: normal; font-size: 11px; }
-
-  /* ── Title block ── */
-  .payslip-title {
-      margin: 14px 0 0;
-      border-top: 2px solid #333;
-      padding-top: 4px;
-  }
-  .payslip-title .ps-label  { font-size: 13px; font-weight: bold; letter-spacing: 2px; }
-  .payslip-title .ps-period { font-size: 12px; font-weight: bold; margin-top: 1px; }
-
-  /* ── Employee info rows ── */
-  .emp-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border: 1px solid #555;
-      border-bottom: none;
-      font-size: 12px;
-      font-weight: bold;
-  }
-  .emp-row:last-child { border-bottom: 1px solid #555; }
-  .emp-cell { padding: 3px 8px; display: flex; align-items: center; gap: 4px; }
-  .emp-cell:first-child { border-right: 1px solid #555; }
-
-  /* ── Main table ── */
-  .main-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  .main-table th {
-      border: 1px solid #555;
-      padding: 4px 8px;
-      background-color: #f0f0f0;
-      font-size: 11px;
-      font-weight: bold;
-      text-align: center;
-  }
-  .main-table th:not(:last-child) { border-right: 1px dashed #777; }
-  .main-table td.col { border: 1px solid #555; padding: 0; vertical-align: top; }
-  .main-table td.col:not(:last-child) { border-right: 1px dashed #777; }
-
-  /* totals footer */
-  .main-table tr.tfoot td {
-      border: 1px solid #555;
-      border-top: 2px solid #333;
-      padding: 4px 8px;
-      font-weight: bold;
-      font-size: 11px;
-      background: #fafafa;
-  }
-  .main-table tr.tfoot td:not(:last-child) { border-right: 1px dashed #777; }
-
-  /* inner borderless tables */
-  .inner { width: 100%; border-collapse: collapse; }
-  .inner td { border: none; padding: 2px 6px; font-size: 11px; }
-  .inner td.r { text-align: right; white-space: nowrap; }
-  .inner td.b { font-weight: bold; }
-
-  /* ── Signature area ── */
-  .sig-area { display: flex; justify-content: space-between; margin-top: 30px; font-size: 11px; }
-  .sig-block { text-align: center; width: 44%; }
-  .sig-line  { border-top: 1px solid #333; margin-top: 32px; padding-top: 3px; font-weight: bold; }
-
-  /* ── Meta ── */
-  .meta { font-size: 10px; color: #aaa; text-align: right; margin-top: 10px; }
-
-  @media print {
-      .preview-actions { display: none; }
-      body { background: #fff; padding: 0; }
-      .payslip-container { box-shadow: none; width: 100%; }
-  }
-</style>
-</head>
-<body>
-
-<!-- Action Bar -->
-<div class="preview-actions">
-  <span>📄 <%= payslip.employee_name %> — <%= payslip.month %> <%= payslip.year %></span>
-  <a class="btn btn-print" href="/admin/payslip/<%= payslip.id %>/print">🖨 Print</a>
-<a class="btn btn-email" id="emailBtn" href="/admin/payslip/<%= payslip.id %>/send-email">✉ Email</a>
-  <a class="btn btn-back"  href="/admin/payslip/list">← Back to List</a>
-<form action="/admin/payslip/<%= payslip.id %>/delete" method="POST" style="display:inline;" id="deleteForm">
-    <button type="submit" class="btn btn-delete">🗑 Delete</button>
-  </form>
-</div>
-
-<!-- Payslip Document -->
-<div class="payslip-container">
-
-  <img src="/images/uhi.png" class="top-banner" alt="Banner">
-
-  <!-- Header -->
-  <div class="header">
-    <img src="/images/ggggg.jpg" alt="DA and BFAR Logos">
-    <div class="header-text">
-      <h4>Republic of the Philippines</h4>
-      <h4>Department of Agriculture</h4>
-      <h3>BUREAU OF FISHERIES AND AQUATIC RESOURCES</h3>
-      <p>REGIONAL FISHERIES OFFICE - MIMAROPA</p>
-      <p class="subtext">Sapul, Calapan City 5200, Oriental Mindoro</p>
-      <p class="subtext">Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189</p>
-      <p class="subtext" style="color:blue;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</p>
-    </div>
-    <img src="/images/lho.png" alt="Bagong Pilipinas Logo">
-  </div>
-
-  <!-- Title -->
-  <div class="payslip-title">
-    <div class="ps-label">P A Y S L I P</div>
-    <div class="ps-period"><%= payslip.month.toUpperCase() %> &nbsp;<%= payslip.year %></div>
-  </div>
-
-  <!-- Employee Info -->
-  <div class="emp-row">
-    <div class="emp-cell">EMPL NAME:&nbsp;<span><%= payslip.employee_name %></span></div>
-    <div class="emp-cell">DIVISION:&nbsp;<span><%= payslip.division || 'N/A' %></span></div>
-  </div>
-  <div class="emp-row">
-    <div class="emp-cell">POSITION:&nbsp;<span><%= payslip.position || '' %></span></div>
-    <div class="emp-cell">SECTION:&nbsp;<span><%= payslip.section || 'N/A' %></span></div>
-  </div>
-
-  <%
-    const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    const labelMap = {
-      gsis_per_share:       'GSIS Per Share',
-      medicare:             'Medicare 5%',
-      pagibig:              'Pag Ibig',
-      withholding_tax:      'Withholding Tax',
-      provident_403:        '403   Provident Fund',
-      gsis_emerg_337:       '337   GSIS -Emerg. Loan',
-      gsis_mpl_346:         '346   GSIS-MPL',
-      hdmf_mpl_440:         '440   HDMF-MPL',
-      islai_premium:        'ISLAI-Premium',
-      islai_loan:           'ISLAI-Loan',
-      hdmf_cal:             'HDMF-CAL',
-      ucpb_loan:            'UCPB Loan',
-      islai_emergency:      'ISLAI-Emergency',
-      gsis_cpl:             'GSIS-CPL',
-      gsis_mpl_lite:        'GSIS-MPL LITE',
-      ucpb_kasama_salary:   'UCPB KASAMA MO',
-      gsis_policy_regular:  'GSIS-Policy Reg',
-      palda_capital_share:  'PAL-DA Capital',
-      palda_coopbank_share: 'PAL-DA CoopBank',
-      bfar_coop_additional: "BFAR Coop Addt'l",
-      palda_regular:        'PAL-DA Regular'
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gov't Payslip — View</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { display:['"Playfair Display"','Georgia','serif'], body:['"DM Sans"','sans-serif'] },
+          colors: { navy: { 50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',800:'#0b2640',900:'#06192e' } },
+        },
+      },
     };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-    const activeDeds = [];
-    Object.entries(labelMap).forEach(([key, label]) => {
-      if (Number(payslip[key] || 0) > 0) activeDeds.push({ label, value: fmt(payslip[key]) });
+  <!-- Nav -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <a href="/admin/payslip/<%= payslip.id %>/print" target="_blank"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white shadow-sm hover:shadow transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span class="hidden sm:inline">Print</span>
+        </a>
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a href="/admin/payslip/list" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span class="hidden sm:inline">All Payslips</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <%
+      const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits:2, maximumFractionDigits:2 });
+      const otherDeds = typeof payslip.other_deductions === 'string'
+        ? JSON.parse(payslip.other_deductions)
+        : (payslip.other_deductions || []);
+    %>
+
+    <!-- Header card -->
+    <div class="bg-gradient-to-r from-navy-600 to-navy-500 dark:from-navy-700 dark:to-navy-600 rounded-2xl px-6 py-5 text-white shadow-lg mb-6">
+      <p class="text-navy-200 text-sm mb-0.5">Gov't Payslip</p>
+      <h2 class="font-display text-xl"><%= payslip.employee_name %></h2>
+      <p class="text-navy-200 text-sm mt-1">
+        <%= payslip.month %> <%= payslip.year %>
+        <% if (payslip.position) { %> &mdash; <%= payslip.position %><% } %>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+      <!-- Gross Pay -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Gross Pay</p>
+        <p class="text-2xl font-bold text-slate-700 dark:text-slate-200 font-mono">₱ <%= fmt(payslip.total_gross) %></p>
+      </div>
+      <!-- Total Deductions -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Total Deductions</p>
+        <p class="text-2xl font-bold text-red-500 dark:text-red-400 font-mono">₱ <%= fmt(payslip.total_deductions) %></p>
+      </div>
+      <!-- Net Pay -->
+      <div class="bg-navy-50 dark:bg-navy-900/30 rounded-xl border border-navy-200 dark:border-navy-800 px-5 py-4">
+        <p class="text-xs font-semibold uppercase tracking-widest text-navy-400 mb-1">Net Pay</p>
+        <p class="text-2xl font-bold text-navy-700 dark:text-navy-200 font-mono">₱ <%= fmt(payslip.net_pay) %></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      <!-- Gross Earnings -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="px-5 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Gross Earnings</h2>
+        </div>
+        <div class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+          <div class="flex justify-between px-5 py-3">
+            <span class="text-slate-600 dark:text-slate-300">Monthly Salary</span>
+            <span class="font-mono font-semibold text-slate-700 dark:text-slate-200">₱ <%= fmt(payslip.monthly_salary) %></span>
+          </div>
+          <div class="flex justify-between px-5 py-3">
+            <span class="text-slate-600 dark:text-slate-300">PERA</span>
+            <span class="font-mono font-semibold text-slate-700 dark:text-slate-200">₱ 2,000.00</span>
+          </div>
+          <div class="flex justify-between px-5 py-3">
+            <span class="font-semibold text-slate-500 dark:text-slate-400">1st Period</span>
+            <span class="font-mono font-semibold text-navy-600 dark:text-navy-300">₱ <%= fmt(payslip.first_period) %></span>
+          </div>
+          <div class="flex justify-between px-5 py-3">
+            <span class="font-semibold text-slate-500 dark:text-slate-400">2nd Period</span>
+            <span class="font-mono font-semibold text-navy-600 dark:text-navy-300">₱ <%= fmt(payslip.second_period) %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deductions -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="px-5 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Deductions</h2>
+        </div>
+        <div class="divide-y divide-slate-100 dark:divide-slate-700 text-sm max-h-96 overflow-y-auto">
+          <%
+            const labelMap = {
+              gsis_per_share:'GSIS Per Share', medicare:'Medicare 5%', pagibig:'Pag Ibig',
+              withholding_tax:'Withholding Tax', provident_403:'403 Provident Fund',
+              gsis_emerg_337:'337 GSIS-Emerg. Loan', gsis_mpl_346:'346 GSIS-MPL',
+              hdmf_mpl_440:'440 HDMF-MPL', islai_premium:'ISLAI-Premium', islai_loan:'ISLAI-Loan',
+              hdmf_cal:'HDMF-CAL', ucpb_loan:'UCPB Loan', islai_emergency:'ISLAI-Emergency',
+              gsis_cpl:'GSIS-CPL', gsis_mpl_lite:'GSIS-MPL LITE', ucpb_kasama_salary:'UCPB KASAMA MO',
+              gsis_policy_regular:'GSIS-Policy Reg', palda_capital_share:'PAL-DA Capital',
+              palda_coopbank_share:'PAL-DA CoopBank', bfar_coop_additional:"BFAR Coop Addt'l",
+              palda_regular:'PAL-DA Regular'
+            };
+          %>
+          <% Object.entries(labelMap).forEach(([key, label]) => {
+               if (Number(payslip[key] || 0) > 0) { %>
+          <div class="flex justify-between px-5 py-2.5">
+            <span class="text-slate-600 dark:text-slate-300"><%= label %></span>
+            <span class="font-mono font-semibold text-red-500 dark:text-red-400">₱ <%= fmt(payslip[key]) %></span>
+          </div>
+          <% } }) %>
+          <% otherDeds.forEach(d => { %>
+          <div class="flex justify-between px-5 py-2.5">
+            <span class="text-slate-600 dark:text-slate-300"><%= d.name %></span>
+            <span class="font-mono font-semibold text-red-500 dark:text-red-400">₱ <%= fmt(d.amount) %></span>
+          </div>
+          <% }) %>
+          <% if (Object.values(labelMap).every((_, i) => Number(payslip[Object.keys(labelMap)[i]] || 0) === 0) && otherDeds.length === 0) { %>
+          <div class="px-5 py-6 text-center text-slate-400 dark:text-slate-500 text-xs italic">No deductions recorded.</div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script nonce="<%= nonce %>">
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
-    (payslip.other_deductions || []).forEach(d => activeDeds.push({ label: d.name, value: fmt(d.amount) }));
-  %>
-
-  <!-- Main Table -->
-  <table class="main-table">
-    <thead>
-      <tr>
-        <th style="width:22%;">GROSS EARNINGS</th>
-        <th style="width:46%;">DEDUCTIONS</th>
-        <th style="width:32%;">PERIODS</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-
-        <!-- GROSS EARNINGS -->
-        <td class="col">
-          <table class="inner" style="table-layout:fixed;">
-            <colgroup><col style="width:55%"><col style="width:45%"></colgroup>
-            <tr>
-              <td>Monthly Salary</td>
-              <td class="r"><%= fmt(payslip.monthly_salary) %></td>
-            </tr>
-            <tr>
-              <td>PERA</td>
-              <td class="r">2,000.00</td>
-            </tr>
-          </table>
-        </td>
-
-        <!-- DEDUCTIONS: single column, label left / amount right -->
-        <td class="col">
-          <table class="inner" style="table-layout:fixed;">
-            <colgroup><col style="width:65%"><col style="width:35%"></colgroup>
-            <% activeDeds.forEach(d => { %>
-            <tr>
-              <td><%= d.label %></td>
-              <td class="r"><%= d.value %></td>
-            </tr>
-            <% }); %>
-            <% if (activeDeds.length === 0) { %>
-            <tr><td colspan="2" style="color:#aaa; font-style:italic; padding:4px 6px;">No deductions entered</td></tr>
-            <% } %>
-          </table><br><br><br><br><br>
-        </td>
-
-        <!-- PERIODS -->
-        <td class="col">
-          <table class="inner" style="table-layout:fixed;">
-            <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
-            <tr>
-              <td class="b">1ST PERIOD</td>
-              <td class="r"><%= fmt(payslip.first_period) %></td>
-            </tr>
-            <tr>
-              <td class="b">2ND PERIOD</td>
-              <td class="r"><%= fmt(payslip.second_period) %></td>
-            </tr>
-          </table>
-        </td>
-
-      </tr>
-
-      <!-- Totals Footer Row -->
-      <tr class="tfoot">
-        <td>GROSS PAY <span style="float:right;"><%= fmt(payslip.total_gross) %></span></td>
-        <td>TOTAL DEDUCTIONS <span style="float:right;"><%= fmt(payslip.total_deductions) %></span></td>
-        <td>TOTAL NET PAY <span style="float:right;"><%= fmt(payslip.net_pay) %></span></td>
-      </tr>
-
-    </tbody>
-  </table>
-
-
-
-</div>
-<script nonce="<%= nonce %>">
-    document.getElementById('emailBtn').addEventListener('click', e => {
-        if (!confirm('Send payslip email to this employee?')) e.preventDefault();
-    });
-    document.getElementById('deleteForm').addEventListener('submit', e => {
-        if (!confirm('Delete this payslip permanently?')) e.preventDefault();
-    });
-</script>
+  </script>
 </body>
 </html>

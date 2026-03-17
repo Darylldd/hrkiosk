@@ -1,20 +1,19 @@
 const AdminPayslip = require('../models/AdminPayslip');
-const Employee = require('../models/Employee');
-const nodemailer = require('nodemailer');
-const puppeteer = require('puppeteer');
+const Employee     = require('../models/Employee');
+const nodemailer   = require('nodemailer');
+const puppeteer    = require('puppeteer');
 const path = require('path');
-const fs = require('fs');
+const fs   = require('fs');
 
 function n(val) {
     const num = Number(val);
-    // FIX: reject negatives — no deduction or salary should be negative
     return (!isNaN(num) && num >= 0) ? num : 0;
 }
 
 function computeTotals(data) {
-    const pera = 2000;
+    const pera           = 2000;
     const monthly_salary = n(data.monthly_salary);
-    const total_gross = monthly_salary + pera;
+    const total_gross    = monthly_salary + pera;
 
     const fixedKeys = [
         'gsis_per_share','medicare','pagibig','withholding_tax',
@@ -32,14 +31,13 @@ function computeTotals(data) {
         .map((name, i) => ({ name: String(name).trim().slice(0, 100), amount: n(amounts[i]) }))
         .filter(d => d.name);
 
-    const otherTotal = other_deductions.reduce((sum, d) => sum + d.amount, 0);
+    const otherTotal       = other_deductions.reduce((sum, d) => sum + d.amount, 0);
     const total_deductions = fixedTotal + otherTotal;
-    const net_pay = total_gross - total_deductions;
+    const net_pay          = total_gross - total_deductions;
 
     return { pera, total_gross, total_deductions, net_pay, other_deductions };
 }
 
-// ── Validate ID param ──────────────────────────────────────────────────────
 function validId(val) {
     const id = parseInt(val, 10);
     return (!isNaN(id) && id > 0) ? id : null;
@@ -51,31 +49,44 @@ exports.showCreateForm = (req, res) => {
     if (employeeId) {
         Employee.getById(employeeId, (err, rows) => {
             const employee = rows?.[0] || null;
-            if (!employee) return res.status(404).send('Employee not found.');
+            if (!employee) {
+                req.session.flash_error = 'Employee not found.';
+                return res.redirect('/admin/payslip/create');
+            }
             res.render('adminPayslipCreate', { employee, nonce: res.locals.nonce });
         });
     } else {
         Employee.getAll((err, employees) => {
-            if (err) return res.status(500).send('Error loading employees.');
+            if (err) {
+                req.session.flash_error = 'Error loading employees. Please try again.';
+                return res.redirect('/dashboard');
+            }
             res.render('adminPayslipSelect', { employees, nonce: res.locals.nonce });
         });
     }
 };
 
 exports.previewPayslip = (req, res) => {
-    const data = req.body;
-
-    // FIX: validate employee_id before querying
+    const data       = req.body;
     const employeeId = validId(data.employee_id);
-    if (!employeeId) return res.status(400).send('Invalid employee.');
 
-    if (!data.month || !data.year) return res.status(400).send('Month and year are required.');
+    if (!employeeId) {
+        req.session.flash_error = 'Invalid employee selected.';
+        return res.redirect('/admin/payslip/create');
+    }
+    if (!data.month || !data.year) {
+        req.session.flash_error = 'Month and year are required.';
+        return res.redirect('/admin/payslip/create?employee_id=' + employeeId);
+    }
 
     const { pera, total_gross, total_deductions, net_pay, other_deductions } = computeTotals(data);
 
     Employee.getById(employeeId, (err, rows) => {
-        if (err || !rows?.[0]) return res.status(404).send('Employee not found.');
-        res.render('adminPayslipPreview', {
+        if (err || !rows?.[0]) {
+            req.session.flash_error = 'Employee not found.';
+            return res.redirect('/admin/payslip/create');
+        }
+        res.render('adminPaysPreview', {
             data,
             employee: rows[0],
             pera, total_gross, total_deductions, net_pay, other_deductions,
@@ -85,11 +96,17 @@ exports.previewPayslip = (req, res) => {
 };
 
 exports.savePayslip = (req, res) => {
-    const data = req.body;
-
+    const data       = req.body;
     const employeeId = validId(data.employee_id);
-    if (!employeeId) return res.status(400).send('Invalid employee.');
-    if (!data.month || !data.year) return res.status(400).send('Month and year are required.');
+
+    if (!employeeId) {
+        req.session.flash_error = 'Invalid employee selected.';
+        return res.redirect('/admin/payslip/create');
+    }
+    if (!data.month || !data.year) {
+        req.session.flash_error = 'Month and year are required.';
+        return res.redirect('/admin/payslip/create?employee_id=' + employeeId);
+    }
 
     const { pera, total_gross, total_deductions, net_pay, other_deductions } = computeTotals(data);
 
@@ -131,34 +148,57 @@ exports.savePayslip = (req, res) => {
     AdminPayslip.create(payslipData, (err, result) => {
         if (err) {
             console.error('savePayslip error:', err);
-            return res.status(500).send('Failed to save payslip.');
+            req.session.flash_error = 'Failed to save payslip. Please try again.';
+            return res.redirect('/admin/payslip/create?employee_id=' + employeeId);
         }
+        req.session.flash_success = 'Payslip saved successfully.';
         res.redirect(`/admin/payslip/${result.insertId}/view`);
     });
 };
 
 exports.viewPayslip = (req, res) => {
     const id = validId(req.params.id);
-    if (!id) return res.status(400).send('Invalid ID.');
+    if (!id) {
+        req.session.flash_error = 'Invalid payslip ID.';
+        return res.redirect('/admin/payslip/list');
+    }
 
     AdminPayslip.findById(id, (err, rows) => {
-        if (err || !rows?.[0]) return res.status(404).send('Payslip not found.');
+        if (err || !rows?.[0]) {
+            req.session.flash_error = 'Payslip not found.';
+            return res.redirect('/admin/payslip/list');
+        }
         const row = rows[0];
         row.other_deductions = typeof row.other_deductions === 'string'
             ? JSON.parse(row.other_deductions)
             : (row.other_deductions || []);
 
+        const flash_success = req.session.flash_success || null;
+        const flash_error   = req.session.flash_error   || null;
+        delete req.session.flash_success;
+        delete req.session.flash_error;
+
         res.render('adminPayslipView', {
             payslip: row,
+            flash_success,
+            flash_error,
             nonce: res.locals.nonce
         });
     });
 };
 
 exports.listPayslips = (req, res) => {
+    const flash_success = req.session.flash_success || null;
+    const flash_error   = req.session.flash_error   || null;
+    delete req.session.flash_success;
+    delete req.session.flash_error;
+
     AdminPayslip.getAll((err, payslips) => {
-        if (err) return res.status(500).send('Error fetching payslips.');
-        res.render('adminPayslipList', { payslips, nonce: res.locals.nonce });
+        if (err) {
+            req.session.flash_error = 'Error fetching payslips. Please try again.';
+            return res.redirect('/dashboard');
+        }
+        res.render('adminPayslipList', { payslips, flash_success, flash_error, nonce: res.locals.nonce });
     });
 };
 
@@ -177,7 +217,7 @@ exports.printPayslip = (req, res) => {
             payslip: row,
             images: {
                 headerGraphic: '/images/uhi.png',
-                lho: '/images/lho.png',
+                lho:  '/images/lho.png',
                 bfar: '/images/ggggg.jpg'
             },
             nonce: res.locals.nonce
@@ -187,17 +227,23 @@ exports.printPayslip = (req, res) => {
 
 exports.deletePayslip = (req, res) => {
     const id = validId(req.params.id);
-    if (!id) return res.status(400).send('Invalid ID.');
+    if (!id) {
+        req.session.flash_error = 'Invalid ID.';
+        return res.redirect('/admin/payslip/list');
+    }
 
     AdminPayslip.deleteById(id, (err) => {
         if (err) {
             console.error('deletePayslip error:', err);
-            return res.status(500).send('Failed to delete.');
+            req.session.flash_error = 'Failed to delete payslip. Please try again.';
+        } else {
+            req.session.flash_success = 'Payslip deleted successfully.';
         }
         res.redirect('/admin/payslip/list');
     });
 };
 
+// sendEmail — called via fetch(), must stay as res.send() text responses
 exports.sendEmail = async (req, res) => {
     const id = validId(req.params.id);
     if (!id) return res.status(400).send('Invalid ID.');
@@ -210,7 +256,7 @@ exports.sendEmail = async (req, res) => {
             ? JSON.parse(payslip.other_deductions)
             : (payslip.other_deductions || []);
 
-        if (!payslip.email) return res.status(400).send('Employee has no email address.');
+        if (!payslip.email) return res.status(400).send('Employee has no email address on file.');
 
         try {
             const toBase64 = (imgPath) =>
@@ -232,11 +278,11 @@ exports.sendEmail = async (req, res) => {
 
             const pdfPath = path.join(__dirname, `../temp/adminpayslip_${id}.pdf`);
             const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-            const page = await browser.newPage();
+            const page    = await browser.newPage();
             await page.setContent(html, { waitUntil: 'networkidle0' });
             await page.pdf({
                 path: pdfPath, format: 'A4', printBackground: true,
-                margin: { top: '30px', bottom: '30px', left: '20px', right: '20px' }
+                margin: { top:'30px', bottom:'30px', left:'20px', right:'20px' }
             });
             await browser.close();
 
@@ -246,15 +292,14 @@ exports.sendEmail = async (req, res) => {
             });
 
             await transporter.sendMail({
-                from: process.env.EMAIL_FROM,
-                to: payslip.email,
+                from:    process.env.EMAIL_FROM,
+                to:      payslip.email,
                 subject: `Payslip – ${payslip.month} ${payslip.year}`,
                 html: `
                     <div style="font-family:Arial,sans-serif;font-size:14px;color:#222;">
                         <p>Dear <strong>${payslip.employee_name}</strong>,</p>
                         <p>Please find attached your payslip for <strong>${payslip.month} ${payslip.year}</strong>.</p>
                         <p>For concerns, please contact the HR office.</p>
-                        <p>Thank you.</p>
                         <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
                         <p style="font-size:12px;color:#888;">Automated email — please do not reply.</p>
                     </div>
@@ -267,7 +312,7 @@ exports.sendEmail = async (req, res) => {
 
         } catch (e) {
             console.error('sendEmail error:', e);
-            res.status(500).send('Email sending failed.');
+            res.status(500).send('Email sending failed. Please try again.');
         }
     });
 };

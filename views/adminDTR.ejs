@@ -1,104 +1,448 @@
-<h2>All Employees DTR</h2>
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Employees DTR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:  '#eef2f7',
+              100: '#d5e0ed',
+              200: '#abc1db',
+              300: '#7599be',
+              400: '#4a72a0',
+              500: '#1a5276',
+              600: '#154464',
+              700: '#103552',
+              800: '#0b2640',
+              900: '#06192e',
+            },
+          },
+          keyframes: {
+            'fade-in': {
+              '0%':   { opacity: '0', transform: 'translateY(8px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+          animation: {
+            'fade-in': 'fade-in 0.35s ease forwards',
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
 
-<p>Logged in as:
-    <strong><%= employee.first_name %> <%= employee.last_name %> (<%= employee.department %>)</strong>
-</p>
+    /* Keyframe defined here so it's available before Tailwind CDN runs */
+    @keyframes card-slide-up {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0);    }
+    }
 
-<!-- ── Filter Bar ─────────────────────────────────────────── -->
-<form method="GET" style="
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding: 14px 18px;
-    background: #f4f6f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-">
-    <span style="font-weight: bold; color: #333;">🗓 Filter by:</span>
+    /* Stagger employee cards */
+    .employee-card {
+      opacity: 0;
+      animation: card-slide-up 0.35s ease forwards;
+    }
+    .employee-card:nth-child(1)  { animation-delay: 0.05s; }
+    .employee-card:nth-child(2)  { animation-delay: 0.10s; }
+    .employee-card:nth-child(3)  { animation-delay: 0.15s; }
+    .employee-card:nth-child(4)  { animation-delay: 0.20s; }
+    .employee-card:nth-child(5)  { animation-delay: 0.25s; }
+    .employee-card:nth-child(6)  { animation-delay: 0.30s; }
+    .employee-card:nth-child(7)  { animation-delay: 0.35s; }
+    .employee-card:nth-child(8)  { animation-delay: 0.40s; }
+    .employee-card:nth-child(9)  { animation-delay: 0.45s; }
+    .employee-card:nth-child(10) { animation-delay: 0.50s; }
+  </style>
+</head>
 
-    <!-- Year -->
-    <label for="year">Year:</label>
-    <select name="year" id="year" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
-        <option value="<%= currentYear %>"     <%= selectedYear === currentYear     ? 'selected' : '' %>><%= currentYear %> (This Year)</option>
-        <option value="<%= currentYear - 1 %>" <%= selectedYear === currentYear - 1 ? 'selected' : '' %>><%= currentYear - 1 %> (Last Year)</option>
-    </select>
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-    <!-- Month -->
-    <label for="month">Month:</label>
-    <select name="month" id="month" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
-        <option value="0"  <%= selectedMonth === '0'  ? 'selected' : '' %>>All Months</option>
-        <option value="1"  <%= selectedMonth === '1'  ? 'selected' : '' %>>January</option>
-        <option value="2"  <%= selectedMonth === '2'  ? 'selected' : '' %>>February</option>
-        <option value="3"  <%= selectedMonth === '3'  ? 'selected' : '' %>>March</option>
-        <option value="4"  <%= selectedMonth === '4'  ? 'selected' : '' %>>April</option>
-        <option value="5"  <%= selectedMonth === '5'  ? 'selected' : '' %>>May</option>
-        <option value="6"  <%= selectedMonth === '6'  ? 'selected' : '' %>>June</option>
-        <option value="7"  <%= selectedMonth === '7'  ? 'selected' : '' %>>July</option>
-        <option value="8"  <%= selectedMonth === '8'  ? 'selected' : '' %>>August</option>
-        <option value="9"  <%= selectedMonth === '9'  ? 'selected' : '' %>>September</option>
-        <option value="10" <%= selectedMonth === '10' ? 'selected' : '' %>>October</option>
-        <option value="11" <%= selectedMonth === '11' ? 'selected' : '' %>>November</option>
-        <option value="12" <%= selectedMonth === '12' ? 'selected' : '' %>>December</option>
-    </select>
+  <!-- ── Top nav ─────────────────────────────────────────── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
-    <button type="submit" style="
-        padding: 6px 16px;
-        background: #2c75b6;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-    ">Apply</button>
-</form>
+      <!-- Brand / back -->
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block
+                     group-hover:text-navy-500 dark:group-hover:text-navy-300 transition-colors">
+          Employee Portal
+        </span>
+      </a>
 
-<!-- ── Results heading ────────────────────────────────────── -->
-<h3 style="color: #555; font-size: 14px; margin-bottom: 16px;">
-    Showing: 
-    <strong>
-        <%= selectedMonth === '0' ? 'All Months' : new Date(2000, parseInt(selectedMonth)-1).toLocaleString('default',{month:'long'}) %>
-        <%= selectedYear %>
-    </strong>
-</h3>
+      <!-- Right side -->
+      <div class="flex items-center gap-2">
+        <!-- Admin badge -->
+        <span class="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                     bg-navy-50 dark:bg-navy-900/50 text-navy-600 dark:text-navy-300
+                     border border-navy-100 dark:border-navy-800">
+          <%= employee.department %>
+        </span>
 
-<% if(users.length === 0){ %>
-    <p>No records found.</p>
-<% } %>
+        <!-- Dark mode -->
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700
+                 text-slate-500 dark:text-slate-400 hover:text-navy-500 dark:hover:text-navy-300
+                 bg-white dark:bg-slate-800 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
 
-<% users.forEach(user => { %>
-    <h3>
-        <%= user.name %> - <%= user.email %> (<%= user.department %>)
-    </h3>
+        <!-- Back to Dashboard -->
+        <a href="/dashboard"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 border border-slate-200 dark:border-slate-700
+                 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+                 bg-white dark:bg-slate-800 hover:bg-navy-50 dark:hover:bg-navy-900/20
+                 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-    <table border="1" style="margin-bottom:20px;">
-        <tr>
-            <th>Date</th>
-            <th>Time In</th>
-            <th>Time Out</th>
-            <th>Hours Worked</th>
-        </tr>
+  <!-- ── Page body ────────────────────────────────────────── -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <%
-        let totalHours = 0;
-        user.records.forEach(record => {
-            if(record.hours !== '-') totalHours += parseFloat(record.hours);
-        %>
-        <tr>
-            <td><%= record.date.toISOString().split('T')[0] %></td>
-            <td><%= record.time_in  ? new Date(record.time_in).toLocaleTimeString()  : '-' %></td>
-            <td><%= record.time_out ? new Date(record.time_out).toLocaleTimeString() : '-' %></td>
-            <td><%= record.hours %></td>
-        </tr>
-        <% }) %>
+    <!-- Page heading -->
+    <div class="mb-6">
+      <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">All Employees DTR</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Viewing as <strong class="text-slate-600 dark:text-slate-300"><%= employee.first_name %> <%= employee.last_name %></strong>
+      </p>
+    </div>
 
-        <tr>
-            <td colspan="3"><strong>Total Hours</strong></td>
-            <td><strong><%= totalHours.toFixed(2) %> hrs</strong></td>
-        </tr>
-    </table>
-<% }) %>
+    <!-- ── Filter bar ─────────────────────────────────────── -->
+    <form method="GET"
+      class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+             rounded-xl px-5 py-4 mb-6 shadow-sm">
+      <div class="flex flex-wrap items-end gap-4">
 
-<a href="/dashboard">Back to Dashboard</a>
+        <!-- Label -->
+        <div class="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+          </svg>
+          Filter by:
+        </div>
+
+        <!-- Year -->
+        <div class="flex flex-col gap-1">
+          <label for="year" class="text-xs font-medium text-slate-500 dark:text-slate-400">Year</label>
+          <select name="year" id="year"
+            class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                   bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200
+                   focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
+                   transition">
+            <option value="<%= currentYear %>"     <%= selectedYear === currentYear     ? 'selected' : '' %>><%= currentYear %> (This Year)</option>
+            <option value="<%= currentYear - 1 %>" <%= selectedYear === currentYear - 1 ? 'selected' : '' %>><%= currentYear - 1 %> (Last Year)</option>
+          </select>
+        </div>
+
+        <!-- Month -->
+        <div class="flex flex-col gap-1">
+          <label for="month" class="text-xs font-medium text-slate-500 dark:text-slate-400">Month</label>
+          <select name="month" id="month"
+            class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600
+                   bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200
+                   focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
+                   transition">
+            <option value="0"  <%= selectedMonth === '0'  ? 'selected' : '' %>>All Months</option>
+            <option value="1"  <%= selectedMonth === '1'  ? 'selected' : '' %>>January</option>
+            <option value="2"  <%= selectedMonth === '2'  ? 'selected' : '' %>>February</option>
+            <option value="3"  <%= selectedMonth === '3'  ? 'selected' : '' %>>March</option>
+            <option value="4"  <%= selectedMonth === '4'  ? 'selected' : '' %>>April</option>
+            <option value="5"  <%= selectedMonth === '5'  ? 'selected' : '' %>>May</option>
+            <option value="6"  <%= selectedMonth === '6'  ? 'selected' : '' %>>June</option>
+            <option value="7"  <%= selectedMonth === '7'  ? 'selected' : '' %>>July</option>
+            <option value="8"  <%= selectedMonth === '8'  ? 'selected' : '' %>>August</option>
+            <option value="9"  <%= selectedMonth === '9'  ? 'selected' : '' %>>September</option>
+            <option value="10" <%= selectedMonth === '10' ? 'selected' : '' %>>October</option>
+            <option value="11" <%= selectedMonth === '11' ? 'selected' : '' %>>November</option>
+            <option value="12" <%= selectedMonth === '12' ? 'selected' : '' %>>December</option>
+          </select>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit"
+          class="px-5 py-2 rounded-lg text-sm font-semibold
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-sm hover:shadow transition-all duration-200
+                 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-navy-400 focus:ring-offset-2">
+          Apply Filter
+        </button>
+      </div>
+    </form>
+
+    <!-- Search bar -->
+    <div class="relative mb-4">
+      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+        </svg>
+      </span>
+      <input
+        id="employeeSearch"
+        type="text"
+        placeholder="Search by name, email, or department..."
+        autocomplete="off"
+        class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl
+               border border-slate-200 dark:border-slate-600
+               bg-white dark:bg-slate-800
+               text-slate-700 dark:text-slate-200
+               placeholder-slate-400 dark:placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
+               shadow-sm transition"
+      />
+      <button id="clearSearch" type="button" aria-label="Clear search"
+        class="absolute inset-y-0 right-0 pr-3.5 items-center hidden
+               text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Results heading -->
+    <div class="flex items-center justify-between mb-5">
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Showing:
+        <span class="font-semibold text-slate-700 dark:text-slate-200">
+          <%= selectedMonth === '0'
+              ? 'All Months'
+              : new Date(2000, parseInt(selectedMonth) - 1).toLocaleString('default', { month: 'long' }) %>
+          <%= selectedYear %>
+        </span>
+        &mdash;
+        <span id="visibleCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= users.length %></span>
+        <span id="visibleLabel">employee<%= users.length !== 1 ? 's' : '' %></span>
+      </p>
+    </div>
+
+    <!-- ── No records (server) ───────────────────────────────── -->
+    <% if (users.length === 0) { %>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-14 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <p class="text-slate-400 dark:text-slate-500 text-sm">No records found for the selected period.</p>
+      </div>
+    <% } %>
+
+    <!-- ── No search match (client) ──────────────────────────── -->
+    <div id="noResultsSearch" style="display:none;"
+      class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-14 text-center mb-6">
+      <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+      </svg>
+      <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">No employees match your search.</p>
+      <p class="text-slate-300 dark:text-slate-600 text-xs mt-1">Try a different name, email, or department.</p>
+    </div>
+
+    <!-- ── Employee cards ─────────────────────────────────── -->
+    <div class="space-y-6">
+      <% users.forEach(user => {
+          let totalHours = 0;
+          user.records.forEach(r => {
+              if (r.hours !== '-') totalHours += parseFloat(r.hours);
+          });
+      %>
+      <div class="employee-card bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm"
+           data-search="<%= user.name.toLowerCase() %> <%= user.email.toLowerCase() %> <%= user.department.toLowerCase() %>">
+
+        <!-- Employee header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3
+                    px-5 py-4 bg-slate-50 dark:bg-slate-700/40 border-b border-slate-100 dark:border-slate-700">
+          <div class="flex items-center gap-3">
+            <!-- Avatar initials -->
+            <div class="w-9 h-9 rounded-full bg-navy-100 dark:bg-navy-900 text-navy-600 dark:text-navy-300
+                        flex items-center justify-center text-sm font-bold shrink-0">
+              <%= user.name.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-700 dark:text-slate-200"><%= user.name %></p>
+              <p class="text-xs text-slate-400 dark:text-slate-500"><%= user.email %></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <!-- Department badge -->
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                         bg-navy-50 dark:bg-navy-900/50 text-navy-600 dark:text-navy-300
+                         border border-navy-100 dark:border-navy-800">
+              <%= user.department %>
+            </span>
+            <!-- Total hours badge -->
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                         bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400
+                         border border-emerald-100 dark:border-emerald-800">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <%= totalHours.toFixed(2) %> hrs total
+            </span>
+          </div>
+        </div>
+
+        <!-- Records table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500
+                         bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                <th class="px-5 py-3 text-left font-semibold">Date</th>
+                <th class="px-5 py-3 text-left font-semibold">Time In</th>
+                <th class="px-5 py-3 text-left font-semibold">Time Out</th>
+                <th class="px-5 py-3 text-right font-semibold">Hours</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+              <% if (user.records.length === 0) { %>
+                <tr>
+                  <td colspan="4" class="px-5 py-6 text-center text-slate-400 dark:text-slate-500 text-xs italic">
+                    No attendance records for this period.
+                  </td>
+                </tr>
+              <% } %>
+              <% user.records.forEach(record => { %>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
+                <td class="px-5 py-3 text-slate-700 dark:text-slate-300 font-medium">
+                  <%= record.date.toISOString().split('T')[0] %>
+                </td>
+                <td class="px-5 py-3 text-slate-600 dark:text-slate-400">
+                  <% if (record.time_in) { %>
+                    <span class="inline-flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
+                      <%= new Date(record.time_in).toLocaleTimeString() %>
+                    </span>
+                  <% } else { %>
+                    <span class="text-slate-300 dark:text-slate-600">—</span>
+                  <% } %>
+                </td>
+                <td class="px-5 py-3 text-slate-600 dark:text-slate-400">
+                  <% if (record.time_out) { %>
+                    <span class="inline-flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                      <%= new Date(record.time_out).toLocaleTimeString() %>
+                    </span>
+                  <% } else { %>
+                    <span class="text-slate-300 dark:text-slate-600">—</span>
+                  <% } %>
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <% if (record.hours !== '-') { %>
+                    <span class="font-semibold text-navy-600 dark:text-navy-300">
+                      <%= record.hours %>
+                      <span class="text-xs font-normal text-slate-400 dark:text-slate-500">hrs</span>
+                    </span>
+                  <% } else { %>
+                    <span class="text-slate-300 dark:text-slate-600">—</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+
+              <!-- Total row -->
+              <tr class="bg-slate-50 dark:bg-slate-700/30 border-t-2 border-slate-200 dark:border-slate-600">
+                <td colspan="3" class="px-5 py-3 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                  Total Hours
+                </td>
+                <td class="px-5 py-3 text-right font-bold text-navy-700 dark:text-navy-200">
+                  <%= totalHours.toFixed(2) %>
+                  <span class="text-xs font-normal text-slate-400 dark:text-slate-500">hrs</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+
+  </main>
+
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    // ── Theme ──────────────────────────────────────────────────
+    const html = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // ── Employee search ────────────────────────────────────────
+    const searchInput   = document.getElementById('employeeSearch');
+    const clearBtn      = document.getElementById('clearSearch');
+    const visibleCount  = document.getElementById('visibleCount');
+    const visibleLabel  = document.getElementById('visibleLabel');
+    const noResults     = document.getElementById('noResultsSearch');
+    const cards         = document.querySelectorAll('.employee-card');
+
+    function runSearch() {
+      const q = searchInput.value.trim().toLowerCase();
+
+      // Toggle clear button visibility
+      clearBtn.classList.toggle('hidden', q === '');
+      clearBtn.classList.toggle('flex',   q !== '');
+
+      let shown = 0;
+      cards.forEach(card => {
+        const haystack = card.dataset.search || '';
+        const match = haystack.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) shown++;
+      });
+
+      // Update count
+      visibleCount.textContent = shown;
+      visibleLabel.textContent = shown !== 1 ? 'employees' : 'employee';
+
+      // Show/hide the "no match" state
+      if (noResults) noResults.style.display = shown === 0 ? '' : 'none';
+    }
+
+    searchInput.addEventListener('input', runSearch);
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.focus();
+      runSearch();
+    });
+  </script>
+</body>
+</html>
