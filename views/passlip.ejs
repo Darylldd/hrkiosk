@@ -30,176 +30,234 @@
   <style>
     body { font-family: 'DM Sans', sans-serif; }
 
-    @keyframes fade-in    { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
-    @keyframes slide-down { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fade-in        { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
+    @keyframes slide-down     { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
     @keyframes slide-in-right { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0); } }
+    .page-in  { animation: fade-in        0.35s ease forwards; }
+    .alert-in { animation: slide-down     0.3s  ease forwards; }
+    .toast-in { animation: slide-in-right 0.4s  ease forwards; }
 
-    .page-in   { animation: fade-in    0.35s ease forwards; }
-    .alert-in  { animation: slide-down 0.3s  ease forwards; }
-    .toast-in  { animation: slide-in-right 0.4s ease forwards; }
-
-    /* ── Keep the passlip document's own styles isolated ── */
+    /* ── Passlip document isolated styles ── */
     .passlip-doc * { box-sizing: border-box; }
     .passlip-doc { font-family: Arial, sans-serif; }
     .passlip-doc input[type="text"] {
-      border: none;
-      border-bottom: 1px solid #000;
-      background: transparent;
-      font-size: 14px;
-      padding: 2px 5px;
-      outline: none;
-      color: #000;
+      border: none; border-bottom: 1px solid #000; background: transparent;
+      font-size: 14px; padding: 2px 5px; outline: none; color: #000;
       font-family: "Times New Roman", Times, serif;
     }
-    .passlip-doc .form-border { border: 2px solid #0e0e0e; margin-bottom: 10px; background-color: rgba(255,255,255,0.97); }
-    .passlip-doc .form-border, .passlip-doc .form-border * { font-family: "Times New Roman", Times, serif; color: #000; }
-    .passlip-doc .section { padding: 30px; position: relative; }
-    .passlip-doc .section-divider { border-top: 2px solid #0e0e0e; }
-    .passlip-doc .section-title { text-align:center; color:#4a86e8 !important; font-weight:bold; font-size:20px; margin:0 0 30px 0; letter-spacing:1px; }
-    .passlip-doc .control-no { position:absolute; top:20px; right:30px; font-size:13px; display:flex; align-items:center; gap:10px; }
-    .passlip-doc .control-no input { width:120px; }
-    .passlip-doc .flex-row { display:flex; justify-content:space-between; margin-bottom:15px; }
-    .passlip-doc .input-group { display:flex; align-items:center; gap:10px; }
-    .passlip-doc .input-group label { font-size:13px; white-space:nowrap; font-weight:bold; }
-    .passlip-doc .input-group input { flex-grow:1; }
-    .passlip-doc .pass-slip-top { display:flex; justify-content:space-between; }
-    .passlip-doc .left-fields { width:65%; display:flex; flex-direction:column; gap:15px; }
-    .passlip-doc .right-checkboxes { width:30%; display:flex; flex-direction:column; gap:10px; padding-top:20px; font-size:14px; font-weight:bold; }
-    .passlip-doc .checkbox-item { display:flex; align-items:center; gap:8px; }
+    .passlip-doc .form-border        { border: 2px solid #0e0e0e; margin-bottom: 10px; background-color: rgba(255,255,255,0.97); }
+    .passlip-doc .form-border,
+    .passlip-doc .form-border *      { font-family: "Times New Roman", Times, serif; color: #000; }
+    .passlip-doc .section            { padding: 30px; position: relative; }
+    .passlip-doc .section-divider    { border-top: 2px solid #0e0e0e; }
+    .passlip-doc .section-title      { text-align:center; color:#4a86e8 !important; font-weight:bold; font-size:20px; margin:0 0 30px 0; letter-spacing:1px; }
+    .passlip-doc .control-no         { position:absolute; top:20px; right:30px; font-size:13px; display:flex; align-items:center; gap:10px; }
+    .passlip-doc .control-no input   { width:120px; }
+    .passlip-doc .flex-row           { display:flex; justify-content:space-between; margin-bottom:15px; }
+    .passlip-doc .input-group        { display:flex; align-items:center; gap:10px; }
+    .passlip-doc .input-group label  { font-size:13px; white-space:nowrap; font-weight:bold; }
+    .passlip-doc .input-group input  { flex-grow:1; }
+    .passlip-doc .pass-slip-top      { display:flex; justify-content:space-between; }
+    .passlip-doc .left-fields        { width:65%; display:flex; flex-direction:column; gap:15px; }
+    .passlip-doc .right-checkboxes   { width:30%; display:flex; flex-direction:column; gap:10px; padding-top:20px; font-size:14px; font-weight:bold; }
+    .passlip-doc .checkbox-item      { display:flex; align-items:center; gap:8px; }
     .passlip-doc .checkbox-item input[type="checkbox"] { width:18px; height:18px; border:2px solid #4a86e8; }
-    .passlip-doc .purpose-section { margin-top:25px; }
-    .passlip-doc .purpose-lines { display:flex; flex-direction:column; gap:25px; margin-top:10px; }
-    .passlip-doc .signatures { display:flex; justify-content:space-between; margin-top:50px; text-align:center; }
-    .passlip-doc .sig-box { width:45%; border-top:1px solid #000; padding-top:5px; font-size:12px; font-style:italic; }
-    .passlip-doc .cert-paragraph { font-size:14px; line-height:2.2; text-align:justify; }
-    .passlip-doc .cert-name-highlight { border-bottom:1px solid #000; padding:0 10px; margin:0 5px; font-weight:bold; display:inline-block; }
-    .passlip-doc .sub-label { display:block; text-align:center; font-size:11px; font-style:italic; margin-top:-10px; margin-bottom:20px; }
-    .passlip-doc .header-section { display:flex; align-items:center; justify-content:center; margin-bottom:25px; position:relative; }
-    .passlip-doc .logos { display:flex; align-items:center; gap:15px; position:absolute; left:0; top:50%; transform:translateY(-50%); }
-    .passlip-doc .logos img { max-height:75px; }
-    .passlip-doc .header-text { text-align:center; font-size:11px; line-height:1.4; color:#555; padding-left:180px; font-family:Arial,sans-serif; }
+    .passlip-doc .purpose-section    { margin-top:25px; }
+    .passlip-doc .purpose-lines      { display:flex; flex-direction:column; gap:25px; margin-top:10px; }
+    .passlip-doc .signatures         { display:flex; justify-content:space-between; margin-top:50px; text-align:center; }
+    .passlip-doc .sig-box            { width:45%; border-top:1px solid #000; padding-top:5px; font-size:12px; font-style:italic; }
+    .passlip-doc .cert-paragraph     { font-size:14px; line-height:2.2; text-align:justify; }
+    .passlip-doc .cert-name-highlight{ border-bottom:1px solid #000; padding:0 10px; margin:0 5px; font-weight:bold; display:inline-block; }
+    .passlip-doc .sub-label          { display:block; text-align:center; font-size:11px; font-style:italic; margin-top:-10px; margin-bottom:20px; }
+    .passlip-doc .header-section     { display:flex; align-items:center; justify-content:center; margin-bottom:25px; position:relative; }
+    .passlip-doc .logos              { display:flex; align-items:center; gap:15px; position:absolute; left:0; top:50%; transform:translateY(-50%); }
+    .passlip-doc .logos img          { max-height:75px; }
+    .passlip-doc .header-text        { text-align:center; font-size:11px; line-height:1.4; color:#555; padding-left:180px; font-family:Arial,sans-serif; }
     .passlip-doc .header-text strong { color:#333; font-size:13px; font-weight:700; }
-    .passlip-doc .footer-info { display:flex; align-items:center; gap:20px; font-size:12px; color:#666; padding:10px 0; margin-bottom:10px; font-family:Arial,sans-serif; }
-    .passlip-doc .top-left-banner { position:absolute; top:0; left:0; width:50%; max-width:400px; z-index:1; }
-    .passlip-doc .bottom-right-banner { position:absolute; bottom:0; right:0; width:50%; max-width:400px; z-index:1; }
-    .passlip-doc .paper-inner { position:relative; z-index:2; padding:40px 40px 30px 40px; }
-    .passlip-doc .paper-wrap { position:relative; overflow:hidden; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    .passlip-doc .footer-info        { display:flex; align-items:center; gap:20px; font-size:12px; color:#666; padding:10px 0; margin-bottom:10px; font-family:Arial,sans-serif; }
+    .passlip-doc .top-left-banner    { position:absolute; top:0; left:0; width:50%; max-width:400px; z-index:1; }
+    .passlip-doc .bottom-right-banner{ position:absolute; bottom:0; right:0; width:50%; max-width:400px; z-index:1; }
+    .passlip-doc .paper-inner        { position:relative; z-index:2; padding:40px 40px 30px 40px; }
+    .passlip-doc .paper-wrap         { position:relative; overflow:hidden; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+
+    /* ── Pagination active state ── */
+    .page-btn { transition: all 0.15s ease; }
+    .page-btn.active {
+      background: #1a5276 !important;
+      color: #fff !important;
+      border-color: #1a5276 !important;
+    }
+
+    /* ── Search highlight ── */
+    mark.search-hl { background:#fef08a; color:inherit; border-radius:2px; padding:0 1px; }
+    .dark mark.search-hl { background:#78350f; color:#fef9c3; }
+
+    /* ── Print: hide everything, show only the table ── */
+    #printAllArea { display: none; }
 
     @media print {
-      .no-print { display:none !important; }
-      #filingToast { display:none !important; }
-      body { background:#fff; padding:0; }
-      .passlip-doc .paper-wrap { box-shadow:none; }
-      .passlip-doc input[type="text"] { border-bottom:1px solid #000; }
+      body > * { display: none !important; }
+      #printAllArea {
+        display: block !important;
+        padding: 14px 18px;
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        color: #000;
+      }
+      #printAllArea .ph { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #555; }
+      #printAllArea .ph h2 { font-size: 11px; font-weight: 700; margin: 0 0 2px; text-transform: uppercase; letter-spacing: .4px; }
+      #printAllArea .ph p  { font-size: 8.5px; color: #555; margin: 0; }
+      #printAllArea table { width: 100%; border-collapse: collapse; font-size: 9px; }
+      #printAllArea th { border:1px solid #888; padding:4px 5px; font-weight:700; font-size:8px; text-transform:uppercase; letter-spacing:.3px; text-align:left; background:#fff; }
+      #printAllArea td { border:1px solid #bbb; padding:4px 5px; vertical-align:top; }
     }
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-  <!-- ── Filing toast (top-right) ───────────────────────── -->
+  <!-- ── Print-only area ── -->
+  <div id="printAllArea">
+    <div class="ph">
+      <h2>Pass Slip Records — <span id="printTypeLabel"></span></h2>
+      <p id="printSubLabel"></p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Passlip No</th><th>Date</th><th>Employee</th>
+          <th>Emp ID</th><th>Department / Division</th><th>Office / Agency to Visit</th><th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody id="printTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ── Filing toast ── -->
   <div id="filingToast"
     class="toast-in fixed top-20 right-4 z-50 bg-white dark:bg-slate-800
            border-l-4 border-amber-400 rounded-xl shadow-xl
-           flex items-start gap-3 px-4 py-3.5 max-w-xs no-print">
+           flex items-start gap-3 px-4 py-3.5 max-w-xs">
     <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
     </svg>
     <div class="flex-1 min-w-0">
       <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-0.5">Filing Notice</p>
       <p class="text-xs text-slate-700 dark:text-slate-200"><%= filingLabel %></p>
-      <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Date on slip: <strong class="text-slate-600 dark:text-slate-300"><%= today %></strong></p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">
+        Date on slip: <strong class="text-slate-600 dark:text-slate-300"><%= today %></strong>
+      </p>
     </div>
     <button onclick="document.getElementById('filingToast').style.display='none'"
       class="text-slate-300 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-300 transition shrink-0 mt-0.5">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
     </button>
   </div>
 
-  <!-- ── Nav ────────────────────────────────────────────── -->
-  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm no-print">
+  <!-- ── Nav ── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
       <a href="/dashboard" class="flex items-center gap-2.5 group">
         <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
-        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">
+          Employee Portal
+        </span>
       </a>
       <div class="flex items-center gap-2">
-        <!-- Type badge -->
         <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
-                     <%= type === 'regular' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800' %>">
+          <%= type === 'regular'
+            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-800'
+            : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800' %>">
           <%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %>
         </span>
         <button id="themeToggle" aria-label="Toggle dark mode"
           class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
                  bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
-          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
-          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
         </button>
-        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
-               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
-               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <a href="/dashboard"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+                 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
           <span class="hidden sm:inline">Dashboard</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ── Body ───────────────────────────────────────────── -->
+  <!-- ── Main ── -->
   <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 page-in">
 
-    <!-- Page title -->
-    <div class="mb-5 no-print">
+    <div class="mb-5">
       <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Pass Slip</h1>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        Submit a pass slip for <span class="font-medium text-slate-700 dark:text-slate-300"><%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %></span>
+        Submit a pass slip for
+        <span class="font-medium text-slate-700 dark:text-slate-300">
+          <%= type === 'regular' ? 'Regular Employee' : 'JO & COS' %>
+        </span>
       </p>
     </div>
 
-    <!-- ── Alert banner ────────────────────────────────── -->
     <% if (locals.msg && msg) { %>
       <% const isErr = msgType === 'error'; %>
-      <div role="alert" class="alert-in mb-5 no-print flex items-start gap-3 px-4 py-3 rounded-xl
-           <%= isErr
-             ? 'bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
-             : 'bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400' %>">
+      <div role="alert" class="alert-in mb-5 flex items-start gap-3 px-4 py-3 rounded-xl
+        <%= isErr
+          ? 'bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
+          : 'bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400' %>">
         <% if (isErr) { %>
-          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
         <% } else { %>
-          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
         <% } %>
         <span class="text-sm font-medium"><%- msg %></span>
       </div>
     <% } %>
 
-    <!-- ── Action bar ──────────────────────────────────── -->
-    <div class="flex flex-wrap items-center gap-3 mb-5 no-print">
+    <div class="flex flex-wrap items-center gap-3 mb-5">
       <button id="openModalBtn"
         class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
                border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
                text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
                hover:border-navy-400 dark:hover:border-navy-500 hover:bg-navy-50 dark:hover:bg-navy-900/20
                transition-all duration-200">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+        </svg>
         View Recorded Passlips
       </button>
-     
     </div>
 
-
-
+    <!-- ── Passlip form ── -->
     <div class="passlip-doc">
       <form method="POST">
-
         <div class="paper-wrap">
           <img src="/images/uhi.png"      class="top-left-banner"     alt="">
           <img src="/images/uhitddd.png"  class="bottom-right-banner" alt="">
-
           <div class="paper-inner">
 
             <div class="header-section">
@@ -214,7 +272,9 @@
                 REGIONAL FISHERIES OFFICE-MIMAROPA<br>
                 Barangay Sapul, Calapan City, Oriental Mindoro, 5200<br>
                 Tel. No. (043) 288-6305 | Mobile No. 0917-107-2189<br>
-                <span style="color:blue;text-decoration:underline;">ord.mimaropa@bfar.da.gov.ph | records.mimaropa@bfar.da.gov.ph</span>
+                <span style="color:blue;text-decoration:underline;">
+                  <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="137c61773d7e7a7e72617c637253717572613d77723d747c653d637b">[email&#160;protected]</a> | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fe8c9b9d918c9a8dd09397939f8c918e9fbe9c989f8cd09a9fd0999188d08e96">[email&#160;protected]</a>
+                </span>
               </div>
             </div>
 
@@ -224,9 +284,7 @@
                   <label>Control No:</label>
                   <input type="text" name="passlip_no" value="<%= previewNo %>" readonly>
                 </div>
-
                 <h2 class="section-title">PASS SLIP</h2>
-
                 <div class="pass-slip-top">
                   <div class="left-fields">
                     <div class="input-group">
@@ -247,7 +305,6 @@
                       <input type="text" name="office_visit" required>
                     </div>
                   </div>
-
                   <div class="right-checkboxes">
                     <div class="checkbox-item">
                       <input type="checkbox" <%= type === 'regular' ? 'checked' : '' %> disabled>
@@ -259,7 +316,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="purpose-section">
                   <div class="input-group">
                     <label>PURPOSE (specific):</label>
@@ -270,25 +326,24 @@
                     <input type="text" style="width:100%;">
                   </div>
                 </div>
-
                 <div class="signatures">
                   <div class="sig-box">Signature over printed name of employee</div>
                   <div class="sig-box">Signature over printed name of Immediate Supervisor</div>
                 </div>
-              </div><!-- /section -->
+              </div>
 
               <div class="section section-divider">
                 <h2 class="section-title">CERTIFICATION</h2>
-
                 <div class="cert-paragraph">
                   This is to certify that Mr./Ms.
-                  <strong class="cert-name-highlight"><%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %></strong>
+                  <strong class="cert-name-highlight">
+                    <%= employee.first_name %> <%= employee.middle_name ? employee.middle_name + ' ' : '' %><%= employee.last_name %>
+                  </strong>
                   of the Bureau of Fisheries and Aquatic Resources (BFAR) has personally appeared at the
                   <input type="text" style="width:80%;margin-top:15px;" readonly placeholder="">
                   on the above stated purpose.
                 </div>
                 <span class="sub-label">(Name of office)</span>
-
                 <div class="flex-row" style="margin-top:30px;">
                   <div class="input-group" style="width:48%;">
                     <label>Actual time of visit (log in):</label>
@@ -299,17 +354,14 @@
                     <input type="text">
                   </div>
                 </div>
-
                 <div class="input-group" style="margin-top:25px;margin-bottom:20px;">
                   <label>Name and signature of staff who assisted:</label>
                   <input type="text">
                 </div>
-
                 <div class="input-group" style="margin-bottom:20px;">
                   <label>Position:</label>
                   <input type="text" style="width:50%;">
                 </div>
-
                 <div class="flex-row">
                   <div class="input-group" style="width:48%;">
                     <label>Mobile No:</label>
@@ -320,7 +372,7 @@
                     <input type="text">
                   </div>
                 </div>
-              </div><!-- /section -->
+              </div>
             </div><!-- /form-border -->
 
             <div class="footer-info">
@@ -328,33 +380,34 @@
               <span>ⓕ BFAR Mimaropa Region</span>
             </div>
 
-            <!-- Submit inside the doc so it's part of the form -->
-            <div class="no-print" style="text-align:center;margin:16px 0 8px;">
+            <div style="text-align:center;margin:16px 0 8px;">
               <button type="submit"
                 class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold
                        bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
                        text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
                 Submit Passlip Application
               </button>
             </div>
 
           </div><!-- /paper-inner -->
         </div><!-- /paper-wrap -->
-
       </form>
     </div><!-- /passlip-doc -->
 
   </main>
 
 
-  <!-- ══════════════════════════════════════════
+  <!-- ════════════════════════════════════════════════
        RECORDS MODAL
-  ══════════════════════════════════════════ -->
-  <div id="passlipModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+  ════════════════════════════════════════════════ -->
+  <div id="passlipModal"
+       class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700
-                w-full max-w-5xl max-h-[90vh] flex flex-col"
+                w-full max-w-6xl max-h-[92vh] flex flex-col"
          style="animation: fade-in 0.25s ease forwards;">
 
       <!-- Modal header -->
@@ -368,16 +421,65 @@
         <button id="closeModal" aria-label="Close"
           class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200
                  hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
         </button>
       </div>
 
-      <!-- Modal table -->
-      <div class="overflow-y-auto flex-1">
+      <!-- Toolbar -->
+      <div class="flex flex-wrap items-center gap-2.5 px-6 py-3 border-b border-slate-100 dark:border-slate-700
+                  shrink-0 bg-slate-50/60 dark:bg-slate-800/60">
+        <div class="relative flex-1 min-w-[200px] max-w-sm">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"/>
+          </svg>
+          <input id="searchInput" type="search" placeholder="Search all records…"
+            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg
+                   border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                   text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500
+                   focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 transition">
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="perPageSelect" class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Rows:</label>
+          <select id="perPageSelect"
+            class="px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-600
+                   bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200
+                   text-xs focus:outline-none focus:ring-2 focus:ring-navy-400 transition cursor-pointer">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="99999">All</option>
+          </select>
+        </div>
+        <span id="resultCount"
+          class="text-xs px-2.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700
+                 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+          — records
+        </span>
+        <div class="flex-1 hidden sm:block"></div>
+        <button id="printAllBtn"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-sm hover:shadow-md active:scale-[0.97]
+                 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:ring-offset-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          <span id="printAllLabel">Print All</span>
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div id="tableScrollArea" class="overflow-y-auto flex-1">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
-            <thead class="sticky top-0 bg-slate-50 dark:bg-slate-700/80 text-xs uppercase tracking-wider
-                          text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-slate-700/90 text-xs uppercase tracking-wider
+                          text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700 z-10">
               <tr>
                 <th class="px-5 py-3 text-left font-semibold">Passlip No</th>
                 <th class="px-5 py-3 text-left font-semibold">Date</th>
@@ -389,93 +491,281 @@
                 <th class="px-5 py-3 text-right font-semibold">Action</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-              <% if (!records || records.length === 0) { %>
-                <tr>
-                  <td colspan="8" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
-                    No passlip records found.
-                  </td>
-                </tr>
-              <% } else { %>
-                <% records.forEach(r => { %>
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
-                  <td class="px-5 py-3.5 font-semibold text-navy-600 dark:text-navy-300 whitespace-nowrap">
-                    <%= r.passlip_no %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
-                    <%= new Date(r.pass_date).toLocaleDateString() %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-700 dark:text-slate-200 font-medium">
-                    <%= r.employee_name %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
-                    <%= r.employee_id || '—' %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs max-w-[140px] truncate">
-                    <%= r.department %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[150px] truncate">
-                    <%= r.office_visit %>
-                  </td>
-                  <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[200px] truncate">
-                    <%= r.purpose %>
-                  </td>
-                  <td class="px-5 py-3.5 text-right">
-                    <a href="/passlip/print/<%= r.id %>?type=<%= type %>" target="_blank"
-                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium
-                             border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
-                             text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
-                             dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                      Print
-                    </a>
-                  </td>
-                </tr>
-                <% }) %>
-              <% } %>
+            <tbody id="recordsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
+              <!-- Populated by JS -->
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- Pagination bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-3
+                  border-t border-slate-100 dark:border-slate-700 shrink-0
+                  bg-slate-50/60 dark:bg-slate-800/60 min-h-[52px]">
+        <p id="pageInfo" class="text-xs text-slate-400 dark:text-slate-500 select-none"></p>
+        <div id="pageButtons" class="flex items-center gap-1 flex-wrap"></div>
+      </div>
+
     </div>
-  </div>
+  </div><!-- /modal -->
 
 
+  <!-- ════════════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════════════ -->
+
+  <!-- Block 1: EJS data injected at top level, outside any IIFE -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script nonce="<%= nonce %>">
+    const ALL_RECORDS  = <%- JSON.stringify((records || []).map(r => ({
+      id:            r.id,
+      passlip_no:    r.passlip_no    || '',
+      pass_date:     r.pass_date     || '',
+      employee_name: r.employee_name || '',
+      employee_id:   r.employee_id   || '',
+      department:    r.department    || '',
+      office_visit:  r.office_visit  || '',
+      purpose:       r.purpose       || ''
+    }))) %>;
+    const PASSLIP_TYPE = '<%- type %>';
+    const TYPE_LABEL   = '<%- type === "regular" ? "Regular Employee" : "JO & COS" %>';
+  </script>
+
+  <!-- Block 2: All logic — uses the globals above -->
   <script nonce="<%= nonce %>">
-    // ── Theme ──────────────────────────────────────────────────
-    const html = document.documentElement;
+  (() => {
+
+    let filtered    = [...ALL_RECORDS];
+    let currentPage = 1;
+    let perPage     = 10;
+    let searchQuery = '';
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+    const esc = s => String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    const hl = (str, q) => {
+      if (!q) return esc(str);
+      return esc(str).replace(
+        new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
+        '<mark class="search-hl">$1</mark>'
+      );
+    };
+
+    const fmtDate = raw =>
+      raw ? new Date(raw).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
+
+    // ── Filter ──────────────────────────────────────────────────────────
+    function applyFilter() {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = ALL_RECORDS.filter(r => {
+        if (!q) return true;
+        return [r.passlip_no, r.employee_name, r.employee_id,
+                r.department, r.office_visit, r.purpose, fmtDate(r.pass_date)]
+          .some(v => String(v).toLowerCase().includes(q));
+      });
+      currentPage = 1;
+      render();
+    }
+
+    // ── Render table ────────────────────────────────────────────────────
+    function render() {
+      const total = filtered.length;
+      const q     = searchQuery.trim().toLowerCase();
+      const start = (currentPage - 1) * perPage;
+      const end   = perPage >= 99999 ? total : Math.min(start + perPage, total);
+      const rows  = filtered.slice(start, end);
+      const tbody = document.getElementById('recordsTableBody');
+
+      if (total === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="px-5 py-14 text-center">
+              <div class="flex flex-col items-center gap-2.5 text-slate-400 dark:text-slate-500">
+                <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-medium">
+                  ${q ? `No results for "<strong>${esc(q)}</strong>"` : 'No passlip records found.'}
+                </p>
+                ${q ? '<p class="text-xs">Try a different keyword.</p>' : ''}
+              </div>
+            </td>
+          </tr>`;
+      } else {
+        tbody.innerHTML = rows.map(r => `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
+            <td class="px-5 py-3.5 font-semibold text-navy-600 dark:text-navy-300 whitespace-nowrap text-sm">
+              ${hl(r.passlip_no, q)}
+            </td>
+            <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
+              ${hl(fmtDate(r.pass_date), q)}
+            </td>
+            <td class="px-5 py-3.5 text-slate-700 dark:text-slate-200 font-medium text-sm">
+              ${hl(r.employee_name, q)}
+            </td>
+            <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs">
+              ${hl(r.employee_id, q) || '—'}
+            </td>
+            <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden md:table-cell text-xs max-w-[140px] truncate"
+                title="${esc(r.department)}">
+              ${hl(r.department, q)}
+            </td>
+            <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell text-xs max-w-[160px] truncate"
+                title="${esc(r.office_visit)}">
+              ${hl(r.office_visit, q)}
+            </td>
+            <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell text-xs max-w-[200px] truncate"
+                title="${esc(r.purpose)}">
+              ${hl(r.purpose, q)}
+            </td>
+            <td class="px-5 py-3.5 text-right">
+              <form action="/passlip/print" method="POST" target="_blank" style="display:inline;">
+                <input type="hidden" name="passlip_no" value="${esc(r.passlip_no)}">
+                <button type="submit"
+                   class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium
+                          border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                          text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
+                          dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30
+                          transition-all duration-200 whitespace-nowrap">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                  </svg>
+                  Print
+                </button>
+              </form>
+            </td>
+          </tr>`).join('');
+      }
+
+      document.getElementById('resultCount').textContent =
+        q ? `${total} of ${ALL_RECORDS.length}` : `${total} record${total !== 1 ? 's' : ''}`;
+      document.getElementById('printAllLabel').textContent =
+        q ? `Print ${total} Result${total !== 1 ? 's' : ''}` : `Print All (${total})`;
+
+      renderPagination(total, start, end);
+    }
+
+    // ── Pagination ──────────────────────────────────────────────────────
+    function renderPagination(total, start, end) {
+      const pageInfo   = document.getElementById('pageInfo');
+      const btnsEl     = document.getElementById('pageButtons');
+      const totalPages = perPage >= 99999 ? 1 : Math.ceil(total / perPage);
+
+      if (total === 0) { pageInfo.textContent = ''; btnsEl.innerHTML = ''; return; }
+
+      pageInfo.textContent = `Showing ${start + 1}–${end} of ${total}`;
+      if (totalPages <= 1) { btnsEl.innerHTML = ''; return; }
+
+      const btnBase = `page-btn px-3 py-1.5 rounded-lg text-xs font-medium border
+        border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+        text-slate-600 dark:text-slate-300 hover:bg-navy-50 hover:border-navy-400
+        hover:text-navy-600 dark:hover:text-navy-300 transition select-none cursor-pointer`;
+
+      btnsEl.innerHTML = [
+        `<button class="${btnBase}" data-p="prev" ${currentPage===1?'disabled':''}>‹ Prev</button>`,
+        ...smartPages(currentPage, totalPages).map(p =>
+          p === '…'
+            ? `<span class="px-1.5 text-xs text-slate-400 dark:text-slate-500 select-none">…</span>`
+            : `<button class="${btnBase} ${p===currentPage?'active':''}" data-p="${p}">${p}</button>`
+        ),
+        `<button class="${btnBase}" data-p="next" ${currentPage===totalPages?'disabled':''}>Next ›</button>`
+      ].join('');
+
+      btnsEl.querySelectorAll('button[data-p]:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tp = Math.ceil(filtered.length / perPage);
+          const v  = btn.dataset.p;
+          if      (v === 'prev') currentPage = Math.max(1, currentPage - 1);
+          else if (v === 'next') currentPage = Math.min(tp, currentPage + 1);
+          else                   currentPage = +v;
+          render();
+          document.getElementById('tableScrollArea').scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function smartPages(cur, total) {
+      if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+      const set    = new Set([1, total, cur-1, cur, cur+1].filter(n => n>=1 && n<=total));
+      const sorted = [...set].sort((a,b) => a-b);
+      const out = []; let prev = 0;
+      for (const n of sorted) {
+        if (prev && n - prev > 1) out.push('…');
+        out.push(n); prev = n;
+      }
+      return out;
+    }
+
+    // ── Print all ───────────────────────────────────────────────────────
+    function doPrintAll() {
+      const q = searchQuery.trim().toLowerCase();
+      document.getElementById('printTypeLabel').textContent = TYPE_LABEL;
+      document.getElementById('printSubLabel').textContent =
+        q
+          ? `Filtered: "${q}" · ${filtered.length} record${filtered.length!==1?'s':''} · ${new Date().toLocaleString('en-PH')}`
+          : `${filtered.length} record${filtered.length!==1?'s':''} · Printed: ${new Date().toLocaleString('en-PH')}`;
+
+      document.getElementById('printTableBody').innerHTML = filtered.map((r, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${esc(r.passlip_no)}</td>
+          <td>${esc(fmtDate(r.pass_date))}</td>
+          <td>${esc(r.employee_name)}</td>
+          <td>${esc(r.employee_id)||'—'}</td>
+          <td>${esc(r.department)}</td>
+          <td>${esc(r.office_visit)}</td>
+          <td>${esc(r.purpose)}</td>
+        </tr>`).join('');
+
+      window.print();
+    }
+
+    // ── Theme ────────────────────────────────────────────────────────────
+    const html   = document.documentElement;
     const stored = localStorage.getItem('theme');
-    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches))
+      html.classList.add('dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
       html.classList.toggle('dark');
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    // ── Records modal ──────────────────────────────────────────
+    // ── Modal ────────────────────────────────────────────────────────────
     const modal = document.getElementById('passlipModal');
+
     document.getElementById('openModalBtn').addEventListener('click', () => {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-    });
-    document.getElementById('closeModal').addEventListener('click', () => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    });
-    modal.addEventListener('click', e => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      applyFilter();
+      setTimeout(() => document.getElementById('searchInput').focus(), 80);
     });
 
-    
+    const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+
+    // ── Search (debounced) ───────────────────────────────────────────────
+    let debounce;
+    document.getElementById('searchInput').addEventListener('input', e => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => { searchQuery = e.target.value; applyFilter(); }, 220);
+    });
+
+    // ── Rows per page ────────────────────────────────────────────────────
+    document.getElementById('perPageSelect').addEventListener('change', e => {
+      perPage = +e.target.value; currentPage = 1; render();
+    });
+
+    // ── Print all button ─────────────────────────────────────────────────
+    document.getElementById('printAllBtn').addEventListener('click', doPrintAll);
+
+  })();
   </script>
+
 </body>
 </html>

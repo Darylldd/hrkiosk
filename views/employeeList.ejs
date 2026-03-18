@@ -29,83 +29,107 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'DM Sans', sans-serif; }
-    @keyframes fade-in    { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
-    @keyframes modal-in   { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
-    .page-in   { animation: fade-in  0.35s ease forwards; }
-    .modal-anim{ animation: modal-in 0.25s ease forwards; }
+    @keyframes fade-in  { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:translateY(0); } }
+    @keyframes modal-in { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .page-in    { animation: fade-in  0.35s ease forwards; }
+    .modal-anim { animation: modal-in 0.25s ease forwards; }
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-  <!-- ── Nav ────────────────────────────────────────────── -->
+  <!-- ── Nav ── -->
   <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
       <a href="/dashboard" class="flex items-center gap-2.5 group">
         <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
-        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">
+          Employee Portal
+        </span>
       </a>
       <div class="flex items-center gap-2">
-        <a href="/employees/add" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-               bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
-               text-white shadow-sm hover:shadow transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        <a href="/employees/add"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                 text-white shadow-sm hover:shadow transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
           <span class="hidden sm:inline">Add Employee</span>
         </a>
         <button id="themeToggle" aria-label="Toggle dark mode"
           class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
                  bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
-          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
-          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
         </button>
-        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
-               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
-               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <a href="/dashboard"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+                 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
           <span class="hidden sm:inline">Dashboard</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ── Body ───────────────────────────────────────────── -->
+  <!-- ── Body ── -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-in">
 
     <div class="mb-6">
       <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Employee List</h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Bureau of Fisheries and Aquatic Resources · MIMAROPA Region</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Bureau of Fisheries and Aquatic Resources · MIMAROPA Region
+      </p>
     </div>
 
     <!-- Search bar -->
     <div class="relative mb-4">
       <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
         </svg>
       </span>
-      <input id="empSearch" type="text" placeholder="Search by name, employee no., department, or status..."
-        autocomplete="off"
-        class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl
-               border border-slate-200 dark:border-slate-600
-               bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
-               placeholder-slate-400 dark:placeholder-slate-500
-               focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
-               shadow-sm transition" />
+      <input id="empSearch" type="text"
+             placeholder="Search by name, employee no., department, or status…"
+             autocomplete="off"
+             class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl
+                    border border-slate-200 dark:border-slate-600
+                    bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
+                    placeholder-slate-400 dark:placeholder-slate-500
+                    focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500
+                    focus:border-transparent shadow-sm transition" />
       <button id="clearEmpSearch" type="button" aria-label="Clear"
         class="absolute inset-y-0 right-0 pr-3.5 items-center hidden
                text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     </div>
 
     <!-- Count -->
     <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
-      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= employees.length %></span>
+      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200">
+        <%= employees.length %>
+      </span>
       employee<%= employees.length !== 1 ? 's' : '' %>
     </p>
 
@@ -114,7 +138,8 @@
       <div class="overflow-x-auto">
         <table class="w-full text-sm" id="empTable">
           <thead>
-            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider
+                       text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
               <th class="px-5 py-3 text-left font-semibold">Emp No</th>
               <th class="px-5 py-3 text-left font-semibold">Full Name</th>
               <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">Department</th>
@@ -134,10 +159,12 @@
             %>
             <% employees.forEach(emp => { %>
             <tr class="emp-row hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100"
-                data-search="<%= (emp.employee_no + ' ' + emp.first_name + ' ' + (emp.middle_name||'') + ' ' + emp.last_name + ' ' + emp.department + ' ' + emp.status).toLowerCase() %>">
+                data-search="<%= (emp.employee_no + ' ' + emp.first_name + ' ' + (emp.middle_name||'') + ' ' + emp.last_name + ' ' + (emp.department||'') + ' ' + (emp.status||'')).toLowerCase() %>">
+
               <td class="px-5 py-3.5 font-medium text-slate-600 dark:text-slate-400">
                 <%= emp.employee_no %>
               </td>
+
               <td class="px-5 py-3.5">
                 <div class="flex items-center gap-3">
                   <% if (emp.profile_pic) { %>
@@ -156,9 +183,11 @@
                   </span>
                 </div>
               </td>
+
               <td class="px-5 py-3.5 text-slate-600 dark:text-slate-400 hidden md:table-cell max-w-[200px] truncate">
                 <%= emp.department %>
               </td>
+
               <td class="px-5 py-3.5 hidden sm:table-cell">
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                   <%= (emp.status || '').toUpperCase() === 'ACTIVE'
@@ -167,23 +196,33 @@
                   <%= emp.status || 'N/A' %>
                 </span>
               </td>
+
               <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell text-xs">
                 <%= formatDate(emp.date_of_original_appointment || emp.date_of_appointment || emp.date_hired) %>
               </td>
+
               <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell">
                 <%= emp.contact_no || '—' %>
               </td>
+
               <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden xl:table-cell text-xs">
                 <%= emp.email || '—' %>
               </td>
+
               <td class="px-5 py-3.5 text-right">
+                <!-- data-empno instead of data-id — keeps DB id out of the page -->
                 <button class="view-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                       border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
-                       text-slate-600 dark:text-slate-300 hover:border-navy-400 dark:hover:border-navy-500
-                       hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30
-                       transition-all duration-200"
-                  data-id="<%= emp.id %>">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                               border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                               text-slate-600 dark:text-slate-300 hover:border-navy-400 dark:hover:border-navy-500
+                               hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30
+                               transition-all duration-200"
+                        data-empno="<%= emp.employee_no %>">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
                   View
                 </button>
               </td>
@@ -193,10 +232,11 @@
         </table>
       </div>
 
-      <!-- No search match state -->
+      <!-- No results state -->
       <div id="noEmpResults" style="display:none;" class="px-5 py-14 text-center">
         <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
         </svg>
         <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">No employees match your search.</p>
         <p class="text-slate-300 dark:text-slate-600 text-xs mt-1">Try a different name, number, or department.</p>
@@ -209,7 +249,8 @@
   <!-- ══════════════════════════════════════════
        EMPLOYEE DETAIL MODAL
   ══════════════════════════════════════════ -->
-  <div id="employeeModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="employeeModal"
+    class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="modal-anim bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700
                 w-full max-w-lg max-h-[90vh] flex flex-col">
 
@@ -219,7 +260,9 @@
         <button id="closeModal" aria-label="Close"
           class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200
                  hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
         </button>
       </div>
 
@@ -235,19 +278,19 @@
     // ── Theme ──────────────────────────────────────────────────
     const html = document.documentElement;
     const stored = localStorage.getItem('theme');
-    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches))
+      html.classList.add('dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
       html.classList.toggle('dark');
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
     // ── Search ─────────────────────────────────────────────────
-    const empSearch    = document.getElementById('empSearch');
-    const clearBtn     = document.getElementById('clearEmpSearch');
-    const rowCountEl   = document.getElementById('rowCount');
-    const noResults    = document.getElementById('noEmpResults');
-    const rows         = document.querySelectorAll('.emp-row');
-    const totalCount   = rows.length;
+    const empSearch  = document.getElementById('empSearch');
+    const clearBtn   = document.getElementById('clearEmpSearch');
+    const rowCountEl = document.getElementById('rowCount');
+    const noResults  = document.getElementById('noEmpResults');
+    const rows       = document.querySelectorAll('.emp-row');
 
     function runSearch() {
       const q = empSearch.value.trim().toLowerCase();
@@ -268,7 +311,7 @@
     // ── Modal ──────────────────────────────────────────────────
     const modal        = document.getElementById('employeeModal');
     const modalContent = document.getElementById('modalContent');
-    const closeModal   = document.getElementById('closeModal');
+    const closeModalBtn = document.getElementById('closeModal');
 
     function fmtDate(d) {
       if (!d) return 'N/A';
@@ -276,44 +319,52 @@
     }
 
     function field(label, value) {
-      const v = value || '—';
       return `
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-0.5">${label}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-200">${v}</p>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-0.5">
+            ${label}
+          </p>
+          <p class="text-sm text-slate-700 dark:text-slate-200">${value || '—'}</p>
         </div>`;
     }
 
     function section(title, fields) {
       return `
         <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-navy-400 dark:text-navy-500 mb-3 pb-1.5 border-b border-slate-100 dark:border-slate-700">${title}</p>
+          <p class="text-xs font-semibold uppercase tracking-widest text-navy-400 dark:text-navy-500
+                    mb-3 pb-1.5 border-b border-slate-100 dark:border-slate-700">${title}</p>
           <div class="grid grid-cols-2 gap-x-6 gap-y-3">${fields}</div>
         </div>`;
     }
 
+    // ── View button — uses employee_no, not DB id ──────────────
     document.querySelectorAll('.view-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        modalContent.innerHTML = `<div class="flex items-center justify-center py-8">
-          <svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-          </svg></div>`;
+        modalContent.innerHTML = `
+          <div class="flex items-center justify-center py-8">
+            <svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+            </svg>
+          </div>`;
         modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         try {
-          const res  = await fetch(`/employees/${btn.dataset.id}/view`);
+          // Uses employee_no — no DB id in the URL
+          const res  = await fetch(`/employees/${encodeURIComponent(btn.dataset.empno)}/view`);
           const data = await res.json();
 
-          const dateHired = fmtDate(data.date_of_original_appointment || data.date_of_appointment || data.date_hired);
+          const dateHired = fmtDate(
+            data.date_of_original_appointment || data.date_of_appointment || data.date_hired
+          );
 
           modalContent.innerHTML =
-            // Avatar + name banner
+            // Avatar + name header
             `<div class="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
               ${data.profile_pic
                 ? `<img src="${data.profile_pic}" alt="${data.first_name}"
-                     class="w-14 h-14 rounded-full object-cover border-2 border-navy-200 dark:border-navy-700 shadow shrink-0" />`
+                       class="w-14 h-14 rounded-full object-cover border-2 border-navy-200 dark:border-navy-700 shadow shrink-0" />`
                 : `<div class="w-14 h-14 rounded-full bg-navy-100 dark:bg-navy-900 text-navy-600 dark:text-navy-300
                               flex items-center justify-center text-xl font-bold shrink-0 select-none">
                     ${(data.first_name || '?').charAt(0).toUpperCase()}
@@ -326,19 +377,48 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${data.department || ''}</p>
               </div>
             </div>` +
-            section('Identity', field('Employee No', data.employee_no) + field('Employee ID', data.employee_id) + field('Account No', data.account_no) + field('Status', data.status)) +
-            section('Employment', field('Position', data.position) + field('Date Hired', dateHired) + field('Nature', data.nature_of_employment)) +
-            section('Personal', field('Birthdate', fmtDate(data.birthdate)) + field('Civil Status', data.civil_status) + field('Sex', data.sex)) +
-            section('Government IDs', field('TIN', data.tin) + field('PhilHealth', data.philhealth_no) + field('GSIS', data.gsis_no) + field('SSS', data.sss_no)) +
-            section('Contact', field('Email', data.email) + field('Contact No', data.contact_no) + field('Emergency Contact', data.emergency_contact_name) + field('Emergency Phone', data.emergency_contact_phone));
+            section('Identity',
+              field('Employee No',  data.employee_no) +
+              field('Employee ID',  data.employee_id) +
+              field('Account No',   data.account_no) +
+              field('Status',       data.status)
+            ) +
+            section('Employment',
+              field('Position',     data.position) +
+              field('Date Hired',   dateHired) +
+              field('Nature',       data.nature_of_employment)
+            ) +
+            section('Personal',
+              field('Birthdate',    fmtDate(data.birthdate)) +
+              field('Civil Status', data.civil_status) +
+              field('Sex',          data.sex)
+            ) +
+            section('Government IDs',
+              field('TIN',          data.tin) +
+              field('PhilHealth',   data.philhealth_no) +
+              field('GSIS',         data.gsis_no) +
+              field('SSS',          data.sss_no)
+            ) +
+            section('Contact',
+              field('Email',              data.email) +
+              field('Contact No',         data.contact_no) +
+              field('Emergency Contact',  data.emergency_contact_name) +
+              field('Emergency Phone',    data.emergency_contact_phone)
+            );
+
         } catch (e) {
-          modalContent.innerHTML = `<p class="text-center text-red-500 text-sm py-8">Failed to load employee details.</p>`;
+          modalContent.innerHTML = `
+            <p class="text-center text-red-500 text-sm py-8">Failed to load employee details.</p>`;
         }
       });
     });
 
-    closeModal.addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
-    modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } });
+    closeModalBtn.addEventListener('click', () => {
+      modal.classList.add('hidden'); modal.classList.remove('flex');
+    });
+    modal.addEventListener('click', e => {
+      if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
         modal.classList.add('hidden'); modal.classList.remove('flex');

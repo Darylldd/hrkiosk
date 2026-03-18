@@ -80,7 +80,6 @@
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">All submitted pass slip records</p>
     </div>
 
-    <!-- Search -->
     <div class="relative mb-4">
       <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +107,6 @@
       <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= records.length %></span> record<%= records.length !== 1 ? 's' : '' %>
     </p>
 
-    <!-- Table card -->
     <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -175,7 +173,6 @@
   </main>
 
   <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
-    // Theme
     const html = document.documentElement;
     const stored = localStorage.getItem('theme');
     if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
@@ -184,7 +181,6 @@
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    // Search
     const searchInput = document.getElementById('recordSearch');
     const clearBtn    = document.getElementById('clearSearch');
     const countEl     = document.getElementById('rowCount');

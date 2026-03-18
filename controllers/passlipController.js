@@ -1,4 +1,5 @@
-const Passlip = require('../models/Passlip');
+const Passlip  = require('../models/Passlip');
+const AuditLog = require('../models/AuditLog');
 
 // HR and admin departments that can see all passlip records
 const PRIVILEGED_DEPARTMENTS = ['hrmu', 'admin'];
@@ -41,12 +42,12 @@ exports.showPasslipForm = (req, res) => {
 
             res.render('passlip', {
                 type,
-                today: filingDate,
+                today:      filingDate,
                 filingLabel,
-                previewNo: result.passlipNo,
+                previewNo:  result.passlipNo,
                 employee,
-                msg: null,
-                msgType: 'success',
+                msg:        null,
+                msgType:    'success',
                 records,
                 office_visit: ''
             });
@@ -99,13 +100,13 @@ exports.submitPasslip = (req, res) => {
 
             const data = {
                 type,
-                seq_no:      result.nextSeq,
-                passlip_no:  result.passlipNo,
+                seq_no:       result.nextSeq,
+                passlip_no:   result.passlipNo,
                 employee_id,
-                pass_date:   filingDate,
-                department:  department.trim(),
+                pass_date:    filingDate,
+                department:   department.trim(),
                 office_visit: office_visit.trim(),
-                purpose:     purpose.trim()
+                purpose:      purpose.trim()
             };
 
             Passlip.insertPasslip(data, (err) => {
@@ -114,12 +115,21 @@ exports.submitPasslip = (req, res) => {
                     return res.status(500).send('Error saving passlip.');
                 }
 
+                // ── Audit log ──
+                AuditLog.log({
+                    employee_id:   employee.id,
+                    employee_name: `${employee.first_name} ${employee.last_name}`,
+                    action:        'SUBMIT_PASSLIP',
+                    details:       `${result.passlipNo} · ${type === 'regular' ? 'Regular' : 'JO/COS'} · To: ${office_visit.trim()} · ${filingDate}`,
+                    ip_address:    req.ip,
+                });
+
                 Passlip.findByType(type, employeeId, (err, records) => {
                     res.render('passlip', {
                         type, today: filingDate, filingLabel,
                         previewNo: result.passlipNo,
                         employee,
-                        msg: `✅ Passlip submitted! No: ${result.passlipNo} — Dated: ${filingDate}`,
+                        msg:     `✅ Passlip submitted! No: ${result.passlipNo} — Dated: ${filingDate}`,
                         msgType: 'success', records: records || [], office_visit: ''
                     });
                 });
@@ -141,11 +151,12 @@ exports.showPasslipRecords = (req, res) => {
     });
 };
 
+// ── Print via POST — passlip_no in request body, nothing in the URL ──────
 exports.printPasslip = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id) || id <= 0) return res.status(400).send('Invalid ID.');
+    const passlipNo = (req.body.passlip_no || '').trim();
+    if (!passlipNo) return res.status(400).send('Invalid passlip number.');
 
-    Passlip.findById(id, (err, results) => {
+    Passlip.findByPasslipNo(passlipNo, (err, results) => {
         if (err || !results.length) return res.status(404).send('Passlip not found.');
         res.render('passlipPrint', { passlip: results[0], nonce: res.locals.nonce });
     });

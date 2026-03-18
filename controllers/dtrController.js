@@ -1,4 +1,5 @@
-const DTR = require('../models/dtrModel');
+const DTR      = require('../models/dtrModel');
+const AuditLog = require('../models/AuditLog');
 
 // ── Validate year/month from query string ──────────────────────────────────
 function sanitizeDateFilter(query) {
@@ -54,7 +55,8 @@ exports.showDTR = (req, res) => {
 };
 
 exports.clockIn = (req, res) => {
-    const userId = req.session.employee.id;
+    const userId   = req.session.employee.id;
+    const emp      = req.session.employee;
 
     DTR.getToday(userId, (err, todayRecords) => {
         if (err) return res.status(500).send('Error checking today.');
@@ -65,6 +67,15 @@ exports.clockIn = (req, res) => {
 
         DTR.clockIn(userId, (err2) => {
             if (err2) return res.status(500).send('Error clocking in.');
+
+            AuditLog.log({
+                employee_id:   emp.id,
+                employee_name: `${emp.first_name} ${emp.last_name}`,
+                action:        'CLOCK_IN',
+                details:       `Clocked in at ${new Date().toLocaleTimeString('en-PH')} on ${new Date().toLocaleDateString('en-PH')}`,
+                ip_address:    req.ip,
+            });
+
             res.redirect('/dtr');
         });
     });
@@ -72,6 +83,7 @@ exports.clockIn = (req, res) => {
 
 exports.clockOut = (req, res) => {
     const userId = req.session.employee.id;
+    const emp    = req.session.employee;
 
     DTR.getToday(userId, (err, todayRecords) => {
         if (err) return res.status(500).send('Error checking today.');
@@ -83,6 +95,22 @@ exports.clockOut = (req, res) => {
 
         DTR.clockOut(userId, (err2) => {
             if (err2) return res.status(500).send('Error clocking out.');
+
+            // Calculate hours worked if we have the time_in
+            let hoursDetail = '';
+            if (today.time_in) {
+                const hrs = ((Date.now() - new Date(today.time_in)) / 1000 / 3600).toFixed(2);
+                hoursDetail = ` · ${hrs} hrs worked`;
+            }
+
+            AuditLog.log({
+                employee_id:   emp.id,
+                employee_name: `${emp.first_name} ${emp.last_name}`,
+                action:        'CLOCK_OUT',
+                details:       `Clocked out at ${new Date().toLocaleTimeString('en-PH')} on ${new Date().toLocaleDateString('en-PH')}${hoursDetail}`,
+                ip_address:    req.ip,
+            });
+
             res.redirect('/dtr');
         });
     });
@@ -102,10 +130,10 @@ exports.showAllDTR = (req, res) => {
 
             if (!users[empId]) {
                 users[empId] = {
-                    name: `${r.first_name} ${r.last_name}`,
-                    email: r.email,
+                    name:       `${r.first_name} ${r.last_name}`,
+                    email:      r.email,
                     department: r.department,
-                    records: []
+                    records:    []
                 };
             }
 
@@ -115,8 +143,8 @@ exports.showAllDTR = (req, res) => {
                     : '-';
 
                 users[empId].records.push({
-                    date: r.date,
-                    time_in: r.time_in,
+                    date:     r.date,
+                    time_in:  r.time_in,
                     time_out: r.time_out,
                     hours
                 });
@@ -124,8 +152,8 @@ exports.showAllDTR = (req, res) => {
         });
 
         res.render('adminDTR', {
-            users: Object.values(users),
-            employee: req.session.employee,
+            users:         Object.values(users),
+            employee:      req.session.employee,
             selectedYear,
             selectedMonth,
             currentYear

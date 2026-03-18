@@ -89,5 +89,5 @@ app.use('/passlip', require('./routes/passlipRoutes'));
 app.use('/payslip', require('./routes/payslipRoutes'));
 app.use('/', require('./routes/employeeRoutes'));
 app.use('/admin/payslip', adminPayslipRoutes);
-
+app.use('/', require('./routes/auditLogRoutes'));
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

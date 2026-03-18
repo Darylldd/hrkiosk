@@ -75,7 +75,7 @@
           </div>
         </div>
 
-        <!-- Employee listbox -->
+        <!-- Employee listbox — value is employee_no, not numeric id -->
         <div>
           <label for="employeeSelect" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1.5">
             Select Employee
@@ -88,7 +88,8 @@
               <option disabled>No employees found.</option>
             <% } else { %>
               <% employees.forEach(emp => { %>
-                <option value="<%= emp.id %>">
+                <!-- value = employee_no so the URL never exposes a numeric DB id -->
+                <option value="<%= emp.employee_no %>">
                   <%= emp.first_name %> <%= emp.middle_name || '' %> <%= emp.last_name %><% if (emp.position) { %> — <%= emp.position %><% } %>
                 </option>
               <% }); %>
@@ -114,6 +115,11 @@
             Cancel
           </a>
         </div>
+
+        <!-- Hidden POST form — employee_no goes in the request body, never the URL -->
+        <form id="selectForm" action="/admin/payslip/select-employee" method="POST" style="display:none;">
+          <input type="hidden" name="employee_no" id="selectedEmpNo">
+        </form>
 
       </div>
     </div>
@@ -152,12 +158,13 @@
     function proceed() {
       const selected = employeeSelect.value;
       if (!selected) {
-        // Flash the border red briefly instead of alert()
         employeeSelect.classList.add('ring-2', 'ring-red-400');
         setTimeout(() => employeeSelect.classList.remove('ring-2', 'ring-red-400'), 1500);
         return;
       }
-      window.location.href = '/admin/payslip/create?employee_id=' + encodeURIComponent(selected);
+      // Submit via POST — employee_no goes in the request body, never the URL
+      document.getElementById('selectedEmpNo').value = selected;
+      document.getElementById('selectForm').submit();
     }
 
     document.getElementById('proceedBtn').addEventListener('click', proceed);

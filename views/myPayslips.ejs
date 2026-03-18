@@ -56,7 +56,6 @@
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">View and print your payslip records</p>
     </div>
 
-    <!-- Flash alerts -->
     <% if (locals.flash_success) { %>
       <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl
            bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
@@ -72,7 +71,6 @@
       </div>
     <% } %>
 
-    <!-- Table card -->
     <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -103,11 +101,12 @@
                 </span>
               </td>
               <td class="px-5 py-3.5 text-right">
+                <!-- data-ref uses payslip_ref, not numeric DB id -->
                 <button class="view-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
                        border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
                        text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
                        dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200"
-                  data-id="<%= p.id %>">
+                  data-ref="<%= p.payslip_ref %>">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                   View
                 </button>
@@ -131,14 +130,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <div id="payslipContent" class="overflow-y-auto flex-1 p-2">
-        <div class="flex items-center justify-center py-12">
-          <svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-          </svg>
-        </div>
-      </div>
+      <div id="payslipContent" class="overflow-y-auto flex-1 p-2"></div>
     </div>
   </div>
 
@@ -155,20 +147,20 @@
     const content = document.getElementById('payslipContent');
 
     document.querySelectorAll('.view-btn').forEach(btn => {
-      btn.addEventListener('click', () => openPayslip(btn.dataset.id));
+      btn.addEventListener('click', () => openPayslip(btn.dataset.ref));
     });
 
-    function openPayslip(id) {
+    function openPayslip(ref) {
       content.innerHTML = `<div class="flex items-center justify-center py-12"><svg class="animate-spin w-6 h-6 text-navy-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg></div>`;
       modal.classList.remove('hidden'); modal.classList.add('flex');
-      fetch('/payslip/' + id)
+      // URL uses payslip_ref — no numeric DB id
+      fetch('/payslip/' + encodeURIComponent(ref))
         .then(res => res.text())
         .then(h => { content.innerHTML = h; })
         .catch(() => { content.innerHTML = '<p class="text-center text-red-500 text-sm py-8">Failed to load payslip.</p>'; });
     }
 
     function closePayslip() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-
     document.getElementById('closeBtn').addEventListener('click', closePayslip);
     modal.addEventListener('click', e => { if (e.target === modal) closePayslip(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closePayslip(); });

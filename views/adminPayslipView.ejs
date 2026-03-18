@@ -35,16 +35,23 @@
         <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
       </a>
       <div class="flex items-center gap-2">
-        <a href="/admin/payslip/<%= payslip.id %>/print" target="_blank"
-          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white shadow-sm hover:shadow transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          <span class="hidden sm:inline">Print</span>
-        </a>
+
+        <!-- Print — POST form, ref in body, clean URL -->
+        <form action="/admin/payslip/print" method="POST" target="_blank">
+          <input type="hidden" name="ref" value="<%= payslip.admin_payslip_ref %>">
+          <button type="submit"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-amber-500 hover:bg-amber-600 text-white shadow-sm hover:shadow transition-all duration-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span class="hidden sm:inline">Print</span>
+          </button>
+        </form>
+
         <button id="themeToggle" aria-label="Toggle dark mode"
           class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
           <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
           <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
+
         <a href="/admin/payslip/list" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           <span class="hidden sm:inline">All Payslips</span>
@@ -73,17 +80,14 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-      <!-- Gross Pay -->
       <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-4">
         <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Gross Pay</p>
         <p class="text-2xl font-bold text-slate-700 dark:text-slate-200 font-mono">₱ <%= fmt(payslip.total_gross) %></p>
       </div>
-      <!-- Total Deductions -->
       <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-4">
         <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Total Deductions</p>
         <p class="text-2xl font-bold text-red-500 dark:text-red-400 font-mono">₱ <%= fmt(payslip.total_deductions) %></p>
       </div>
-      <!-- Net Pay -->
       <div class="bg-navy-50 dark:bg-navy-900/30 rounded-xl border border-navy-200 dark:border-navy-800 px-5 py-4">
         <p class="text-xs font-semibold uppercase tracking-widest text-navy-400 mb-1">Net Pay</p>
         <p class="text-2xl font-bold text-navy-700 dark:text-navy-200 font-mono">₱ <%= fmt(payslip.net_pay) %></p>
@@ -149,7 +153,7 @@
             <span class="font-mono font-semibold text-red-500 dark:text-red-400">₱ <%= fmt(d.amount) %></span>
           </div>
           <% }) %>
-          <% if (Object.values(labelMap).every((_, i) => Number(payslip[Object.keys(labelMap)[i]] || 0) === 0) && otherDeds.length === 0) { %>
+          <% if (Object.keys(labelMap).every(k => Number(payslip[k] || 0) === 0) && otherDeds.length === 0) { %>
           <div class="px-5 py-6 text-center text-slate-400 dark:text-slate-500 text-xs italic">No deductions recorded.</div>
           <% } %>
         </div>

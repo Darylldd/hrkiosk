@@ -36,16 +36,19 @@
 
 <body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-  <!-- ── Nav ────────────────────────────────────────────── -->
+  <!-- ── Nav ── -->
   <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
       <a href="/dashboard" class="flex items-center gap-2.5 group">
         <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
-        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">Employee Portal</span>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">
+          Employee Portal
+        </span>
       </a>
 
       <div class="flex items-center gap-2">
@@ -54,40 +57,53 @@
             class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
                    bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
                    text-white shadow-sm hover:shadow transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
             <span class="hidden sm:inline">Upload TO</span>
           </a>
         <% } %>
+
         <button id="themeToggle" aria-label="Toggle dark mode"
           class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
                  bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
-          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
-          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
         </button>
-        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-               border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
-               text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
-               hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+
+        <a href="/dashboard"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+                 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
           <span class="hidden sm:inline">Dashboard</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ── Body ───────────────────────────────────────────── -->
+  <!-- ── Body ── -->
   <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 py-8 page-in">
 
-    <!-- Page title -->
     <div class="mb-6">
       <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Travel Orders</h1>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">View and manage employee travel documentation</p>
     </div>
 
-    <!-- ── Split layout ────────────────────────────────── -->
+    <!-- ── Split layout ── -->
     <div class="flex flex-col xl:flex-row gap-5">
 
-      <!-- ── LEFT: document preview ─────────────────────── -->
+      <!-- ── LEFT: document preview ── -->
       <div class="xl:w-[480px] shrink-0">
         <div class="sticky top-24">
           <% if (preview) {
@@ -100,7 +116,10 @@
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
                          border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300
                          hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 transition-all duration-200">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
                   Full View
                 </a>
               </div>
@@ -117,7 +136,8 @@
                         flex flex-col items-center justify-center py-20 px-8 text-center gap-3">
               <div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-1">
                 <svg class="w-7 h-7 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               </div>
               <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">No Document Selected</p>
@@ -127,17 +147,18 @@
         </div>
       </div>
 
-      <!-- ── RIGHT: search + table ───────────────────────── -->
+      <!-- ── RIGHT: search + table ── -->
       <div class="flex-1 min-w-0 space-y-4">
 
         <!-- Search bar -->
-        <div class="relative">
-          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
-            </svg>
-          </span>
-          <form method="get" class="flex gap-2">
+        <form method="get" class="flex gap-2">
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+              </svg>
+            </span>
             <input type="text" name="search"
               placeholder="Search TO #, name, department, or destination..."
               value="<%= search || '' %>"
@@ -145,26 +166,26 @@
                      border border-slate-200 dark:border-slate-600
                      bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
                      placeholder-slate-400 dark:placeholder-slate-500
-                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500 focus:border-transparent
-                     shadow-sm transition" />
-            <button type="submit"
-              class="px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0
-                     bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
-                     text-white shadow-sm hover:shadow transition-all duration-200
-                     focus:outline-none focus:ring-2 focus:ring-navy-400 focus:ring-offset-2">
-              Search
-            </button>
-            <% if (search) { %>
-              <a href="/travel-orders"
-                class="px-4 py-2.5 rounded-xl text-sm font-medium shrink-0
-                       border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
-                       text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700
-                       transition-all duration-200">
-                Clear
-              </a>
-            <% } %>
-          </form>
-        </div>
+                     focus:outline-none focus:ring-2 focus:ring-navy-400 dark:focus:ring-navy-500
+                     focus:border-transparent shadow-sm transition" />
+          </div>
+          <button type="submit"
+            class="px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0
+                   bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
+                   text-white shadow-sm hover:shadow transition-all duration-200
+                   focus:outline-none focus:ring-2 focus:ring-navy-400 focus:ring-offset-2">
+            Search
+          </button>
+          <% if (search) { %>
+            <a href="/travel-orders"
+              class="px-4 py-2.5 rounded-xl text-sm font-medium shrink-0
+                     border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                     text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700
+                     transition-all duration-200">
+              Clear
+            </a>
+          <% } %>
+        </form>
 
         <!-- Table card -->
         <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
@@ -193,7 +214,8 @@
                 <% } %>
 
                 <% orders.forEach(order => {
-                    const isActive   = previewId === order.id;
+                    // Compare against to_no string — no DB id on the page at all
+                    const isActive   = previewToNo === order.to_no;
                     const travelDate = order.travel_date ? new Date(order.travel_date).toLocaleDateString() : '—';
                     const returnDate = order.return_date ? new Date(order.return_date).toLocaleDateString() : '—';
                     const createdAt  = new Date(order.created_at).toLocaleDateString();
@@ -231,25 +253,36 @@
                   <td class="px-4 py-3.5 text-right whitespace-nowrap">
                     <div class="inline-flex items-center gap-1.5">
 
-                      <!-- View / Viewing -->
-                      <a href="/travel-orders?search=<%= search %>&preview_id=<%= order.id %>"
+                      <!-- View / Viewing — uses to_no, not DB id -->
+                      <a href="/travel-orders?search=<%= encodeURIComponent(search) %>&preview_to_no=<%= encodeURIComponent(order.to_no) %>"
                         class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
                                <%= isActive
                                  ? 'bg-navy-500 text-white shadow-sm'
                                  : 'border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 bg-white dark:bg-slate-900 hover:bg-navy-50 dark:hover:bg-navy-900/30' %>">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
                         <%= isActive ? 'Viewing' : 'View' %>
                       </a>
 
-                      <!-- Print -->
-                      <a href="/travel-orders/print/<%= order.id %>" target="_blank"
-                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium
-                               border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
-                               text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
-                               dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                        Print
-                      </a>
+                      <!-- Print — POST form, to_no in body, clean URL -->
+                      <form action="/travel-orders/print" method="POST" target="_blank" style="display:inline;">
+                        <input type="hidden" name="to_no" value="<%= order.to_no %>">
+                        <button type="submit"
+                          class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium
+                                 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900
+                                 text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600
+                                 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                          </svg>
+                          Print
+                        </button>
+                      </form>
 
                     </div>
                   </td>
@@ -269,7 +302,8 @@
   <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
     const html = document.documentElement;
     const stored = localStorage.getItem('theme');
-    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches))
+      html.classList.add('dark');
     document.getElementById('themeToggle').addEventListener('click', () => {
       html.classList.toggle('dark');
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');

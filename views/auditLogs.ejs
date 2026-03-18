@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit Logs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50:'#eef2f7',100:'#d5e0ed',200:'#abc1db',300:'#7599be',
+              400:'#4a72a0',500:'#1a5276',600:'#154464',700:'#103552',
+              800:'#0b2640',900:'#06192e',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .page-in { animation: fade-in 0.35s ease forwards; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
+
+  <!-- ── Nav ── -->
+  <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/dashboard" class="flex items-center gap-2.5 group">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-navy-500 dark:bg-navy-600 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <span class="font-display text-lg text-navy-700 dark:text-navy-200 hidden sm:block group-hover:text-navy-500 transition-colors">
+          Employee Portal
+        </span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400
+                 bg-white dark:bg-slate-800 hover:text-navy-500 dark:hover:text-navy-300 transition-all duration-200">
+          <svg class="hidden dark:block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg class="block dark:hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+        <a href="/dashboard"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
+                 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800
+                 text-slate-600 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300
+                 hover:bg-navy-50 dark:hover:bg-navy-900/20 transition-all duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span class="hidden sm:inline">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Body ── -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 page-in">
+
+    <!-- Header -->
+    <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="font-display text-2xl text-navy-700 dark:text-navy-200">Audit Logs</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          System activity · <span class="font-medium text-slate-600 dark:text-slate-300"><%= total %></span> total records
+        </p>
+      </div>
+      <!-- Rows per page -->
+      <form method="GET" action="/audit-logs" class="flex items-center gap-2">
+        <input type="hidden" name="search" value="<%= search %>">
+        <label class="text-xs text-slate-500 dark:text-slate-400">Rows:</label>
+        <select name="limit" onchange="this.form.submit()"
+          class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600
+                 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
+                 text-xs focus:outline-none focus:ring-2 focus:ring-navy-400 transition cursor-pointer">
+          <% [25, 50, 100].forEach(n => { %>
+            <option value="<%= n %>" <%= limit === n ? 'selected' : '' %>><%= n %></option>
+          <% }) %>
+        </select>
+      </form>
+    </div>
+
+    <!-- Search bar -->
+    <form method="GET" action="/audit-logs" class="relative mb-4 flex gap-2">
+      <input type="hidden" name="limit" value="<%= limit %>">
+      <input type="hidden" name="page"  value="1">
+      <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          </svg>
+        </span>
+        <input type="text" name="search" value="<%= search %>"
+               placeholder="Search by name, action, details, or IP…"
+               autocomplete="off"
+               class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl
+                      border border-slate-200 dark:border-slate-600
+                      bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200
+                      placeholder-slate-400 dark:placeholder-slate-500
+                      focus:outline-none focus:ring-2 focus:ring-navy-400 shadow-sm transition" />
+      </div>
+      <button type="submit"
+        class="px-4 py-2.5 rounded-xl text-sm font-medium
+               bg-navy-500 hover:bg-navy-600 text-white shadow-sm transition-all duration-200">
+        Search
+      </button>
+      <% if (search) { %>
+        <a href="/audit-logs?limit=<%= limit %>"
+           class="px-4 py-2.5 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-600
+                  bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300
+                  hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200">
+          Clear
+        </a>
+      <% } %>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider
+                       text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
+              <th class="px-5 py-3 text-left font-semibold">Timestamp</th>
+              <th class="px-5 py-3 text-left font-semibold">Employee</th>
+              <th class="px-5 py-3 text-left font-semibold">Action</th>
+              <th class="px-5 py-3 text-left font-semibold hidden lg:table-cell">Details</th>
+              <th class="px-5 py-3 text-left font-semibold hidden md:table-cell">IP Address</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            <% if (!logs || logs.length === 0) { %>
+              <tr>
+                <td colspan="5" class="px-5 py-14 text-center">
+                  <div class="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500">
+                    <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-sm font-medium">No audit logs found.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } else { %>
+              <% logs.forEach(log => { %>
+              <%
+                // Action badge colour
+                const actionColors = {
+                  LOGIN:            'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800',
+                  LOGOUT:           'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600',
+                  CREATE_EMPLOYEE:  'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+                  UPDATE_PROFILE:   'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800',
+                  DELETE_EMPLOYEE:  'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+                };
+                const badgeClass = actionColors[log.action] || 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800';
+              %>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100">
+                <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-xs whitespace-nowrap">
+                  <%= new Date(log.created_at).toLocaleString('en-PH', {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                  }) %>
+                </td>
+                <td class="px-5 py-3.5 font-medium text-slate-700 dark:text-slate-200">
+                  <%= log.employee_name %>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border <%= badgeClass %>">
+                    <%= log.action.replace(/_/g, ' ') %>
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-xs truncate text-xs"
+                    title="<%= log.details || '' %>">
+                  <%= log.details || '—' %>
+                </td>
+                <td class="px-5 py-3.5 text-slate-400 dark:text-slate-500 hidden md:table-cell text-xs font-mono">
+                  <%= log.ip_address || '—' %>
+                </td>
+              </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty search state -->
+      <% if (search && logs.length === 0) { %>
+        <div class="px-5 py-10 text-center">
+          <p class="text-slate-400 dark:text-slate-500 text-sm">No logs match "<strong><%= search %></strong>".</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+      <p class="text-xs text-slate-400 dark:text-slate-500">
+        Page <%= page %> of <%= totalPages %> · <%= total %> records
+      </p>
+      <div class="flex items-center gap-1.5 flex-wrap">
+
+        <!-- Prev -->
+        <% if (page > 1) { %>
+          <a href="/audit-logs?page=<%= page - 1 %>&limit=<%= limit %>&search=<%= encodeURIComponent(search) %>"
+             class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600
+                    bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300
+                    hover:bg-navy-50 hover:border-navy-400 hover:text-navy-600 transition">
+            ‹ Prev
+          </a>
+        <% } %>
+
+        <!-- Page numbers -->
+        <% for (let p = Math.max(1, page - 2); p <= Math.min(totalPages, page + 2); p++) { %>
+          <a href="/audit-logs?page=<%= p %>&limit=<%= limit %>&search=<%= encodeURIComponent(search) %>"
+             class="px-3 py-1.5 rounded-lg text-xs font-medium border transition
+                    <%= p === page
+                      ? 'bg-navy-500 border-navy-500 text-white'
+                      : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-navy-50 hover:border-navy-400 hover:text-navy-600' %>">
+            <%= p %>
+          </a>
+        <% } %>
+
+        <!-- Next -->
+        <% if (page < totalPages) { %>
+          <a href="/audit-logs?page=<%= page + 1 %>&limit=<%= limit %>&search=<%= encodeURIComponent(search) %>"
+             class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600
+                    bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300
+                    hover:bg-navy-50 hover:border-navy-400 hover:text-navy-600 transition">
+            Next ›
+          </a>
+        <% } %>
+
+      </div>
+    </div>
+    <% } %>
+
+  </main>
+
+  <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
+    const html   = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches))
+      html.classList.add('dark');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

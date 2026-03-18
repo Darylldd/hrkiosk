@@ -35,12 +35,33 @@
     .alert-in  { animation: slide-down 0.3s  ease forwards; }
     input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #f8fafc inset !important; -webkit-text-fill-color:#0b2640 !important; }
     .dark input:-webkit-autofill { -webkit-box-shadow:0 0 0 40px #0f172a inset !important; -webkit-text-fill-color:#e2e8f0 !important; }
+
+    /* ── Contract drop-zone ── */
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #4a72a0;
+      background: #eef2f7;
+    }
+    .dark .drop-zone {
+      border-color: #475569;
+    }
+    .dark .drop-zone:hover, .dark .drop-zone.dragover {
+      border-color: #7599be;
+      background: #1e293b;
+    }
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 
-  <!-- ── Nav ────────────────────────────────────────────── -->
+  <!-- ── Nav ── -->
   <header class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
       <a href="/dashboard" class="flex items-center gap-2.5 group">
@@ -69,7 +90,7 @@
     </div>
   </header>
 
-  <!-- ── Body ───────────────────────────────────────────── -->
+  <!-- ── Body ── -->
   <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 page-in">
 
     <div class="mb-6">
@@ -216,6 +237,79 @@
         </div>
       </div>
 
+      <!-- ── Contract / Document Upload ── -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+        <div class="flex items-start justify-between mb-4 gap-3">
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Contract / Document</h2>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Optional — PDF, JPG, or PNG · max 10 MB</p>
+          </div>
+          <!-- View existing contract link -->
+          <% if (employee.contract_file) { %>
+            <a href="<%= employee.contract_file %>" target="_blank"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                      border border-navy-200 dark:border-navy-700 bg-navy-50 dark:bg-navy-900/30
+                      text-navy-600 dark:text-navy-300 hover:bg-navy-100 dark:hover:bg-navy-900/60
+                      transition-all duration-200 shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              View Content
+            </a>
+          <% } %>
+        </div>
+
+        <!-- Hidden file input OUTSIDE the drop zone so clicks don't loop -->
+        <input id="contract_file" type="file" name="contract_file"
+               accept=".pdf,image/jpeg,image/png,image/gif" class="hidden" />
+
+        <!-- Drop zone — no onclick, handled entirely in JS below -->
+        <div class="drop-zone" id="contractDropZone">
+          <div id="contractDropContent">
+            <% if (employee.contract_file) { %>
+              <div class="flex flex-col items-center gap-2">
+                <svg class="w-9 h-9 text-navy-400 dark:text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  <%= employee.contract_file.split('/').pop() %>
+                </p>
+                <p class="text-xs text-slate-400 dark:text-slate-500">Click or drag &amp; drop to replace</p>
+              </div>
+            <% } else { %>
+              <div class="flex flex-col items-center gap-2">
+                <svg class="w-9 h-9 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  Click or drag &amp; drop your contract here
+                </p>
+                <p class="text-xs text-slate-400 dark:text-slate-500">PDF, JPG, PNG · max 10 MB · optional</p>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Selected-file preview -->
+          <div id="contractPreview" class="hidden flex-col items-center gap-2">
+            <svg class="w-9 h-9 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p id="contractFileName" class="text-sm font-medium text-slate-700 dark:text-slate-200"></p>
+            <p id="contractFileSize" class="text-xs text-slate-400 dark:text-slate-500"></p>
+            <button type="button" id="clearContract"
+              class="mt-1 text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 underline transition">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Submit -->
       <div class="flex justify-end">
         <button type="submit"
@@ -223,7 +317,9 @@
                  bg-navy-500 hover:bg-navy-600 dark:bg-navy-600 dark:hover:bg-navy-500
                  text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200
                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
           Update Profile
         </button>
       </div>
@@ -232,7 +328,7 @@
   </main>
 
   <script nonce="<%= typeof nonce !== 'undefined' ? nonce : '' %>">
-    // Theme
+    // ── Theme ──────────────────────────────────────────────────
     const html = document.documentElement;
     const stored = localStorage.getItem('theme');
     if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
@@ -241,7 +337,7 @@
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    // Live photo preview
+    // ── Live photo preview ──────────────────────────────────────
     document.getElementById('profile_pic').addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
@@ -251,7 +347,6 @@
         if (preview.tagName === 'IMG') {
           preview.src = e.target.result;
         } else {
-          // Replace initials div with an img
           const img = document.createElement('img');
           img.id = 'picPreview';
           img.src = e.target.result;
@@ -262,6 +357,67 @@
       };
       reader.readAsDataURL(file);
     });
+
+    (function () {
+      const input       = document.getElementById('contract_file');
+      const dropZone    = document.getElementById('contractDropZone');
+      const dropContent = document.getElementById('contractDropContent');
+      const preview     = document.getElementById('contractPreview');
+      const nameEl      = document.getElementById('contractFileName');
+      const sizeEl      = document.getElementById('contractFileSize');
+      const clearBtn    = document.getElementById('clearContract');
+
+      function fmtSize(bytes) {
+        if (bytes < 1024)       return bytes + ' B';
+        if (bytes < 1024*1024)  return (bytes/1024).toFixed(1) + ' KB';
+        return (bytes/(1024*1024)).toFixed(1) + ' MB';
+      }
+
+      function showPreview(file) {
+        nameEl.textContent = file.name;
+        sizeEl.textContent = fmtSize(file.size);
+        dropContent.classList.add('hidden');
+        preview.classList.remove('hidden');
+        preview.classList.add('flex');
+      }
+
+      function clearPreview() {
+        input.value = '';
+        preview.classList.add('hidden');
+        preview.classList.remove('flex');
+        dropContent.classList.remove('hidden');
+      }
+
+      // ── Click to open picker — attached in JS so browser treats it as direct ──
+      dropZone.addEventListener('click', function (e) {
+        // Don't reopen picker if user clicked Remove button
+        if (e.target.closest('#clearContract')) return;
+        input.click();
+      });
+
+      input.addEventListener('change', function () {
+        if (this.files[0]) showPreview(this.files[0]);
+      });
+
+      clearBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); // prevent drop zone click from firing
+        clearPreview();
+      });
+
+      // ── Drag & drop ──
+      dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        showPreview(file);
+      });
+    })();
   </script>
 </body>
 </html>

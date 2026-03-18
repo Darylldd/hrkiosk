@@ -1,15 +1,12 @@
 const Employee = require('../models/Employee');
-const argon2 = require('argon2');
+const AuditLog  = require('../models/AuditLog');
+const argon2    = require('argon2');
 
 exports.showLogin = (req, res) => {
-    // Pick up one-time flash messages stored in session
     const error   = req.session.flash_error   || null;
     const success = req.session.flash_success || null;
-
-    // Clear them immediately so they don't persist on refresh
     delete req.session.flash_error;
     delete req.session.flash_success;
-
     res.render('login', { error, success });
 };
 
@@ -40,7 +37,6 @@ exports.login = async (req, res) => {
             if (employee.pin.startsWith('$argon2')) {
                 valid = await argon2.verify(employee.pin, pin);
             } else {
-                // Legacy plain-text PIN: compare then upgrade in background
                 if (employee.pin === pin) {
                     valid = true;
                     Employee.updatePin(employee.id, pin, (updateErr) => {
@@ -63,7 +59,6 @@ exports.login = async (req, res) => {
         let role = 'employee';
         const hrDepartments = ['HR', 'HRMU'];
         const hrPositions   = ['HR Manager', 'HR Officer'];
-
         if (hrDepartments.includes(employee.department) || hrPositions.includes(employee.position)) {
             role = 'hr';
         }
@@ -73,20 +68,28 @@ exports.login = async (req, res) => {
             employee_no: employee.employee_no,
             first_name:  employee.first_name,
             last_name:   employee.last_name,
+            middle_name: employee.middle_name  || '',
             department:  employee.department,
             position:    employee.position,
+            profile_pic: employee.profile_pic  || null,
             role,
         };
+
+        AuditLog.log({
+            employee_id:   employee.id,
+            employee_name: `${employee.first_name} ${employee.last_name}`,
+            action:        'LOGIN',
+            details:       `Logged in`,
+            ip_address:    req.ip,
+        });
 
         res.redirect('/dashboard');
     });
 };
 
 exports.dashboard = (req, res) => {
-    // Pass any one-time flash messages to the dashboard view
     const error   = req.session.flash_error   || null;
     const success = req.session.flash_success || null;
-
     delete req.session.flash_error;
     delete req.session.flash_success;
 
@@ -98,11 +101,18 @@ exports.dashboard = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
+    const emp = req.session?.employee;
+    if (emp) {
+        AuditLog.log({
+            employee_id:   emp.id,
+            employee_name: `${emp.first_name} ${emp.last_name}`,
+            action:        'LOGOUT',
+            details:       'Logged out',
+            ip_address:    req.ip,
+        });
+    }
+    req.session.destroy(() => res.redirect('/login'));
 };
-
 
 exports.setFlash = (req, res, type, message, redirectTo = '/dashboard') => {
     req.session[`flash_${type}`] = message;

@@ -1,11 +1,8 @@
 <%# ── payslip.ejs ────────────────────────────────────────────────────────────
     Rendered as a fragment and injected via fetch() into a modal's innerHTML.
-    No <html>/<head>/<body> tags — just the content.
-    The document layout (header, table, numbers) must stay pixel-perfect.
-    Only the action bar gets the Tailwind treatment.
+    No html/head/body tags — just the content.
 %>
 
-<!-- Scoped styles for the payslip document fragment -->
 <style>
   .ps-doc * { box-sizing: border-box; }
   .ps-doc { font-family: Arial, sans-serif; }
@@ -21,17 +18,21 @@
   .ps-doc .text-right { text-align:right; font-family:'Courier New',Courier,monospace; font-weight:bold; }
 </style>
 
+<!-- Print button — POST form, payslip_ref in body, clean URL -->
 <div style="text-align:right; padding:8px 12px 8px 12px; font-family:Arial,sans-serif;">
-  <a href="/payslip/<%= employee.id %>/print" target="_blank"
-    style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;
-           font-size:11px;font-weight:600;background:#1a5276;color:#fff;
-           text-decoration:none;border:none;cursor:pointer;letter-spacing:0.3px;">
-    <svg style="width:12px;height:12px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-    </svg>
-    Print
-  </a>
+  <form action="/payslip/print" method="POST" target="_blank" style="display:inline;">
+    <input type="hidden" name="payslip_ref" value="<%= employee.payslip_ref %>">
+    <button type="submit"
+      style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;
+             font-size:11px;font-weight:600;background:#1a5276;color:#fff;
+             border:none;cursor:pointer;letter-spacing:0.3px;">
+      <svg style="width:12px;height:12px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+      </svg>
+      Print
+    </button>
+  </form>
 </div>
 
 <div class="ps-doc">

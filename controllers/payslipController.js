@@ -1,16 +1,16 @@
 const Payslip  = require('../models/Payslip');
 const Employee = require('../models/Employee');
+const AuditLog = require('../models/AuditLog');
 const nodemailer = require('nodemailer');
 const puppeteer  = require('puppeteer');
 const path = require('path');
 const fs   = require('fs');
 
-// ── Validate and sanitize numeric payslip fields ───────────────────────────
 function sanitizePayslipNumbers(data) {
     const fields = [
         'basic_pay', 'late_absences', 'pagibig_mp1', 'pagibig_mp2',
         'pagibig_mpl', 'pagibig_calamity', 'sss', 'philhealth',
-        'tax', 'disallowances'
+        'tax', 'disallowances',
     ];
     const clean = {};
     for (const field of fields) {
@@ -20,8 +20,17 @@ function sanitizePayslipNumbers(data) {
     return clean;
 }
 
+// Generate a human-readable, URL-safe payslip reference
+// Format: 2024-03-1H-EMP00123   (month-cutoffShort-employeeNo)
+function makeRef(employee_no, month, cutoff) {
+    const cutoffShort = cutoff === 'FIRST_HALF' ? '1H' : '2H';
+    const safeEmpNo   = (employee_no || 'UNK').replace(/[^A-Za-z0-9_-]/g, '_');
+    return `${month}-${cutoffShort}-${safeEmpNo}`;
+}
+
 const HR_DEPTS = ['HR', 'HRMU', 'Finance and Administrative Section (FAS)'];
 
+// ── Create form ────────────────────────────────────────────────────────────
 exports.showCreateForm = (req, res) => {
     Employee.getAll((err, employees) => {
         if (err) {
@@ -32,6 +41,7 @@ exports.showCreateForm = (req, res) => {
     });
 };
 
+// ── Create POST ────────────────────────────────────────────────────────────
 exports.createPayslip = (req, res) => {
     const employee_id = parseInt(req.body.employee_id, 10);
     if (isNaN(employee_id) || employee_id <= 0) {
@@ -45,28 +55,57 @@ exports.createPayslip = (req, res) => {
         return res.redirect('/payslip/create');
     }
 
-    const nums = sanitizePayslipNumbers(req.body);
-
-    const totalDeductions =
-        nums.late_absences + nums.pagibig_mp1 + nums.pagibig_mp2 +
-        nums.pagibig_mpl  + nums.pagibig_calamity + nums.sss +
-        nums.philhealth   + nums.tax + nums.disallowances;
-
-    const netPay = nums.basic_pay - totalDeductions;
-
-    const payslipData = { employee_id, month, cutoff, ...nums, totalDeductions, netPay };
-
-    Payslip.create(payslipData, (err) => {
-        if (err) {
-            console.error('createPayslip error:', err);
-            req.session.flash_error = 'Failed to create payslip. Please try again.';
+    // Fetch employee_no so we can build a meaningful ref
+    Employee.getById(employee_id, (err, empResult) => {
+        if (err || !empResult || empResult.length === 0) {
+            req.session.flash_error = 'Employee not found.';
             return res.redirect('/payslip/create');
         }
-        req.session.flash_success = 'Payslip created successfully.';
-        res.redirect('/payslip/list');
+
+        const emp        = empResult[0];
+        const payslip_ref = makeRef(emp.employee_no, month, cutoff);
+        const nums        = sanitizePayslipNumbers(req.body);
+
+        const totalDeductions =
+            nums.late_absences + nums.pagibig_mp1 + nums.pagibig_mp2 +
+            nums.pagibig_mpl  + nums.pagibig_calamity + nums.sss +
+            nums.philhealth   + nums.tax + nums.disallowances;
+
+        const netPay = nums.basic_pay - totalDeductions;
+
+        const payslipData = {
+            payslip_ref,
+            employee_id,
+            month,
+            cutoff,
+            ...nums,
+            totalDeductions,
+            netPay,
+        };
+
+        Payslip.create(payslipData, (err) => {
+            if (err) {
+                console.error('createPayslip error:', err);
+                req.session.flash_error = 'Failed to create payslip. Please try again.';
+                return res.redirect('/payslip/create');
+            }
+
+            const actor = req.session.employee;
+            AuditLog.log({
+                employee_id:   actor.id,
+                employee_name: `${actor.first_name} ${actor.last_name}`,
+                action:        'CREATE_PAYSLIP',
+                details:       `${payslip_ref} · ${emp.first_name} ${emp.last_name} · Net: ${netPay.toFixed(2)}`,
+                ip_address:    req.ip,
+            });
+
+            req.session.flash_success = 'Payslip created successfully.';
+            res.redirect('/payslip/list');
+        });
     });
 };
 
+// ── List ───────────────────────────────────────────────────────────────────
 exports.listPayslips = (req, res) => {
     const flash_success = req.session.flash_success || null;
     const flash_error   = req.session.flash_error   || null;
@@ -78,22 +117,18 @@ exports.listPayslips = (req, res) => {
             req.session.flash_error = 'Error fetching payslips. Please try again.';
             return res.redirect('/dashboard');
         }
-        res.render('payslipList', {
-            payslips,
-            flash_success,
-            flash_error,
-            nonce: res.locals.nonce
-        });
+        res.render('payslipList', { payslips, flash_success, flash_error, nonce: res.locals.nonce });
     });
 };
 
+// ── View (fragment for modal) — by payslip_ref ─────────────────────────────
 exports.viewPayslip = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id) || id <= 0) return res.status(400).send('Invalid ID.');
-
+    const ref             = (req.params.payslip_ref || '').trim();
     const sessionEmployee = req.session.employee;
 
-    Payslip.findById(id, (err, result) => {
+    if (!ref) return res.status(400).send('Invalid payslip reference.');
+
+    Payslip.findByRef(ref, (err, result) => {
         if (err || !result || result.length === 0)
             return res.status(404).send('Payslip not found.');
 
@@ -105,30 +140,28 @@ exports.viewPayslip = (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const employee = {
-            ...row,
-            name:       row.employee_name || '',
-            account_no: row.account_no    || ''
-        };
+        const employee = { ...row, name: row.employee_name || '', account_no: row.account_no || '' };
 
         res.render('payslip', {
             employee,
             month:           row.month,
             cutoff:          row.cutoff,
+            payslip_ref:     row.payslip_ref,
             totalDeductions: row.totalDeductions,
             netPay:          row.netPay,
-            nonce:           res.locals.nonce
+            nonce:           res.locals.nonce,
         });
     });
 };
 
+// ── Print via POST — payslip_ref in request body, nothing in the URL ──────
 exports.printPayslip = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id) || id <= 0) return res.status(400).send('Invalid ID.');
-
+    const ref             = (req.body.payslip_ref || '').trim();
     const sessionEmployee = req.session.employee;
 
-    Payslip.findById(id, (err, result) => {
+    if (!ref) return res.status(400).send('Invalid payslip reference.');
+
+    Payslip.findByRef(ref, (err, result) => {
         if (err || !result || result.length === 0)
             return res.status(404).send('Payslip not found.');
 
@@ -140,47 +173,45 @@ exports.printPayslip = (req, res) => {
             return res.status(403).send('Access denied.');
         }
 
-        const payslip = {
-            ...row,
-            employee_name: row.employee_name || '',
-            account_no:    row.account_no    || ''
-        };
+        const payslip = { ...row, employee_name: row.employee_name || '', account_no: row.account_no || '' };
+
+        AuditLog.log({
+            employee_id:   sessionEmployee.id,
+            employee_name: `${sessionEmployee.first_name} ${sessionEmployee.last_name}`,
+            action:        'PRINT_PAYSLIP',
+            details:       `${ref}`,
+            ip_address:    req.ip,
+        });
 
         res.render('payslipPrint', {
             payslip,
             images: {
                 headerGraphic: '/images/uhi.png',
                 lho:           '/images/bp.png',
-                bfar:          '/images/dabfar.png'
+                bfar:          '/images/dabfar.png',
             },
-            nonce: res.locals.nonce
+            nonce: res.locals.nonce,
         });
     });
 };
 
+// ── My payslips ────────────────────────────────────────────────────────────
 exports.myPayslips = (req, res) => {
     const flash_success = req.session.flash_success || null;
     const flash_error   = req.session.flash_error   || null;
     delete req.session.flash_success;
     delete req.session.flash_error;
 
-    const userId = req.session.employee.id;
-
-    Payslip.getByEmployeeId(userId, (err, payslips) => {
+    Payslip.getByEmployeeId(req.session.employee.id, (err, payslips) => {
         if (err) {
             req.session.flash_error = 'Error fetching your payslips.';
             return res.redirect('/dashboard');
         }
-        res.render('myPayslips', {
-            payslips,
-            flash_success,
-            flash_error,
-            nonce: res.locals.nonce
-        });
+        res.render('myPayslips', { payslips, flash_success, flash_error, nonce: res.locals.nonce });
     });
 };
 
-// ── sendEmail — called via fetch(), must stay as res.send() text ───────────
+// ── Send email — still uses numeric id internally (HR-only route) ──────────
 exports.sendEmail = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id) || id <= 0) return res.status(400).send('Invalid ID.');
@@ -200,7 +231,7 @@ exports.sendEmail = async (req, res) => {
             const images = {
                 headerGraphic: toBase64('/images/uhi.png'),
                 lho:           toBase64('/images/bp.png'),
-                bfar:          toBase64('/images/dabfar.png')
+                bfar:          toBase64('/images/dabfar.png'),
             };
 
             const html = await new Promise((resolve, reject) => {
@@ -217,13 +248,13 @@ exports.sendEmail = async (req, res) => {
             await page.setContent(html, { waitUntil: 'networkidle0' });
             await page.pdf({
                 path: pdfPath, format: 'A4', printBackground: true,
-                margin: { top:'40px', bottom:'40px', left:'20px', right:'20px' }
+                margin: { top: '40px', bottom: '40px', left: '20px', right: '20px' },
             });
             await browser.close();
 
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
-                auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+                auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
             });
 
             await transporter.sendMail({
@@ -240,10 +271,20 @@ exports.sendEmail = async (req, res) => {
                         <p style="font-size:12px;color:#555;">Automated email — please do not reply.</p>
                     </div>
                 `,
-                attachments: [{ filename: `Payslip_${payslip.month}.pdf`, path: pdfPath }]
+                attachments: [{ filename: `Payslip_${payslip.month}.pdf`, path: pdfPath }],
             });
 
             fs.unlinkSync(pdfPath);
+
+            const actor = req.session.employee;
+            AuditLog.log({
+                employee_id:   actor.id,
+                employee_name: `${actor.first_name} ${actor.last_name}`,
+                action:        'EMAIL_PAYSLIP',
+                details:       `${payslip.payslip_ref || id} → ${payslip.email}`,
+                ip_address:    req.ip,
+            });
+
             res.send('Payslip sent successfully.');
 
         } catch (error) {

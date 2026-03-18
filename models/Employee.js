@@ -45,8 +45,9 @@ const Employee = {
                 email,
                 contact_no,
                 emergency_contact_name,
-                emergency_contact_phone
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                emergency_contact_phone,
+                contract_file
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         db.query(sql, [
@@ -75,33 +76,33 @@ const Employee = {
             data.email,
             data.contact_no,
             data.emergency_contact_name,
-            data.emergency_contact_phone
+            data.emergency_contact_phone,
+            data.contract_file,
         ], callback);
     },
 
     updateProfile: (id, data, callback) => {
-        const sql = `
-            UPDATE employees SET
-                first_name = ?,
-                middle_name = ?,
-                last_name = ?,
-                employee_id = ?,
-                department = ?,
-                position = ?,
-                email = ?,
-                contact_no = ?,
-                account_no = ?,
-                tin = ?,
-                philhealth_no = ?,
-                gsis_no = ?,
-                sss_no = ?,
-                emergency_contact_name = ?,
-                emergency_contact_phone = ?,
-                profile_pic = ?
-            WHERE id = ?
-        `;
+        // Build the SET clause dynamically so that a null contract_file
+        // (i.e. no new file was uploaded) does NOT overwrite the existing one.
+        const fields = [
+            'first_name = ?',
+            'middle_name = ?',
+            'last_name = ?',
+            'employee_id = ?',
+            'department = ?',
+            'position = ?',
+            'email = ?',
+            'contact_no = ?',
+            'account_no = ?',
+            'tin = ?',
+            'philhealth_no = ?',
+            'gsis_no = ?',
+            'sss_no = ?',
+            'emergency_contact_name = ?',
+            'emergency_contact_phone = ?',
+        ];
 
-        db.query(sql, [
+        const values = [
             data.first_name,
             data.middle_name,
             data.last_name,
@@ -117,18 +118,33 @@ const Employee = {
             data.sss_no,
             data.emergency_contact_name,
             data.emergency_contact_phone,
-            data.profile_pic,
-            id
-        ], callback);
+        ];
+
+        // Only update profile_pic if a new file was supplied
+        if (data.profile_pic !== null) {
+            fields.push('profile_pic = ?');
+            values.push(data.profile_pic);
+        }
+
+        // Only update contract_file if a new file was supplied
+        if (data.contract_file !== null) {
+            fields.push('contract_file = ?');
+            values.push(data.contract_file);
+        }
+
+        values.push(id); // for WHERE id = ?
+
+        const sql = `UPDATE employees SET ${fields.join(', ')} WHERE id = ?`;
+        db.query(sql, values, callback);
     },
-       updatePin: (id, pin, callback) => {
+
+    updatePin: (id, pin, callback) => {
         const argon2 = require('argon2');
         argon2.hash(pin).then((hashed) => {
             const sql = `UPDATE employees SET pin = ? WHERE id = ?`;
             db.query(sql, [hashed, id], callback);
         }).catch(callback);
-    }
-
+    },
 };
 
 module.exports = Employee;

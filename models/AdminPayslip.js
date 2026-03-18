@@ -5,6 +5,7 @@ const AdminPayslip = {
     create: (data, callback) => {
         const sql = `
             INSERT INTO admin_payslips (
+                admin_payslip_ref,
                 employee_id, month, year, division, section,
                 monthly_salary, pera,
                 gsis_per_share, medicare, pagibig, withholding_tax,
@@ -17,6 +18,7 @@ const AdminPayslip = {
                 total_gross, total_deductions, net_pay,
                 first_period, second_period
             ) VALUES (
+                ?,
                 ?,?,?,?,?,
                 ?,?,
                 ?,?,?,?,
@@ -32,6 +34,7 @@ const AdminPayslip = {
         `;
 
         const params = [
+            data.admin_payslip_ref,
             data.employee_id, data.month, data.year, data.division, data.section,
             data.monthly_salary, data.pera,
             data.gsis_per_share, data.medicare, data.pagibig, data.withholding_tax,
@@ -42,7 +45,7 @@ const AdminPayslip = {
             data.bfar_coop_additional, data.palda_regular,
             JSON.stringify(data.other_deductions || []),
             data.total_gross, data.total_deductions, data.net_pay,
-            data.first_period, data.second_period
+            data.first_period, data.second_period,
         ];
 
         db.query(sql, params, callback);
@@ -52,7 +55,8 @@ const AdminPayslip = {
         const sql = `
             SELECT
                 ap.id,
-                CONCAT(e.first_name,' ',IFNULL(e.middle_name,''),' ',e.last_name) AS employee_name,
+                ap.admin_payslip_ref,
+                CONCAT(e.first_name, ' ', IFNULL(e.middle_name, ''), ' ', e.last_name) AS employee_name,
                 ap.month, ap.year, ap.net_pay, ap.created_at
             FROM admin_payslips ap
             LEFT JOIN employees e ON e.id = ap.employee_id
@@ -61,11 +65,27 @@ const AdminPayslip = {
         db.query(sql, callback);
     },
 
+    // ── Look up by ref — used for view & print (no numeric DB id in URL) ──
+    findByRef: (ref, callback) => {
+        const sql = `
+            SELECT
+                ap.*,
+                CONCAT(e.first_name, ' ', IFNULL(e.middle_name, ''), ' ', e.last_name) AS employee_name,
+                e.position, e.account_no, e.email
+            FROM admin_payslips ap
+            LEFT JOIN employees e ON e.id = ap.employee_id
+            WHERE ap.admin_payslip_ref = ?
+            LIMIT 1
+        `;
+        db.query(sql, [ref], callback);
+    },
+
+    // Keep for internal use (email / delete still use numeric id)
     findById: (id, callback) => {
         const sql = `
             SELECT
                 ap.*,
-                CONCAT(e.first_name,' ',IFNULL(e.middle_name,''),' ',e.last_name) AS employee_name,
+                CONCAT(e.first_name, ' ', IFNULL(e.middle_name, ''), ' ', e.last_name) AS employee_name,
                 e.position, e.account_no, e.email
             FROM admin_payslips ap
             LEFT JOIN employees e ON e.id = ap.employee_id
@@ -76,7 +96,7 @@ const AdminPayslip = {
 
     getByEmployeeId: (employeeId, callback) => {
         const sql = `
-            SELECT id, month, year, net_pay
+            SELECT id, admin_payslip_ref, month, year, net_pay
             FROM admin_payslips
             WHERE employee_id = ?
             ORDER BY year DESC, month DESC
@@ -86,8 +106,7 @@ const AdminPayslip = {
 
     deleteById: (id, callback) => {
         db.query('DELETE FROM admin_payslips WHERE id = ?', [id], callback);
-    }
-
+    },
 };
 
 module.exports = AdminPayslip;

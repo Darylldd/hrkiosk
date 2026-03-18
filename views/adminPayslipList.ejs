@@ -62,7 +62,6 @@
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Government payslips with GSIS, PERA, and period deductions</p>
     </div>
 
-    <!-- Flash alerts -->
     <% if (locals.flash_success) { %>
       <div role="alert" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-900/25 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
         <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -94,7 +93,8 @@
     </div>
 
     <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
-      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= payslips ? payslips.length : 0 %></span> record<%= (!payslips || payslips.length !== 1) ? 's' : '' %>
+      <span id="rowCount" class="font-semibold text-slate-700 dark:text-slate-200"><%= payslips ? payslips.length : 0 %></span>
+      record<%= (!payslips || payslips.length !== 1) ? 's' : '' %>
     </p>
 
     <!-- Table -->
@@ -103,7 +103,6 @@
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
-              <th class="px-5 py-3 text-left font-semibold hidden sm:table-cell">#</th>
               <th class="px-5 py-3 text-left font-semibold">Employee</th>
               <th class="px-5 py-3 text-left font-semibold">Month</th>
               <th class="px-5 py-3 text-left font-semibold hidden sm:table-cell">Year</th>
@@ -113,12 +112,12 @@
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
             <% if (!payslips || payslips.length === 0) { %>
-              <tr><td colspan="6" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">No payslips found.</td></tr>
+              <tr><td colspan="5" class="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">No payslips found.</td></tr>
             <% } %>
-            <% if (payslips) { payslips.forEach((p, i) => { %>
+            <% if (payslips) { payslips.forEach(p => { %>
             <tr class="ps-row hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors duration-100"
                 data-search="<%= (p.employee_name + ' ' + p.month + ' ' + p.year).toLowerCase() %>">
-              <td class="px-5 py-3.5 text-slate-400 dark:text-slate-500 text-xs hidden sm:table-cell"><%= i + 1 %></td>
+
               <td class="px-5 py-3.5 font-medium text-slate-700 dark:text-slate-200"><%= p.employee_name %></td>
               <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300"><%= p.month %></td>
               <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400 hidden sm:table-cell"><%= p.year %></td>
@@ -129,26 +128,42 @@
               </td>
               <td class="px-5 py-3.5 text-right">
                 <div class="inline-flex items-center gap-1.5">
-                  <a href="/admin/payslip/<%= p.id %>/view"
-                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    View
-                  </a>
-                  <a href="/admin/payslip/<%= p.id %>/print" target="_blank"
-                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    Print
-                  </a>
+
+                  <!-- View — POST form, ref in body, clean URL -->
+                  <form action="/admin/payslip/view" method="POST" style="display:inline;">
+                    <input type="hidden" name="ref" value="<%= p.admin_payslip_ref %>">
+                    <button type="submit"
+                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-navy-400 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-900/30 transition-all duration-200">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                      View
+                    </button>
+                  </form>
+
+                  <!-- Print — POST form, ref in body, clean URL -->
+                  <form action="/admin/payslip/print" method="POST" target="_blank" style="display:inline;">
+                    <input type="hidden" name="ref" value="<%= p.admin_payslip_ref %>">
+                    <button type="submit"
+                      class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                      Print
+                    </button>
+                  </form>
+
+                  <!-- Email — data-id keeps numeric id (HR-only fetch() action) -->
                   <button class="email-btn inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
                     data-id="<%= p.id %>">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     Email
                   </button>
+
+                  <!-- Delete — data-id numeric id for POST action -->
                   <button class="delete-btn inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
-                    data-id="<%= p.id %>" data-name="<%= p.employee_name %> — <%= p.month %> <%= p.year %>">
+                    data-id="<%= p.id %>"
+                    data-name="<%= p.employee_name %> — <%= p.month %> <%= p.year %>">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Delete
                   </button>
+
                 </div>
               </td>
             </tr>
@@ -224,10 +239,10 @@
     psSearch.addEventListener('input', runSearch);
     clearBtn.addEventListener('click', () => { psSearch.value=''; psSearch.focus(); runSearch(); });
 
-    // Delete modal
-    const deleteModal  = document.getElementById('deleteModal');
-    const deleteForm   = document.getElementById('deleteForm');
-    const deleteLabel  = document.getElementById('deleteLabel');
+    // Delete modal — uses data-id (numeric, HR-only POST)
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteForm  = document.getElementById('deleteForm');
+    const deleteLabel = document.getElementById('deleteLabel');
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         deleteLabel.textContent = btn.dataset.name;
@@ -238,7 +253,7 @@
     document.getElementById('deleteCancelBtn').addEventListener('click', () => { deleteModal.classList.add('hidden'); deleteModal.classList.remove('flex'); });
     deleteModal.addEventListener('click', e => { if(e.target===deleteModal){ deleteModal.classList.add('hidden'); deleteModal.classList.remove('flex'); } });
 
-    // Email modal
+    // Email modal — uses data-id (numeric, HR-only fetch())
     const emailModal   = document.getElementById('emailModal');
     const emailConfirm = document.getElementById('emailConfirmBtn');
     const emailCancel  = document.getElementById('emailCancelBtn');
